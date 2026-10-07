@@ -1,0 +1,61 @@
+:root {
+  --motion-ease: cubic-bezier(.22, 1, .36, 1);
+  --motion-fast: 160ms;
+  --motion-normal: 240ms;
+}
+
+/* Feedback stays on controls; the page and brand artwork remain still. */
+.button, .icon-button, .back-link {
+  transition: background-color var(--motion-fast), filter var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast) var(--motion-ease);
+}
+.button:not(:disabled):active, .icon-button:not(:disabled):active, .back-link:active {
+  transform: scale(.98);
+}
+.field input, .field textarea, .field select, .search-box {
+  transition: border-color var(--motion-fast), box-shadow var(--motion-fast), background-color var(--motion-fast);
+}
+.choice-chip { transition: background-color var(--motion-fast); }
+.choice-chip span { transition: border-color var(--motion-fast); }
+.choice-chip input { accent-color: #7042c3; }
+
+.motion-segmented { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.motion-segmented a { position: relative; background: white; transition: color var(--motion-fast), border-color var(--motion-fast); }
+.motion-segmented a > span { position: relative; z-index: 2; }
+.motion-segmented a.active { background: white; }
+.motion-segmented a:hover { filter: none; }
+.segment-indicator {
+  position: absolute; z-index: 1; left: 0; top: 0; bottom: 0;
+  width: calc((100% - 10px) / 2); border: 1px solid #9dbdec; border-radius: 30px;
+  background: #deebff; pointer-events: none;
+  transform: translateX(calc(var(--active-index) * (100% + 10px)));
+  transition: transform var(--motion-normal) var(--motion-ease);
+}
+.study-tabs .segment-indicator { background: #e1d7fc; border: 2px solid #9774d2; box-shadow: 0 0 12px #a77bf333; }
+.motion-segmented.study-tabs a.active { border: 1px solid #b9bcc5; box-shadow: none; }
+.tab-content { animation: content-enter var(--motion-normal) var(--motion-ease); }
+
+.dialog[open] { animation: dialog-enter var(--motion-normal) var(--motion-ease) both; }
+.dialog[open]::backdrop { animation: backdrop-enter var(--motion-normal) ease both; }
+.dialog[open][data-phase="closing"] { animation: dialog-exit var(--motion-fast) ease-in both; }
+.dialog[open][data-phase="closing"]::backdrop { animation: backdrop-exit var(--motion-fast) ease-in both; }
+.menu-content nav a { transition: background-color var(--motion-fast); }
+.menu-content nav a .icon { transition: transform var(--motion-fast) var(--motion-ease); }
+@media (hover: hover) and (pointer: fine) {
+  .menu-content nav a:hover .icon { transform: translateX(3px); }
+}
+.stars button { transition: background-color var(--motion-fast), color var(--motion-fast); }
+.stars .star-confirming .icon { animation: star-confirm 280ms var(--motion-ease); }
+.toast { transition: transform var(--motion-normal) var(--motion-ease), opacity var(--motion-fast); }
+
+@keyframes content-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes dialog-enter { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes dialog-exit { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(8px) scale(.98); } }
+@keyframes backdrop-enter { from { opacity: 0; } to { opacity: 1; } }
+@keyframes backdrop-exit { from { opacity: 1; } to { opacity: 0; } }
+@keyframes star-confirm { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.2); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .button:not(:disabled):active, .icon-button:not(:disabled):active, .back-link:active,
+  .menu-content nav a:hover .icon { transform: none; }
+}

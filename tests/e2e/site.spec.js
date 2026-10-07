@@ -282,3 +282,64 @@ test('Guest phone header and navigation have usable touch targets at reduced vie
     }
   }
 });
+
+test('Motion preserves touch targets, modal focus and reduced-motion behavior', async ({ page }) => {
+  for (const reducedMotion of ['no-preference', 'reduce']) {
+    await page.emulateMedia({ reducedMotion });
+    for (const width of [320, 390, 1440]) {
+      await page.setViewportSize({ width, height: 844 });
+      await demo(page, 'alina', '/questions/q1');
+      const menuButton = page.getByRole('button', { name: 'Открыть меню' });
+      await menuButton.click();
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible();
+      await expect(dialog).toHaveAttribute('data-phase', 'open');
+      await page.keyboard.press('Tab');
+      expect(await page.evaluate(() => Boolean(document.activeElement.closest('dialog')))).toBe(true);
+      if (reducedMotion === 'reduce') expect(await dialog.evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+      await page.keyboard.press('Escape');
+      await expect(dialog).not.toBeVisible();
+      await expect(menuButton).toBeFocused();
+      // Reopen immediately after an exit: no stale timer may close the new dialog.
+      await menuButton.click();
+      await expect(dialog).toBeVisible();
+      await dialog.getByRole('button', { name: 'Закрыть', exact: true }).click();
+      await menuButton.click();
+      await expect(dialog).toHaveAttribute('data-phase', 'open');
+      await page.waitForTimeout(200);
+      await expect(dialog).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(dialog).not.toBeVisible();
+
+      await menuButton.click();
+      await dialog.getByRole('link', { name: 'Знакомства', exact: true }).click();
+      await expect(dialog).not.toBeVisible();
+      await expect(page.getByRole('heading', { level: 1, name: 'Знакомства' })).toBeFocused();
+      await page.goto('/#/questions/q1');
+
+      const stars = page.getByRole('radiogroup', { name: 'Оценка ответа Мария Соколова' });
+      await stars.getByRole('radio', { name: '5 из 5 звёзд' }).click();
+      await stars.getByRole('radio', { name: '2 из 5 звёзд' }).click();
+      await expect(stars.getByRole('radio', { name: '2 из 5 звёзд' })).toHaveAttribute('aria-checked', 'true');
+      expect((await saved(page)).answers.find(a => a.id === 'a1').rating).toBe(2);
+      const target = await stars.getByRole('radio', { name: '2 из 5 звёзд' }).boundingBox();
+      expect(target.width).toBeGreaterThanOrEqual(44);
+      expect(target.height).toBeGreaterThanOrEqual(44);
+      if (reducedMotion === 'reduce') expect(await stars.locator('.star-confirming .icon').evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+
+      await page.goto('/#/study');
+      const indicator = page.locator('.study-tabs .segment-indicator');
+      const firstPosition = await indicator.boundingBox();
+      await page.getByRole('link', { name: 'Нужна помощь', exact: true }).click();
+      await expect(page.getByRole('heading', { name: 'С чем нужно помочь?' })).toBeVisible();
+      await expect.poll(async () => (await indicator.boundingBox()).x).toBeGreaterThan(firstPosition.x + firstPosition.width);
+      await page.getByRole('link', { name: 'Могу помочь', exact: true }).click();
+      await expect(page.getByLabel('Поиск по предмету')).toBeVisible();
+      if (reducedMotion === 'reduce') {
+        expect(await indicator.evaluate(el => getComputedStyle(el).transitionDuration)).toBe('0s');
+        expect(await page.locator('.tab-content').evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    }
+  }
+});

@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { useApp, go } from './context';
 import { commonItems, fullName, initials, rankings } from './domain';
 
@@ -15,10 +15,28 @@ export function Field({ label, error, id, children, className = '' }) {
   return <div className={`field ${className}`}><label htmlFor={controlId}>{label}</label>{React.cloneElement(children, { id: controlId, 'aria-invalid': error ? 'true' : undefined, 'aria-describedby': error ? `${controlId}-error` : children.props['aria-describedby'] })}{error && <p id={`${controlId}-error`} className="field-error">{error}</p>}</div>;
 }
 export function FormErrors({ errors }) { const { t } = useApp(); const list = Object.values(errors).filter(Boolean); return list.length ? <div className="form-errors" role="alert"><strong>{t('Проверь поля формы', 'Please check the form')}</strong><ul>{list.map((e, i) => <li key={i}>{e}</li>)}</ul></div> : null; }
-export function Dialog({ open, onClose, title, children, className = '' }) {
-  const dialog = useRef(null); const titleId = useId(); const { t } = useApp();
-  useEffect(() => { if (open && !dialog.current.open) dialog.current.showModal(); if (!open && dialog.current.open) dialog.current.close(); }, [open]);
-  return <dialog ref={dialog} className={`dialog ${className}`} aria-labelledby={titleId} onCancel={onClose} onClose={onClose} onClick={e => { if (e.target === e.currentTarget && (e.clientX < e.currentTarget.getBoundingClientRect().left || e.clientX > e.currentTarget.getBoundingClientRect().right || e.clientY < e.currentTarget.getBoundingClientRect().top || e.clientY > e.currentTarget.getBoundingClientRect().bottom)) onClose(); }}><div className="dialog-heading"><h2 id={titleId}>{title}</h2><button type="button" className="icon-button close-button" onClick={onClose} aria-label={t('Закрыть', 'Close')}>×</button></div>{children}</dialog>;
+export function Dialog({ open, onClose, onAfterClose, title, children, className = '' }) {
+  const dialog = useRef(null); const closeTimer = useRef(null); const titleId = useId(); const { t } = useApp(); const [phase,setPhase] = useState('closed');
+  useEffect(() => {
+    clearTimeout(closeTimer.current);
+    if (open) {
+      setPhase('open');
+      if (!dialog.current.open) dialog.current.showModal();
+    } else if (dialog.current.open) {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        dialog.current.close(); setPhase('closed');
+      } else {
+        setPhase('closing');
+        // Keep native focus containment until the short exit finishes.
+        closeTimer.current = setTimeout(() => { dialog.current?.close(); setPhase('closed'); }, 160);
+      }
+    }
+    return () => clearTimeout(closeTimer.current);
+  }, [open]);
+  return <dialog ref={dialog} data-phase={phase} className={`dialog ${className}`} aria-labelledby={titleId} onCancel={e => { e.preventDefault(); onClose(); }} onClose={() => { onClose(); onAfterClose?.(); }} onClick={e => { if (e.target === e.currentTarget && (e.clientX < e.currentTarget.getBoundingClientRect().left || e.clientX > e.currentTarget.getBoundingClientRect().right || e.clientY < e.currentTarget.getBoundingClientRect().top || e.clientY > e.currentTarget.getBoundingClientRect().bottom)) onClose(); }}><div className="dialog-heading"><h2 id={titleId}>{title}</h2><button type="button" className="icon-button close-button" onClick={onClose} aria-label={t('Закрыть', 'Close')}>×</button></div>{children}</dialog>;
+}
+export function SegmentedNav({ items, activeIndex, label, className = '' }) {
+  return <nav className={`segmented motion-segmented ${className}`} aria-label={label} style={{ '--active-index': activeIndex }}><span className="segment-indicator" aria-hidden="true" />{items.map(([to,text],index) => <Link to={to} key={to} className={index === activeIndex ? 'active' : ''} aria-current={index === activeIndex ? 'page' : undefined}><span>{text}</span></Link>)}</nav>;
 }
 export function Header({ path, onMenu }) {
   const { me, t, locale, setState } = useApp();
@@ -41,16 +59,17 @@ export function StudentCard({ user }) {
   return <article className="student-card panel"><Link to={`/people/${user.id}`} className="person-heading"><Avatar user={user} /><h2>{fullName(user)}</h2></Link>{me && <span className="shared-badge">{t('Общие языки:','Shared languages:')} {shared}</span>}<p className="student-details">{user.direction}<br />{user.course} {t('курс','year')}</p><Tags values={user.languages} /><Tags values={user.interests} kind="interest" /><p className="student-about">{user.about}</p><Link to={`/people/${user.id}`} className="button button-blue">{t('Познакомиться','Say hello')}</Link></article>;
 }
 export function Stars({ value, onChange, disabled, label, hint }) {
-  const { t } = useApp(); const id = useId(); const refs = useRef([]);
+  const { t } = useApp(); const id = useId(); const refs = useRef([]); const [pulse,setPulse] = useState(0);
+  function choose(next) { setPulse(next); onChange(next); }
   function keyDown(e, star) {
     let next;
     if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = Math.min(5, star + 1);
     if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = Math.max(1, star - 1);
     if (e.key === 'Home') next = 1;
     if (e.key === 'End') next = 5;
-    if (next) { e.preventDefault(); refs.current[next - 1]?.focus(); onChange(next); }
+    if (next) { e.preventDefault(); refs.current[next - 1]?.focus(); choose(next); }
   }
-  return <div className="stars-control"><div className="stars" role="radiogroup" aria-label={label} aria-describedby={`${id}-hint`}>{[1,2,3,4,5].map(n => <button ref={el => refs.current[n - 1] = el} key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} ${t('из 5 звёзд','out of 5 stars')}`} disabled={disabled} tabIndex={disabled ? -1 : (value === n || (!value && n === 1)) ? 0 : -1} className={n <= value ? 'star-selected' : ''} onClick={() => onChange(n)} onKeyDown={e => keyDown(e,n)}><Icon name="star" /></button>)}</div><p id={`${id}-hint`} className={value ? 'rating-hint selected' : 'rating-hint'}>{hint || (value ? t(`Твоя оценка: ${value} из 5 ★`, `Your rating: ${value} out of 5 ★`) : t('Оцени ответ от 1 до 5 звёзд','Rate this answer from 1 to 5 stars'))}</p></div>;
+  return <div className="stars-control"><div className="stars" role="radiogroup" aria-label={label} aria-describedby={`${id}-hint`}>{[1,2,3,4,5].map(n => <button ref={el => refs.current[n - 1] = el} key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} ${t('из 5 звёзд','out of 5 stars')}`} disabled={disabled} tabIndex={disabled ? -1 : (value === n || (!value && n === 1)) ? 0 : -1} className={`${n <= value ? 'star-selected' : ''} ${pulse === n && value === n ? 'star-confirming' : ''}`} onClick={() => choose(n)} onKeyDown={e => keyDown(e,n)} onAnimationEnd={() => setPulse(0)}><Icon name="star" /></button>)}</div><p id={`${id}-hint`} className={value ? 'rating-hint selected' : 'rating-hint'}>{hint || (value ? t(`Твоя оценка: ${value} из 5 ★`, `Your rating: ${value} out of 5 ★`) : t('Оцени ответ от 1 до 5 звёзд','Rate this answer from 1 to 5 stars'))}</p></div>;
 }
 export function RatingPanel({ full = false }) {
   const { state, t } = useApp(); const rows = rankings(state).slice(0,full ? 20 : 5);

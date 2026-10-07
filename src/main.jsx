@@ -8,6 +8,7 @@ import '@fontsource/inter/800.css';
 import '@fontsource/manrope/400.css';
 import '@fontsource/manrope/700.css';
 import './styles.css';
+import './motion.css';
 import App from './App';
 import { AppProvider } from './context';
 
