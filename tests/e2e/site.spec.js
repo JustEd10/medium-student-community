@@ -126,9 +126,11 @@ test('Search, filters, empty state, person profile and real local chat messages'
   await page.getByLabel('Поиск по имени или интересам').fill('НикогоНеНайти');
   await expect(page.getByRole('heading', { name: 'Пока никого не нашли' })).toBeVisible();
   await page.getByRole('button', { name: 'Сбросить поиск' }).click();
-  await page.getByText('Фильтры', { exact: true }).click();
+  await expect(page.locator('details.filters')).not.toHaveAttribute('open', '');
+  await expect(page.getByLabel('Язык', { exact: true })).toBeVisible();
   await page.getByLabel('Язык', { exact: true }).selectOption('中文');
   await expect(page.locator('.student-card')).toHaveCount(2);
+  await expect(page.locator('.student-card').first()).toContainText('Вэй Линь');
   await page.locator('.student-card').filter({ hasText: 'Вэй Линь' }).getByRole('link', { name: 'Познакомиться' }).click();
   await page.getByRole('button', { name: 'Написать', exact: true }).click();
   await page.getByLabel('Написать сообщение', { exact: true }).fill('<script>не исполнять</script> Привет, Вэй!');
@@ -174,6 +176,18 @@ test('All screens fit desktop, tablet and narrow phones without runtime errors',
       for (const img of await page.locator('img').all()) expect(await img.evaluate(el => el.complete && el.naturalWidth > 0)).toBe(true);
     }
   }
+  await page.getByRole('button', { name: 'Switch interface to English' }).click();
+  for (const width of [1440, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: width > 600 ? 900 : 844 });
+    for (const route of ['/', '/profile', '/people', '/questions', '/study', '/register']) {
+      await page.goto(`/#${route}`);
+      await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+      await page.evaluate(() => document.fonts.ready);
+      const dimensions = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, viewport: window.innerWidth }));
+      expect(dimensions.scroll, `English ${route} at ${width}px`).toBeLessThanOrEqual(dimensions.viewport + 1);
+    }
+  }
+  await page.getByRole('button', { name: 'Переключить интерфейс на русский' }).click();
   expect(errors).toEqual([]);
   if (testInfo.project.name === 'chromium') {
     await mkdir('docs/screenshots', { recursive: true });
