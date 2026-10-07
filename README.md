@@ -4,6 +4,10 @@
 
 ![Главная на ПК](docs/screenshots/desktop-home.jpg)
 
+## Опубликованный сайт
+
+[Открыть Медиум](https://medium-bob01.amvera.io/) — сайт развёрнут в Amvera через Safari, работает по HTTPS.
+
 ## Запуск
 
 Нужен Node.js 20 или новее. Команды выполняются в папке проекта:
@@ -87,4 +91,4 @@ npm run test:e2e
 - [Соответствие экранов Figma и сайта](docs/SCREEN-MAP.md)
 - [Скриншоты ПК и телефона](docs/screenshots/README.md)
 
-Репозиторий: [JustEd10/medium-student-community](https://github.com/JustEd10/medium-student-community). Репозиторий приватный; для просмотра нужен доступ к аккаунту. Исходники, тесты, отчёт и скриншоты находятся в ветке `main`.
+Репозиторий: [JustEd10/medium-student-community](https://github.com/JustEd10/medium-student-community). Репозиторий публичный и доступен без входа в аккаунт. Исходники, тесты, отчёт и скриншоты находятся в ветке `main`.
