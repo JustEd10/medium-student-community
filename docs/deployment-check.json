@@ -9,15 +9,15 @@
     "desired": 1
   },
   "ciSuccess": true,
-  "checkedAt": "2026-10-07T20:48:54.215981+00:00",
-  "sourceCommit": "139fd03ae8d65a0514b6e2c8338ce72d0b864926",
-  "testedCommit": "139fd03ae8d65a0514b6e2c8338ce72d0b864926",
-  "amveraCommit": "deee93eb9df51e40c7f241224364edbc96ee4fab",
-  "amveraSourceUploadCommit": "650dbac8a611b06a2b7034866ca0452db056bf5c",
+  "checkedAt": "2026-10-07T21:30:52.651159+00:00",
+  "sourceCommit": "bbc2929a60e2005348d2ac2ad7ae8c699fde406c",
+  "testedCommit": "bbc2929a60e2005348d2ac2ad7ae8c699fde406c",
+  "amveraCommit": "ddea5a3fd02f6ec4a26748d5c7c4e3b423a0f898",
+  "amveraSourceUploadCommit": "ddea5a3fd02f6ec4a26748d5c7c4e3b423a0f898",
   "html": {
     "path": "index.html",
     "status": 200,
-    "sha256": "44039e21c7748ce55d6c1a684ed0875853df598aea20a5c618a7ded12e25b33a"
+    "sha256": "6689ac82862664307ec543722166270598739a4f8ff96dc4e496fd086ccfcca6"
   },
   "assets": [
     {
@@ -66,14 +66,14 @@
       "sha256": "9adaec192131c3ad7913ca781474a099394d5fa358d8090ad1c408ec59298789"
     },
     {
-      "path": "assets/index--DsZJmgA.js",
+      "path": "assets/index-BpIcbPyj.css",
       "status": 200,
-      "sha256": "2018f1447e8e87e29c81ebde324ce0ee120ea015a57c90616bce4ca5469bbf71"
+      "sha256": "c9c2933b91761ca562ea696832b990854e7664c080966fe9056106405473073e"
     },
     {
-      "path": "assets/index-B1ppO1bg.css",
+      "path": "assets/index-Dlat_DF-.js",
       "status": 200,
-      "sha256": "95753f01a6a8558ffc542b6e0f244a785057840e69a29a5169e587107707a923"
+      "sha256": "70b784a3897373933a1c9ef17d4314f097f0f937fc9e3758c592aa14c6d22aa2"
     },
     {
       "path": "assets/menu.svg",
@@ -101,38 +101,82 @@
       "sha256": "0a63183dde8c1d715b5d47f656b7506edf6cf5bc3acf753e0d530602c9bc3662"
     }
   ],
-  "archiveSha256": "48617833ea2931a527ead71446d08f6458db9cb8fbc6bac21105570965da62bc",
+  "archiveSha256": "805abad259b31c42af4acbdbe94445e6119c2128db0248705b4b0f41f3122e9c",
   "archiveRuntimeFileCount": 34,
-  "ciRunId": 37683050939,
-  "uiCheckedAt": "2026-10-07T20:54:00.336045+00:00",
+  "ciRunId": 37687775820,
+  "uiCheckedAt": "2026-10-07T21:33:41.008049+00:00",
   "liveInterfaceChecks": {
-    "desktopViewport": [
+    "filters": [
+      {
+        "arrowPosition": "calc(100% - 18px) 50%",
+        "background": "rgb(250, 247, 255)",
+        "borderRadius": "30px",
+        "height": 50,
+        "paddingRight": "48px"
+      },
+      {
+        "arrowPosition": "calc(100% - 18px) 50%",
+        "background": "rgb(250, 247, 255)",
+        "borderRadius": "30px",
+        "height": 50,
+        "paddingRight": "48px"
+      },
+      {
+        "arrowPosition": "calc(100% - 18px) 50%",
+        "background": "rgb(250, 247, 255)",
+        "borderRadius": "30px",
+        "height": 50,
+        "paddingRight": "48px"
+      }
+    ],
+    "headerWave": "linear-gradient(90deg, rgba(0, 0, 0, 0) 240px, rgb(243, 233, 255) 480px), url(\"https://medium-bob01.amvera.io/assets/bg-fa1Te5l-.png\")",
+    "navCenterOffset": 0,
+    "overflow": false,
+    "top5": "Топ-5",
+    "viewport": [
       1440,
       900
     ],
-    "phoneViewport": [
-      390,
-      844
-    ],
-    "horizontalOverflow": false,
-    "navigationTargetsHeight": 44,
-    "checkboxSize": 16,
-    "checkboxAppearance": "none",
-    "backgroundPosition": "left top",
-    "sendIcon": "assets/send.svg",
-    "sendTarget": [
-      44,
-      44
-    ],
-    "sendVerticalCenterOffset": 0,
-    "chatHeightDesktop": 660,
-    "chatHeightPhone": 609,
-    "dialogListOverflowY": "auto",
-    "messagesOverflowY": "auto",
+    "publish": {
+      "background": "rgb(40, 121, 91)",
+      "color": "rgb(255, 255, 255)",
+      "height": 47.59375
+    },
+    "homeTextUpdated": true,
+    "phone": {
+      "filters": [
+        {
+          "arrowPosition": "calc(100% - 18px) 50%",
+          "background": "rgb(250, 247, 255)",
+          "borderRadius": "30px",
+          "height": 50,
+          "paddingRight": "48px"
+        },
+        {
+          "arrowPosition": "calc(100% - 18px) 50%",
+          "background": "rgb(250, 247, 255)",
+          "borderRadius": "30px",
+          "height": 50,
+          "paddingRight": "48px"
+        },
+        {
+          "arrowPosition": "calc(100% - 18px) 50%",
+          "background": "rgb(250, 247, 255)",
+          "borderRadius": "30px",
+          "height": 50,
+          "paddingRight": "48px"
+        }
+      ],
+      "overflow": false,
+      "viewport": [
+        390,
+        844
+      ]
+    },
     "screenshots": [
-      "outputs/Медиум — обновлённый профиль.png",
-      "outputs/Медиум — обновлённый чат.png",
-      "outputs/Медиум — чат на телефоне.png"
+      "outputs/Медиум — обновлённые фильтры и шапка.png",
+      "outputs/Медиум — кнопка опубликовать.png",
+      "outputs/Медиум — фильтры на телефоне.png"
     ]
   }
 }

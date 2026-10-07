@@ -1,10 +1,10 @@
 {
   "repository": "JustEd10/medium-student-community",
-  "runId": 37683050939,
-  "jobId": 113003737450,
-  "headSha": "139fd03ae8d65a0514b6e2c8338ce72d0b864926",
-  "runtimeSourceCommit": "139fd03ae8d65a0514b6e2c8338ce72d0b864926",
-  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37683050939",
+  "runId": 37687775820,
+  "jobId": 113019922438,
+  "headSha": "bbc2929a60e2005348d2ac2ad7ae8c699fde406c",
+  "runtimeSourceCommit": "bbc2929a60e2005348d2ac2ad7ae8c699fde406c",
+  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37687775820",
   "conclusion": "success",
   "unitTests": 7,
   "endToEndTests": 33,
@@ -46,8 +46,8 @@
     "Last ranking link stays above bottom navigation",
     "Guest homepage axe checks in Russian and English"
   ],
-  "artifactId": 11509992179,
-  "artifactSha256": "b16a23052e35dc67fee449022a5aded59452f5c9624c80c245f9f9276517322c",
+  "artifactId": 11511608887,
+  "artifactSha256": "253b28a5a9052a00a453597e74afad7463781cd6ee8ed209750a7d904213cbba",
   "playwrightStats": {
     "total": 33,
     "expected": 33,
