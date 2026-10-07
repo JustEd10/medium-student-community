@@ -1,16 +1,18 @@
 {
   "repository": "JustEd10/medium-student-community",
-  "runId": 37578609787,
-  "jobId": 112652980829,
-  "headSha": "0bd2ec9ef631c7d024fc64f03247db6f03efaed4",
-  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37578609787",
+  "runId": 37602043989,
+  "jobId": 112728496962,
+  "headSha": "08fe1775b2d8975f1491b812c95abf32a99ad285",
+  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37602043989",
   "conclusion": "success",
   "unitTests": 7,
-  "endToEndTests": 14,
+  "endToEndTests": 16,
   "browsers": [
     "Chromium 153",
     "Firefox 155"
   ],
   "responsiveChecks": 112,
-  "axeScans": 44
+  "axeScans": 44,
+  "testTarget": "Vite production build via preview",
+  "productionIconAssets": "HTTP 200 and SVG content in Chromium and Firefox"
 }

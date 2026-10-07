@@ -1,0 +1,79 @@
+{
+  "url": "https://medium-bob01.amvera.io/",
+  "checkedAt": "2026-10-07T09:50:20.011900+00:00",
+  "sourceCommit": "08fe1775b2d8975f1491b812c95abf32a99ad285",
+  "amveraCommit": "eccbc394d41038e7d1aa0e1f2e885fe089bca487",
+  "htmlMatchesProductionBuild": true,
+  "assets": [
+    {
+      "path": "assets/index-DxJupvzx.js",
+      "status": 200,
+      "sha256": "478a88c955b0f61b77cb456e9149a09ee7cfe9583cac2197126a843d7344f067"
+    },
+    {
+      "path": "assets/index-BSBzkh_j.css",
+      "status": 200,
+      "sha256": "2d12b474a628ac3b853c26c2369a503e630b8ddc5f0672f13bc09de3e1809c53"
+    },
+    {
+      "path": "assets/arrow.svg",
+      "status": 200,
+      "sha256": "e8e3bd3aa3f028fc3c5bdcebce201ca64dcd77ca9cf0ead85c2c67bab01fa26e"
+    },
+    {
+      "path": "assets/book.svg",
+      "status": 200,
+      "sha256": "1f6b335945d614111cd6014a1ee73c8343c9623aa677920150ddf2659b3d39d2"
+    },
+    {
+      "path": "assets/chat.svg",
+      "status": 200,
+      "sha256": "3082912f4594ab35a24576e4f4da6aaea3ebe8d60b47d0c6444e87934ddc6c52"
+    },
+    {
+      "path": "assets/comment.svg",
+      "status": 200,
+      "sha256": "2b0d4bade251676487962c2600aa6ecbb0cd208144e30cf50f7be31738fd374e"
+    },
+    {
+      "path": "assets/filter.svg",
+      "status": 200,
+      "sha256": "c0baa4207216b1ef98201eefff59d1cb53728330851b9dd48ca122843220e849"
+    },
+    {
+      "path": "assets/home.svg",
+      "status": 200,
+      "sha256": "9adaec192131c3ad7913ca781474a099394d5fa358d8090ad1c408ec59298789"
+    },
+    {
+      "path": "assets/menu.svg",
+      "status": 200,
+      "sha256": "01e20d5522a79bc52935f87662313845a565ae707af42fff8f6aaeba3d06552d"
+    },
+    {
+      "path": "assets/people.svg",
+      "status": 200,
+      "sha256": "ad95648e99e3c0211db8c4d262aed88de3eb7255c6bfaea581ffe71be17d57ed"
+    },
+    {
+      "path": "assets/search.svg",
+      "status": 200,
+      "sha256": "7227d610ab5b730203dcab581a18ddd82224a147b3dce2264f10c71ed5adac8f"
+    },
+    {
+      "path": "assets/star.svg",
+      "status": 200,
+      "sha256": "0a63183dde8c1d715b5d47f656b7506edf6cf5bc3acf753e0d530602c9bc3662"
+    }
+  ],
+  "amveraStatus": "Запущено",
+  "replicas": {
+    "running": 1,
+    "desired": 1
+  },
+  "safariVisualChecks": [
+    "Ответы с пятью звёздами",
+    "Рейтинг",
+    "Иконки меню и фильтров"
+  ]
+}
