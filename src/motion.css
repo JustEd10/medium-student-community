@@ -14,7 +14,7 @@
 .field input, .field textarea, .field select, .search-box, .message-field .field-control {
   transition: border-color var(--motion-fast), box-shadow var(--motion-fast), background-color var(--motion-fast);
 }
-.desktop-nav a, .bottom-nav a { transition: color var(--motion-fast), background-color var(--motion-fast), box-shadow var(--motion-fast); }
+.desktop-nav a, .bottom-nav a { transition: box-shadow var(--motion-fast); }
 .choice-chip { transition: background-color var(--motion-fast); }
 .choice-chip span { transition: border-color var(--motion-fast); }
 .choice-chip input { accent-color: #7042c3; }

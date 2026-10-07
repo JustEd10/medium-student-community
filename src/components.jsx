@@ -38,7 +38,12 @@ export function Dialog({ open, onClose, onAfterClose, navigationKey = '', title,
     }
     return () => clearTimeout(closeTimer.current);
   }, [open,navigationKey]);
-  return <dialog ref={dialog} data-phase={phase} className={`dialog ${className}`} aria-labelledby={titleId} onCancel={e => { e.preventDefault(); onClose(); }} onClose={() => { onClose(); onAfterClose?.(); }} onClick={e => { if (e.target === e.currentTarget && (e.clientX < e.currentTarget.getBoundingClientRect().left || e.clientX > e.currentTarget.getBoundingClientRect().right || e.clientY < e.currentTarget.getBoundingClientRect().top || e.clientY > e.currentTarget.getBoundingClientRect().bottom)) onClose(); }}><div className="dialog-heading"><h2 id={titleId}>{title}</h2><button type="button" className="icon-button close-button" onClick={onClose} aria-label={t('Закрыть', 'Close')}>×</button></div>{children}</dialog>;
+  function nativeClose() {
+    // A queued native close event can arrive after showModal() reopened the menu.
+    if (dialog.current.open) return;
+    onClose(); onAfterClose?.();
+  }
+  return <dialog ref={dialog} data-phase={phase} className={`dialog ${className}`} aria-labelledby={titleId} onCancel={e => { e.preventDefault(); onClose(); }} onClose={nativeClose} onClick={e => { if (e.target === e.currentTarget && (e.clientX < e.currentTarget.getBoundingClientRect().left || e.clientX > e.currentTarget.getBoundingClientRect().right || e.clientY < e.currentTarget.getBoundingClientRect().top || e.clientY > e.currentTarget.getBoundingClientRect().bottom)) onClose(); }}><div className="dialog-heading"><h2 id={titleId}>{title}</h2><button type="button" className="icon-button close-button" onClick={onClose} aria-label={t('Закрыть', 'Close')}>×</button></div>{children}</dialog>;
 }
 export function SegmentedNav({ items, activeIndex, label, className = '' }) {
   return <nav className={`segmented motion-segmented ${className}`} aria-label={label} style={{ '--active-index': activeIndex }}><span className="segment-indicator" aria-hidden="true" />{items.map(([to,text],index) => <Link to={to} key={to} className={index === activeIndex ? 'active' : ''} aria-current={index === activeIndex ? 'page' : undefined}><span>{text}</span></Link>)}</nav>;
