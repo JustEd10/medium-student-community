@@ -1,12 +1,16 @@
 import React, { useId, useLayoutEffect, useRef, useState } from 'react';
 import { useApp, go } from './context';
 import { commonItems, fullName, initials, rankings } from './domain';
+import { avatarColors } from './avatar';
 
 // CSS masks resolve relative URLs against the stylesheet, which lives in /assets/ after a build.
 export const asset = name => new URL(`${import.meta.env.BASE_URL}assets/${name}`, document.baseURI).href;
 export function Icon({ name, className = '' }) { return <span aria-hidden="true" className={`icon ${className}`} style={{ '--icon-url': `url("${asset(`${name}.svg`)}")` }} />; }
 export function Link({ to, children, className = '', ...props }) { return <a href={`#${to}`} className={className} {...props}>{children}</a>; }
-export function Avatar({ user, large = false }) { return <span aria-hidden="true" className={`avatar color-${user?.color ?? 0} ${large ? 'avatar-large' : ''}`}>{initials(user)}</span>; }
+export function Avatar({ user, large = false }) {
+  const { background, foreground } = avatarColors(user?.color);
+  return <span aria-hidden="true" className={`avatar ${large ? 'avatar-large' : ''}`} style={{ '--avatar-background': background, '--avatar-foreground': foreground, '--avatar-glow': `${background}55` }}>{initials(user)}</span>;
+}
 export function Tags({ values, kind = 'language' }) { const { t } = useApp(); return <ul className={`tags tags-${kind}`} aria-label={kind === 'language' ? t('Языки','Languages') : t('Интересы','Interests')}>{values.map(value => <li key={value}>{value}</li>)}</ul>; }
 export function PageTitle({ title, description }) { return <div className="page-title"><h1 tabIndex={-1}>{title}</h1>{description && <p>{description}</p>}</div>; }
 export function Empty({ title, description, children }) { return <div className="empty-state panel"><h2>{title}</h2>{description && <p>{description}</p>}{children}</div>; }
