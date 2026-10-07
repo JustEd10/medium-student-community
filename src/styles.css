@@ -318,9 +318,9 @@ input[type=checkbox] { accent-color: #6542a4; width: 20px; height: 20px; flex: 0
 .message-form { position: relative; margin-top: 16px; }
 .message-form .field { margin-bottom: 0; }
 .message-form .field label { position: absolute; height: 1px; width: 1px; overflow: hidden; clip-path: inset(50%); }
-.message-field .field-control { display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid #b7a0e9; border-radius: 20px; background: #f7f7fa; }
+.message-field .field-control { display: flex; align-items: flex-end; gap: 8px; padding: 6px; border: 1px solid #b7a0e9; border-radius: 20px; background: #f7f7fa; }
 .message-field .field-control:focus-within { outline: 3px solid #5140c9; outline-offset: 4px; }
-.message-form .field textarea { background: transparent; border: 0; border-radius: 12px; min-height: 60px; max-height: 180px; padding: 8px 10px; }
+.message-form .field textarea { background: transparent; border: 0; border-radius: 12px; height: 44px; min-height: 44px; padding: 8px 10px; line-height: 24px; resize: none; overflow-y: hidden; overscroll-behavior: contain; }
 .message-form .field textarea:focus-visible { outline: none; }
 .message-field .field-control:has([aria-invalid=true]) { border-color: #a92540; }
 .send-button { color: #696969; border-radius: 12px; }
