@@ -90,7 +90,7 @@ test('Question → answer → five-star rating, replacement, ranking and self-ra
   await page.goto('/#/questions?tab=rating');
   const row = page.locator('.rating-list li').filter({ hasText: 'Вэй Линь' });
   await expect(row.locator('.rating-score')).toContainText('2');
-  await expect(row).toContainText('1 оценок · средняя 2.0');
+  await expect(row).toContainText('Оценок: 1 · средняя 2.0');
   await demo(page, 'wei', `/questions/${id}`);
   await expect(group.getByRole('radio', { name: '5 из 5 звёзд' })).toBeDisabled();
 });
