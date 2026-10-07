@@ -19,6 +19,17 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - name: Use Ubuntu archive for browser dependencies
+        run: |
+          sudo python3 - <<'PYTHON'
+          from pathlib import Path
+          for source in Path('/etc/apt').rglob('*'):
+              if source.is_file() and (source.name == 'sources.list' or source.suffix in ['.sources', '.list']):
+                  text = source.read_text()
+                  updated = text.replace('http://azure.archive.ubuntu.com/ubuntu', 'https://archive.ubuntu.com/ubuntu')
+                  if updated != text:
+                      source.write_text(updated)
+          PYTHON
       - run: npx playwright install --with-deps chromium firefox
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v7
