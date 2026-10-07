@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Медиум — экран для проверки</title><style>html,body{margin:0;padding:0}iframe{display:block;border:0}</style></head><body>
+<iframe title="Сайт Медиум" id="screen"></iframe>
+<script type="module">
+const params=new URLSearchParams(location.search), frame=document.querySelector('#screen');
+frame.width=Number(params.get('width'))||390;frame.height=Number(params.get('height'))||844;
+frame.src='/?capture='+Date.now()+'#'+(params.get('route')||'/');
+</script></body></html>

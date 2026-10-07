@@ -1,0 +1,1035 @@
+[
+  {
+    "requestedPath": "/",
+    "frameWidth": 390,
+    "url": "#/",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "#home-title"
+          ],
+          [
+            ".gradient-text"
+          ],
+          [
+            ".hero-slogan"
+          ],
+          [
+            ".hero-description"
+          ],
+          [
+            "#destinations-title"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/profile",
+    "frameWidth": 390,
+    "url": "#/profile",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/people",
+    "frameWidth": 390,
+    "url": "#/people",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "summary"
+          ],
+          [
+            ".results-heading > h2"
+          ],
+          [
+            "p[role=\"status\"]"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/people/wei",
+    "frameWidth": 390,
+    "url": "#/people/wei",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            ".back-link"
+          ],
+          [
+            "h1"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/questions",
+    "frameWidth": 390,
+    "url": "#/questions",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            ".button-gradient"
+          ],
+          [
+            ".filters > summary"
+          ],
+          [
+            ".result-count"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/questions/q1",
+    "frameWidth": 390,
+    "url": "#/questions/q1",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            ".back-link"
+          ],
+          [
+            ".answers-heading"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/questions?tab=rating",
+    "frameWidth": 390,
+    "url": "#/questions?tab=rating",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": [
+          [
+            "span[aria-label=\"7 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(6) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(7) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(8) > .rating-score[aria-label=\"0 звёзд\"]"
+          ]
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "span[aria-label=\"7 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(6) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(7) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(8) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/study",
+    "frameWidth": 390,
+    "url": "#/study",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/study?tab=need",
+    "frameWidth": 390,
+    "url": "#/study?tab=need",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            ".my-requests > h2"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/chats",
+    "frameWidth": 390,
+    "url": "#/chats",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/chats/c1",
+    "frameWidth": 390,
+    "url": "#/chats/c1",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": [
+          [
+            ".message-scroll"
+          ]
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/menu",
+    "frameWidth": 390,
+    "url": "#/menu",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            "p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/login",
+    "frameWidth": 390,
+    "url": "#/login",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/register",
+    "frameWidth": 390,
+    "url": "#/register",
+    "width": 375,
+    "scrollWidth": 375,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/",
+    "frameWidth": 1440,
+    "url": "#/",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "#home-title"
+          ],
+          [
+            ".gradient-text"
+          ],
+          [
+            ".hero-slogan"
+          ],
+          [
+            ".hero-description"
+          ],
+          [
+            "#destinations-title"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/profile",
+    "frameWidth": 1440,
+    "url": "#/profile",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/people",
+    "frameWidth": 1440,
+    "url": "#/people",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "summary"
+          ],
+          [
+            ".results-heading > h2"
+          ],
+          [
+            "p[role=\"status\"]"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/people/wei",
+    "frameWidth": 1440,
+    "url": "#/people/wei",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            ".back-link"
+          ],
+          [
+            "h1"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/questions",
+    "frameWidth": 1440,
+    "url": "#/questions",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": [
+          [
+            "span[aria-label=\"7 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"]"
+          ]
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            ".button-gradient"
+          ],
+          [
+            ".filters > summary"
+          ],
+          [
+            ".result-count"
+          ],
+          [
+            "span[aria-label=\"7 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/questions/q1",
+    "frameWidth": 1440,
+    "url": "#/questions/q1",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": [
+          [
+            "span[aria-label=\"7 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"]"
+          ]
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            ".back-link"
+          ],
+          [
+            ".answers-heading"
+          ],
+          [
+            "span[aria-label=\"7 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/questions?tab=rating",
+    "frameWidth": 1440,
+    "url": "#/questions?tab=rating",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": [
+          [
+            "span[aria-label=\"7 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(6) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(7) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(8) > .rating-score[aria-label=\"0 звёзд\"]"
+          ]
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "span[aria-label=\"7 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(6) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(7) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(8) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/study",
+    "frameWidth": 1440,
+    "url": "#/study",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": [
+          [
+            "span[aria-label=\"7 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"]"
+          ]
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "span[aria-label=\"7 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"5 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "span[aria-label=\"4 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(4) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "li:nth-child(5) > .rating-score[aria-label=\"0 звёзд\"] > span[aria-hidden=\"true\"]"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/study?tab=need",
+    "frameWidth": 1440,
+    "url": "#/study?tab=need",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            ".my-requests > h2"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/chats",
+    "frameWidth": 1440,
+    "url": "#/chats",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": [
+          [
+            ".message-scroll"
+          ]
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/chats/c1",
+    "frameWidth": 1440,
+    "url": "#/chats/c1",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": [
+          [
+            ".message-scroll"
+          ]
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            ".page-title > p"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/menu",
+    "frameWidth": 1440,
+    "url": "#/menu",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            "p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/login",
+    "frameWidth": 1440,
+    "url": "#/login",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "requestedPath": "/register",
+    "frameWidth": 1440,
+    "url": "#/register",
+    "width": 1425,
+    "scrollWidth": 1425,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          [
+            "h1"
+          ],
+          [
+            "footer > p"
+          ],
+          [
+            "a[href$=\"#/menu\"]"
+          ]
+        ]
+      }
+    ]
+  }
+]

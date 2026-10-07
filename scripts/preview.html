@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Проверка Медиума</title>
+<style>body{margin:0;padding:16px;font:14px system-ui;background:#f3f4f7;color:#202033}label{display:inline-flex;gap:8px;align-items:center;margin-right:16px}select,input,button{font:inherit;padding:8px;border:1px solid #9c9fae;border-radius:8px}button{cursor:pointer;background:white}iframe{display:block;border:0;margin-top:16px;background:white}output{display:block;white-space:pre-wrap;padding:12px;max-width:1150px}details{margin-top:12px}p{margin:8px 0}</style></head><body>
+<h1>Проверка адаптации и доступности</h1>
+<label>Размер экрана <select id="size"><option value="1440,900">ПК 1440 × 900</option><option value="768,900">Планшет 768 × 900</option><option value="390,844">Телефон 390 × 844</option><option value="320,844">Телефон 320 × 844</option></select></label>
+<label>Адрес страницы <input id="route" value="/" style="width:250px"></label><button id="open">Открыть экран</button> <button id="scan">Проверить доступность</button>
+<p>Только инструмент разработки. Размер iframe задаёт реальные CSS media queries страницы. Отчёт axe проверяет WCAG A/AA автоматически и не заменяет проверку клавиатурой.</p>
+<details><summary>Результат проверки</summary><output id="report">Проверка ещё не запускалась.</output></details>
+<iframe id="preview" title="Сайт Медиум" width="1440" height="900" src="/#/"></iframe>
+<script type="module">
+const frame=document.querySelector('#preview'), report=document.querySelector('#report');
+document.querySelector('#open').addEventListener('click',()=>{const [width,height]=document.querySelector('#size').value.split(',');frame.width=width;frame.height=height;frame.src='/?preview='+Date.now()+'#'+document.querySelector('#route').value;});
+document.querySelector('#scan').addEventListener('click',async()=>{
+ report.parentElement.open=true;report.textContent='Проверяем…';
+ try {
+  if(!frame.contentWindow.axe){await new Promise((ok,no)=>{const script=frame.contentDocument.createElement('script');script.src='/node_modules/axe-core/axe.min.js';script.onload=ok;script.onerror=no;frame.contentDocument.head.appendChild(script);});}
+  const result=await frame.contentWindow.axe.run(frame.contentDocument,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});
+  report.textContent=JSON.stringify({url:frame.contentWindow.location.hash,width:frame.contentDocument.documentElement.clientWidth,scrollWidth:frame.contentDocument.documentElement.scrollWidth,violations:result.violations.map(v=>({id:v.id,impact:v.impact,description:v.description,nodes:v.nodes.map(n=>({target:n.target,html:n.html,summary:n.failureSummary}))})),incomplete:result.incomplete.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))},null,2);
+ } catch(e){report.textContent='Ошибка: '+e.message;}
+});
+</script></body></html>

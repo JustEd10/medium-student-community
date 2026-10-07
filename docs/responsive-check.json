@@ -1,0 +1,450 @@
+[
+  {
+    "frameWidth": 1440,
+    "route": "/",
+    "h1": "Привет!Это Медиум",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/profile",
+    "h1": "Твой профиль",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/people",
+    "h1": "Знакомства",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/people/wei",
+    "h1": "Профиль Вэй Линь",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/questions",
+    "h1": "Вопрос-ответ",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/questions/q1",
+    "h1": "Когда можно получить студенческий билет?",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/questions?tab=rating",
+    "h1": "Вопрос-ответ",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/study",
+    "h1": "Помощь с учёбой",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/study?tab=need",
+    "h1": "Помощь с учёбой",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/chats",
+    "h1": "Общение",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/chats/c1",
+    "h1": "Общение",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/menu",
+    "h1": "Меню",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/login",
+    "h1": "Вход",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 1440,
+    "route": "/register",
+    "h1": "Регистрация",
+    "images": true,
+    "scroll": 1425,
+    "width": 1425
+  },
+  {
+    "frameWidth": 768,
+    "route": "/",
+    "h1": "Привет!Это Медиум",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/profile",
+    "h1": "Твой профиль",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/people",
+    "h1": "Знакомства",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/people/wei",
+    "h1": "Профиль Вэй Линь",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/questions",
+    "h1": "Вопрос-ответ",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/questions/q1",
+    "h1": "Когда можно получить студенческий билет?",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/questions?tab=rating",
+    "h1": "Вопрос-ответ",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/study",
+    "h1": "Помощь с учёбой",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/study?tab=need",
+    "h1": "Помощь с учёбой",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/chats",
+    "h1": "Общение",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/chats/c1",
+    "h1": "Общение",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/menu",
+    "h1": "Меню",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/login",
+    "h1": "Вход",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 768,
+    "route": "/register",
+    "h1": "Регистрация",
+    "images": true,
+    "scroll": 753,
+    "width": 753
+  },
+  {
+    "frameWidth": 390,
+    "route": "/",
+    "h1": "Привет!Это Медиум",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/profile",
+    "h1": "Твой профиль",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/people",
+    "h1": "Знакомства",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/people/wei",
+    "h1": "Профиль Вэй Линь",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/questions",
+    "h1": "Вопрос-ответ",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/questions/q1",
+    "h1": "Когда можно получить студенческий билет?",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/questions?tab=rating",
+    "h1": "Вопрос-ответ",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/study",
+    "h1": "Помощь с учёбой",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/study?tab=need",
+    "h1": "Помощь с учёбой",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/chats",
+    "h1": "Общение",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/chats/c1",
+    "h1": "Общение",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/menu",
+    "h1": "Меню",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/login",
+    "h1": "Вход",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 390,
+    "route": "/register",
+    "h1": "Регистрация",
+    "images": true,
+    "scroll": 375,
+    "width": 375
+  },
+  {
+    "frameWidth": 320,
+    "route": "/",
+    "h1": "Привет!Это Медиум",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/profile",
+    "h1": "Твой профиль",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/people",
+    "h1": "Знакомства",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/people/wei",
+    "h1": "Профиль Вэй Линь",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/questions",
+    "h1": "Вопрос-ответ",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/questions/q1",
+    "h1": "Когда можно получить студенческий билет?",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/questions?tab=rating",
+    "h1": "Вопрос-ответ",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/study",
+    "h1": "Помощь с учёбой",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/study?tab=need",
+    "h1": "Помощь с учёбой",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/chats",
+    "h1": "Общение",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/chats/c1",
+    "h1": "Общение",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/menu",
+    "h1": "Меню",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/login",
+    "h1": "Вход",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  },
+  {
+    "frameWidth": 320,
+    "route": "/register",
+    "h1": "Регистрация",
+    "images": true,
+    "scroll": 305,
+    "width": 305
+  }
+]
