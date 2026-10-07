@@ -19,7 +19,10 @@ export function Auth({ register, next }) {
   const [values, setValues] = useState({ name: '', email: '', password: '', confirm: '' });
   const [errors, setErrors] = useState({}); const [busy, setBusy] = useState(false); const [show, setShow] = useState(false); const [demo, setDemo] = useState('alina');
   const target = next?.startsWith('/') && !next.startsWith('//') ? next : register ? '/profile' : '/people';
-  const update = e => setValues(v => ({ ...v, [e.target.name]: e.target.value }));
+  const update = e => {
+    const { name, value } = e.currentTarget;
+    setValues(v => ({ ...v, [name]: value }));
+  };
   async function submit(e) {
     e.preventDefault(); if (busy) return;
     const email = values.email.trim().toLowerCase(); const issues = {};

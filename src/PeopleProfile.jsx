@@ -18,7 +18,10 @@ export function Profile() {
   const { state, me, setState, t, notify } = useApp(); const [values,setValues] = useState(() => profileValues(me)); const [errors,setErrors] = useState({});
   useEffect(() => { setValues(profileValues(me)); setErrors({}); }, [me?.id]);
   if (!me) return <LoginGate next="/profile" title={t('Твой профиль','Your profile')} />;
-  const update = e => setValues(v => ({ ...v, [e.target.name]: e.target.value }));
+  const update = e => {
+    const { name, value } = e.currentTarget;
+    setValues(v => ({ ...v, [name]: value }));
+  };
   const toggle = (key,value) => setValues(v => ({ ...v, [key]: v[key].includes(value) ? v[key].filter(x => x !== value) : [...v[key],value] }));
   function submit(e) {
     e.preventDefault(); const issues = {};
