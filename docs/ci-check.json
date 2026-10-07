@@ -1,0 +1,16 @@
+{
+  "repository": "JustEd10/medium-student-community",
+  "runId": 37578609787,
+  "jobId": 112652980829,
+  "headSha": "0bd2ec9ef631c7d024fc64f03247db6f03efaed4",
+  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37578609787",
+  "conclusion": "success",
+  "unitTests": 7,
+  "endToEndTests": 14,
+  "browsers": [
+    "Chromium 153",
+    "Firefox 155"
+  ],
+  "responsiveChecks": 112,
+  "axeScans": 44
+}
