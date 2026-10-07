@@ -213,3 +213,72 @@ test('WCAG AA automated accessibility checks on desktop and mobile screens', asy
     }
   }
 });
+
+test('Guest phone header and navigation have usable touch targets at reduced viewport heights', async ({ page }, testInfo) => {
+  test.setTimeout(120000);
+  async function touchTarget(locator) {
+    const box = await locator.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    return box;
+  }
+  for (const [width,height] of [[320,580],[390,660],[390,844]]) {
+    await page.setViewportSize({ width,height });
+    await page.goto('/#/');
+    for (const locale of ['ru','en']) {
+      const join = page.locator('.button-header');
+      const label = join.locator('.header-join-short');
+      await expect(label).toHaveText(locale === 'ru' ? 'Начать' : 'Join');
+      const controls = [page.locator('.language-button'), join, page.locator('.menu-toggle')];
+      const boxes = [];
+      for (const control of controls) boxes.push(await touchTarget(control));
+      for (let i = 1; i < boxes.length; i++) expect(boxes[i].x).toBeGreaterThanOrEqual(boxes[i-1].x + boxes[i-1].width);
+      expect(boxes.at(-1).x + boxes.at(-1).width).toBeLessThanOrEqual(width);
+      const text = await label.boundingBox();
+      expect(text.height).toBeLessThan(24);
+      await join.click();
+      await expect(page).toHaveURL(/#\/register$/);
+      await page.goto('/#/');
+      for (const selector of ['.button-hero','.hero-logo']) {
+        const item = page.locator(selector);
+        await item.evaluate(el => el.scrollIntoView({ block: 'center' }));
+        const rect = await item.boundingBox();
+        const header = await page.locator('.site-header').boundingBox();
+        const nav = await page.locator('.bottom-nav').boundingBox();
+        expect(rect.y).toBeGreaterThanOrEqual(header.y + header.height);
+        expect(rect.y + rect.height).toBeLessThanOrEqual(nav.y);
+      }
+      await page.goto('/#/questions/q1');
+      const back = page.locator('.back-link');
+      const backBox = await touchTarget(back);
+      // Press the padded edge, where the old text-only link was hard to hit.
+      await back.click({ position: { x: backBox.width - 8, y: backBox.height - 8 } });
+      await expect(page).toHaveURL(/#\/questions$/);
+      await page.goto('/#/study');
+      for (const link of await page.locator('.study-tabs a').all()) await touchTarget(link);
+      await page.locator('.study-tabs a').nth(1).click();
+      await expect(page).toHaveURL(/#\/study\?tab=need$/);
+      await page.locator('.study-tabs a').first().click();
+      await expect(page).toHaveURL(/#\/study$/);
+      const ranking = page.locator('.mobile-rating-link');
+      await ranking.evaluate(el => el.scrollIntoView({ block: 'center' }));
+      const rankingBox = await touchTarget(ranking);
+      const bottom = await page.locator('.bottom-nav').boundingBox();
+      expect(rankingBox.y + rankingBox.height).toBeLessThanOrEqual(bottom.y);
+      await ranking.click();
+      await expect(page).toHaveURL(/#\/questions\?tab=rating$/);
+      await page.goto('/#/');
+      const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+      expect(accessibility.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) }))).toEqual([]);
+      if (testInfo.project.name === 'chromium' && width === 390 && height === 844 && locale === 'ru') {
+        await mkdir('docs/screenshots', { recursive: true });
+        await page.screenshot({ path: 'docs/screenshots/mobile-guest-home.png', fullPage: true });
+        await page.goto('/#/questions/q1');
+        await page.screenshot({ path: 'docs/screenshots/mobile-guest-answer.png', fullPage: true });
+      }
+      await page.locator('.language-button').click();
+      await page.goto('/#/');
+    }
+  }
+});

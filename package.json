@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test tests/domain.test.js",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/run-browser-tests.js",
     "test:install": "node scripts/install-browsers.js"
   },
   "dependencies": {
