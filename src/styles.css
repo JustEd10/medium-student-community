@@ -281,6 +281,7 @@ input[type=checkbox] { accent-color: #6542a4; width: 20px; height: 20px; flex: 0
 .help-form h2 { font-size: 28px; margin-bottom: 24px; }
 .help-form .field input, .help-form .field textarea { background: #e1f8ed; border-color: #79ad8d; }
 .help-form .button { display: flex; min-width: 220px; margin: 20px auto 0; }
+.help-form .button-green { background: #28795b; color: #fff; border-color: #21684e; }
 .help-tip { background: #e1f3eb; border-color: #c7e6d7; font-family: Manrope,Inter,sans-serif; }
 .help-tip h2 { color: #277251; font-size: 22px; font-weight: 700; }
 .help-tip p { color: #4c665e; font-size: 16px; }
