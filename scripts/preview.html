@@ -4,7 +4,7 @@
 <h1>Проверка адаптации и доступности</h1>
 <label>Размер экрана <select id="size"><option value="1440,900">ПК 1440 × 900</option><option value="768,900">Планшет 768 × 900</option><option value="390,844">Телефон 390 × 844</option><option value="320,844">Телефон 320 × 844</option></select></label>
 <label>Адрес страницы <input id="route" value="/" style="width:250px"></label><button id="open">Открыть экран</button> <button id="scan">Проверить доступность</button>
-<p>Только инструмент разработки. Размер iframe задаёт реальные CSS media queries страницы. Отчёт axe проверяет WCAG A/AA автоматически и не заменяет проверку клавиатурой.</p>
+<p>Этот инструмент предназначен для разработки. Размер iframe определяет ширину страницы и применение CSS media queries. axe выполняет автоматическую проверку WCAG A/AA; работу с клавиатурой нужно проверить отдельно.</p>
 <details><summary>Результат проверки</summary><output id="report">Проверка ещё не запускалась.</output></details>
 <iframe id="preview" title="Сайт Медиум" width="1440" height="900" src="/#/"></iframe>
 <script type="module">
