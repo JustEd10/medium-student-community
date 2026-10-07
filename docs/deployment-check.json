@@ -1,17 +1,24 @@
 {
   "url": "https://medium-bob01.amvera.io/",
-  "checkedAt": "2026-10-07T18:45:17.063420+00:00",
-  "sourceCommit": "ac587ab9955c0aa181a3ca810f2ecb129f8c2130",
-  "testedCommit": "ac587ab9955c0aa181a3ca810f2ecb129f8c2130",
   "runtimeFilesMatchTestedCommit": true,
-  "amveraCommit": "a9ad40424e5b84b9282ca3368e9f08e498c22805",
   "htmlMatchesProductionBuild": true,
+  "productionJavaScriptCssVerified": true,
+  "amveraStatus": "Запущено",
+  "replicas": {
+    "running": 1,
+    "desired": 1
+  },
+  "ciSuccess": true,
+  "checkedAt": "2026-10-07T20:48:54.215981+00:00",
+  "sourceCommit": "139fd03ae8d65a0514b6e2c8338ce72d0b864926",
+  "testedCommit": "139fd03ae8d65a0514b6e2c8338ce72d0b864926",
+  "amveraCommit": "deee93eb9df51e40c7f241224364edbc96ee4fab",
+  "amveraSourceUploadCommit": "650dbac8a611b06a2b7034866ca0452db056bf5c",
   "html": {
     "path": "index.html",
     "status": 200,
-    "sha256": "2f65ad3c4b4b6547120f1b697b9ccc70f726777b0544aeb36067d712fda51539"
+    "sha256": "44039e21c7748ce55d6c1a684ed0875853df598aea20a5c618a7ded12e25b33a"
   },
-  "productionJavaScriptCssVerified": true,
   "assets": [
     {
       "path": "assets/arrow.svg",
@@ -19,9 +26,9 @@
       "sha256": "e8e3bd3aa3f028fc3c5bdcebce201ca64dcd77ca9cf0ead85c2c67bab01fa26e"
     },
     {
-      "path": "assets/bg-4w4DrQk-.png",
+      "path": "assets/bg-fa1Te5l-.png",
       "status": 200,
-      "sha256": "f152d83d82fee8b5dc6426afef088b4e5517d2033a00e0b455be19bdcdbd6b70"
+      "sha256": "ca35244d338288ab3dc465d42bc4a0cecdd7f1cbcc01f01fe7a15c06a095b9fe"
     },
     {
       "path": "assets/book.svg",
@@ -59,14 +66,14 @@
       "sha256": "9adaec192131c3ad7913ca781474a099394d5fa358d8090ad1c408ec59298789"
     },
     {
-      "path": "assets/index-Bh1-XxhA.js",
+      "path": "assets/index--DsZJmgA.js",
       "status": 200,
-      "sha256": "75bf836bed7bcb46297f102b15e0bbbfe1eab789cba82e855bc21bbb6f7c384f"
+      "sha256": "2018f1447e8e87e29c81ebde324ce0ee120ea015a57c90616bce4ca5469bbf71"
     },
     {
-      "path": "assets/index-CEBUEuL7.css",
+      "path": "assets/index-B1ppO1bg.css",
       "status": 200,
-      "sha256": "d4d6e3a0c2a50584f7804368b29e9fa81cd659e225626ffa55dfa0d302dc9d24"
+      "sha256": "95753f01a6a8558ffc542b6e0f244a785057840e69a29a5169e587107707a923"
     },
     {
       "path": "assets/menu.svg",
@@ -84,36 +91,48 @@
       "sha256": "7227d610ab5b730203dcab581a18ddd82224a147b3dce2264f10c71ed5adac8f"
     },
     {
+      "path": "assets/send.svg",
+      "status": 200,
+      "sha256": "4505375ebee0a74aa0e6913b7e68f0c0577d300bdb620ea76ac7bd8f9149a013"
+    },
+    {
       "path": "assets/star.svg",
       "status": 200,
       "sha256": "0a63183dde8c1d715b5d47f656b7506edf6cf5bc3acf753e0d530602c9bc3662"
     }
   ],
-  "archiveSha256": "55ca82d2a2bd6fdf0d7eff3db549ba36cccae852c8d0b6d7371e4d5411cdfb34",
-  "amveraStatus": "Запущено",
-  "replicas": {
-    "running": 1,
-    "desired": 1
-  },
-  "ciRunId": 37667184941,
-  "ciSuccess": true,
-  "archiveRuntimeFileCount": 33,
-  "uiCheckedAt": "2026-10-07T19:02:37.083337+00:00",
-  "mobileLiveChecks": {
-    "viewport": {
-      "width": 390,
-      "height": 844
-    },
+  "archiveSha256": "48617833ea2931a527ead71446d08f6458db9cb8fbc6bac21105570965da62bc",
+  "archiveRuntimeFileCount": 34,
+  "ciRunId": 37683050939,
+  "uiCheckedAt": "2026-10-07T20:54:00.336045+00:00",
+  "liveInterfaceChecks": {
+    "desktopViewport": [
+      1440,
+      900
+    ],
+    "phoneViewport": [
+      390,
+      844
+    ],
     "horizontalOverflow": false,
-    "tabIndicatorDuration": "0.24s",
-    "tabContentOpacity": "1",
-    "menuAnimation": "dialog-enter",
-    "menuFocusContained": true,
-    "menuNavigationClosesImmediately": true,
-    "newHeadingFocusedAfterMenuNavigation": true,
+    "navigationTargetsHeight": 44,
+    "checkboxSize": 16,
+    "checkboxAppearance": "none",
+    "backgroundPosition": "left top",
+    "sendIcon": "assets/send.svg",
+    "sendTarget": [
+      44,
+      44
+    ],
+    "sendVerticalCenterOffset": 0,
+    "chatHeightDesktop": 660,
+    "chatHeightPhone": 609,
+    "dialogListOverflowY": "auto",
+    "messagesOverflowY": "auto",
     "screenshots": [
-      "outputs/Медиум — анимации на сайте.png",
-      "outputs/Медиум — переключение вкладок.gif"
+      "outputs/Медиум — обновлённый профиль.png",
+      "outputs/Медиум — обновлённый чат.png",
+      "outputs/Медиум — чат на телефоне.png"
     ]
   }
 }

@@ -1,13 +1,13 @@
 {
   "repository": "JustEd10/medium-student-community",
-  "runId": 37667184941,
-  "jobId": 112949299189,
-  "headSha": "ac587ab9955c0aa181a3ca810f2ecb129f8c2130",
-  "runtimeSourceCommit": "ac587ab9955c0aa181a3ca810f2ecb129f8c2130",
-  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37667184941",
+  "runId": 37683050939,
+  "jobId": 113003737450,
+  "headSha": "139fd03ae8d65a0514b6e2c8338ce72d0b864926",
+  "runtimeSourceCommit": "139fd03ae8d65a0514b6e2c8338ce72d0b864926",
+  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37683050939",
   "conclusion": "success",
   "unitTests": 7,
-  "endToEndTests": 30,
+  "endToEndTests": 33,
   "browsers": [
     "Chromium",
     "Firefox",
@@ -34,7 +34,7 @@
     ]
   ],
   "axeScans": 84,
-  "screenshots": 20,
+  "screenshots": 21,
   "testTarget": "Vite production build via preview",
   "productionIconAssets": "HTTP 200 and SVG content in all three engines",
   "guestPhoneChecks": [
@@ -46,11 +46,11 @@
     "Last ranking link stays above bottom navigation",
     "Guest homepage axe checks in Russian and English"
   ],
-  "artifactId": 11503537858,
-  "artifactSha256": "5575e063daa74ef18e7d9183a1c56f53b19883e2b7440ddf2e42f606e5c8d2d1",
+  "artifactId": 11509992179,
+  "artifactSha256": "b16a23052e35dc67fee449022a5aded59452f5c9624c80c245f9f9276517322c",
   "playwrightStats": {
-    "total": 30,
-    "expected": 30,
+    "total": 33,
+    "expected": 33,
     "unexpected": 0,
     "flaky": 0,
     "skipped": 0,
@@ -78,5 +78,20 @@
     "Sliding tab indicator in both directions",
     "Animation and transitions disabled for reduced motion",
     "No horizontal overflow"
-  ]
+  ],
+  "chatScrollChecks": {
+    "widths": [
+      1440,
+      390,
+      320
+    ],
+    "messages": 60,
+    "independentListAndMessageScroll": true,
+    "composerPositionStable": true,
+    "sendButtonCentered": true,
+    "sendButtonMinimumSize": [
+      44,
+      44
+    ]
+  }
 }
