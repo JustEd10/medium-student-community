@@ -142,6 +142,64 @@ test('Search, filters, empty state, person profile and real local chat messages'
   await expect(page.locator('.message.incoming').last()).toContainText('Привет, Вэй!');
 });
 
+test('Long chat lists and messages scroll independently while the composer stays in place', async ({ page, request }, testInfo) => {
+  await demo(page, 'alina', '/chats/c1');
+  await page.evaluate(() => {
+    const state = JSON.parse(localStorage.getItem('medium.frontend.v1'));
+    const chat = state.chats.find(c => c.id === 'c1');
+    chat.messages = Array.from({ length: 60 }, (_, i) => ({ id: `long-${i}`, senderId: i % 2 ? 'wei' : 'alina', body: `Сообщение ${i + 1}: обсуждаем занятия и кампус.`, createdAt: Date.now() + i }));
+    const copies = Array.from({ length: 35 }, (_, i) => ({ ...chat, id: `list-${i}`, messages: chat.messages.slice(0, 1) }));
+    state.chats.push(...copies);
+    localStorage.setItem('medium.frontend.v1', JSON.stringify(state));
+  });
+  await page.reload();
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/#/chats/c1');
+    const composer = page.locator('.message-field .field-control');
+    const send = page.getByRole('button', { name: 'Отправить сообщение' });
+    const before = await composer.boundingBox();
+    const button = await send.boundingBox();
+    expect(button.width).toBeGreaterThanOrEqual(44);
+    expect(button.height).toBeGreaterThanOrEqual(44);
+    expect(Math.abs(button.y + button.height / 2 - before.y - before.height / 2)).toBeLessThan(1);
+    expect(button.x + button.width).toBeLessThanOrEqual(before.x + before.width);
+    const scroll = page.locator('.message-scroll');
+    const dimensions = await scroll.evaluate(el => ({ height: el.clientHeight, full: el.scrollHeight }));
+    expect(dimensions.full).toBeGreaterThan(dimensions.height);
+    await scroll.evaluate(el => { el.scrollTop = 0; });
+    await expect(scroll).toHaveJSProperty('scrollTop', 0);
+    const after = await composer.boundingBox();
+    expect(Math.abs(after.y - before.y)).toBeLessThan(1);
+    await expect(send.locator('.icon')).toHaveAttribute('style', /send\.svg/);
+    await send.click();
+    await expect(page.getByRole('alert')).toContainText('Напиши сообщение');
+    const inputBox = await composer.boundingBox();
+    const errorButton = await send.boundingBox();
+    expect(Math.abs(errorButton.y + errorButton.height / 2 - inputBox.y - inputBox.height / 2)).toBeLessThan(1);
+    await page.getByLabel('Написать сообщение', { exact: true }).fill('Проверка самолётика');
+    await send.click();
+    await expect(page.locator('.message.outgoing').last()).toContainText('Проверка самолётика');
+    await page.goto('/#/chats');
+    const chats = page.getByRole('region', { name: 'Диалоги', exact: true });
+    const listBefore = await chats.boundingBox();
+    const list = await chats.evaluate(el => ({ height: el.clientHeight, full: el.scrollHeight }));
+    expect(list.full).toBeGreaterThan(list.height);
+    await chats.evaluate(el => { el.scrollTop = el.scrollHeight; });
+    expect(await chats.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+    const listAfter = await chats.boundingBox();
+    expect(listAfter.height).toBe(listBefore.height);
+  }
+  const response = await request.get('/assets/send.svg');
+  expect(response.status()).toBe(200);
+  if (testInfo.project.name === 'chromium') {
+    await mkdir('docs/screenshots', { recursive: true });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/#/chats/c1');
+    await page.screenshot({ path: 'docs/screenshots/desktop-long-chat.png', fullPage: true });
+  }
+});
+
 test('Keyboard navigation, native modal focus and arrow-key star selection', async ({ page }) => {
   await demo(page, 'alina', '/questions/q1');
   const group = page.getByRole('radiogroup', { name: 'Оценка ответа Мария Соколова' });

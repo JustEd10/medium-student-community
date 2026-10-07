@@ -11,9 +11,10 @@
 .button:not(:disabled):active, .icon-button:not(:disabled):active, .back-link:active {
   transform: scale(.98);
 }
-.field input, .field textarea, .field select, .search-box {
+.field input, .field textarea, .field select, .search-box, .message-field .field-control {
   transition: border-color var(--motion-fast), box-shadow var(--motion-fast), background-color var(--motion-fast);
 }
+.desktop-nav a, .bottom-nav a { transition: color var(--motion-fast), background-color var(--motion-fast), box-shadow var(--motion-fast); }
 .choice-chip { transition: background-color var(--motion-fast); }
 .choice-chip span { transition: border-color var(--motion-fast); }
 .choice-chip input { accent-color: #7042c3; }
@@ -30,8 +31,8 @@
   transform: translateX(calc(var(--active-index) * (100% + 10px)));
   transition: transform var(--motion-normal) var(--motion-ease);
 }
-.study-tabs .segment-indicator { background: #e1d7fc; border: 2px solid #9774d2; box-shadow: 0 0 12px #a77bf333; }
-.motion-segmented.study-tabs a.active { border: 1px solid #b9bcc5; box-shadow: none; }
+.study-tabs .segment-indicator, .question-tabs .segment-indicator { background: #e1d7fc; border: 2px solid #9774d2; box-shadow: 0 0 12px #a77bf333; }
+.motion-segmented.study-tabs a.active, .motion-segmented.question-tabs a.active { border: 1px solid #b9bcc5; box-shadow: none; }
 .tab-content { animation: content-enter var(--motion-normal) var(--motion-ease); }
 
 .dialog[open] { animation: dialog-enter var(--motion-normal) var(--motion-ease) both; }

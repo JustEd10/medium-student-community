@@ -10,9 +10,9 @@ export function Avatar({ user, large = false }) { return <span aria-hidden="true
 export function Tags({ values, kind = 'language' }) { const { t } = useApp(); return <ul className={`tags tags-${kind}`} aria-label={kind === 'language' ? t('Языки','Languages') : t('Интересы','Interests')}>{values.map(value => <li key={value}>{value}</li>)}</ul>; }
 export function PageTitle({ title, description }) { return <div className="page-title"><h1 tabIndex={-1}>{title}</h1>{description && <p>{description}</p>}</div>; }
 export function Empty({ title, description, children }) { return <div className="empty-state panel"><h2>{title}</h2>{description && <p>{description}</p>}{children}</div>; }
-export function Field({ label, error, id, children, className = '' }) {
+export function Field({ label, error, id, children, className = '', endAdornment }) {
   const autoId = useId(); const controlId = id || autoId;
-  return <div className={`field ${className}`}><label htmlFor={controlId}>{label}</label>{React.cloneElement(children, { id: controlId, 'aria-invalid': error ? 'true' : undefined, 'aria-describedby': error ? `${controlId}-error` : children.props['aria-describedby'] })}{error && <p id={`${controlId}-error`} className="field-error">{error}</p>}</div>;
+  return <div className={`field ${className}`}><label htmlFor={controlId}>{label}</label>{endAdornment ? <div className="field-control">{React.cloneElement(children, { id: controlId, 'aria-invalid': error ? 'true' : undefined, 'aria-describedby': error ? `${controlId}-error` : children.props['aria-describedby'] })}{endAdornment}</div> : React.cloneElement(children, { id: controlId, 'aria-invalid': error ? 'true' : undefined, 'aria-describedby': error ? `${controlId}-error` : children.props['aria-describedby'] })}{error && <p id={`${controlId}-error`} className="field-error">{error}</p>}</div>;
 }
 export function FormErrors({ errors }) { const { t } = useApp(); const list = Object.values(errors).filter(Boolean); return list.length ? <div className="form-errors" role="alert"><strong>{t('Проверь поля формы', 'Please check the form')}</strong><ul>{list.map((e, i) => <li key={i}>{e}</li>)}</ul></div> : null; }
 export function Dialog({ open, onClose, onAfterClose, navigationKey = '', title, children, className = '' }) {
