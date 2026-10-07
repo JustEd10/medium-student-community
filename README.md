@@ -75,7 +75,7 @@ npm run test:e2e
 
 Сборка и 7 тестов правил приложения прошли. В браузере Codex проверены пользовательские сценарии при ширине 1440, 768, 390 и 320 пикселей, выбор звёзд клавиатурой и доступность через axe. Результаты и ограничения описаны в [отчёте](docs/REPORT.md).
 
-В GitHub Actions прошли 16 end-to-end тестов production-сборки в Chromium и Firefox, 7 тестов логики и сама сборка. Проверены 112 сочетаний маршрута и ширины, клавиатура, формы, чат, оценки и 44 автоматические проверки доступности. [Успешный запуск CI](https://github.com/JustEd10/medium-student-community/actions/runs/37602043989) проверил код коммита `08fe177`. В локальной среде macOS отдельные процессы браузеров были заблокированы; кроссбраузерная проверка выполнена на Ubuntu в CI. Workflow использует официальные [checkout](https://github.com/actions/checkout), [setup-node](https://github.com/actions/setup-node) и [upload-artifact](https://github.com/actions/upload-artifact).
+В GitHub Actions прошли 16 end-to-end тестов production-сборки в Chromium и Firefox, 7 тестов логики и сама сборка. Проверены 112 сочетаний маршрута и ширины, клавиатура, формы, чат, оценки и 44 автоматические проверки доступности. [Успешный запуск CI](https://github.com/JustEd10/medium-student-community/actions/runs/37615534925) проверил код коммита `08fe177`. В локальной среде macOS отдельные процессы браузеров были заблокированы; кроссбраузерная проверка выполнена на Ubuntu в CI. Workflow использует официальные [checkout](https://github.com/actions/checkout), [setup-node](https://github.com/actions/setup-node) и [upload-artifact](https://github.com/actions/upload-artifact).
 
 В режиме разработки можно открыть инструменты проверки:
 

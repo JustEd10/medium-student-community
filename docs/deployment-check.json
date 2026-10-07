@@ -1,14 +1,14 @@
 {
   "url": "https://medium-bob01.amvera.io/",
-  "checkedAt": "2026-10-07T09:50:20.011900+00:00",
-  "sourceCommit": "08fe1775b2d8975f1491b812c95abf32a99ad285",
-  "amveraCommit": "eccbc394d41038e7d1aa0e1f2e885fe089bca487",
+  "checkedAt": "2026-10-07T11:43:50.643477+00:00",
+  "sourceCommit": "2878b09bea0cd89f04ac499fadb06beba57fe6bc",
+  "amveraCommit": "6fabf2e38806f00cfbe90e01d236e13bfe1023e3",
   "htmlMatchesProductionBuild": true,
   "assets": [
     {
-      "path": "assets/index-DxJupvzx.js",
+      "path": "assets/index-HMkvfchf.js",
       "status": 200,
-      "sha256": "478a88c955b0f61b77cb456e9149a09ee7cfe9583cac2197126a843d7344f067"
+      "sha256": "a4c4b2e921e7d7a18b7766c00ca2c56aa1dace9e2207d1906a65efaec91766c7"
     },
     {
       "path": "assets/index-BSBzkh_j.css",
@@ -72,8 +72,9 @@
     "desired": 1
   },
   "safariVisualChecks": [
-    "Ответы с пятью звёздами",
-    "Рейтинг",
-    "Иконки меню и фильтров"
+    "Обновлённая главная на русском и английском",
+    "Вопросы и описание раздела",
+    "Правила пятизвёздочного рейтинга",
+    "Логотип и иконки меню и фильтров"
   ]
 }
