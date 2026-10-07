@@ -10,6 +10,30 @@ async function demo(page, id = 'alina', next = '/people') {
 }
 async function saved(page) { return page.evaluate(() => JSON.parse(localStorage.getItem('medium.frontend.v1'))); }
 
+test('Production CSS mask icons resolve to existing SVG assets', async ({ page, request }) => {
+  const urls = new Set();
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const route of ['/', '/people', '/questions', '/questions/q1', '/study', '/menu']) {
+    await page.goto(`/#${route}`);
+    await expect(page.locator('main')).toBeVisible();
+    const masks = await page.locator('.icon').evaluateAll(elements => elements.map(el => {
+      const style = getComputedStyle(el);
+      return style.maskImage || style.webkitMaskImage;
+    }));
+    for (const mask of masks) {
+      const match = mask.match(/^url\(["']?(.*?)["']?\)$/);
+      expect(match, `Resolved icon mask: ${mask}`).not.toBeNull();
+      urls.add(match[1]);
+    }
+  }
+  expect(urls.size).toBeGreaterThan(5);
+  for (const url of urls) {
+    const response = await request.get(url);
+    expect(response.status(), `Icon asset ${url}`).toBe(200);
+    expect(await response.text(), `SVG content ${url}`).toMatch(/<svg\b/);
+  }
+});
+
 test('Registration, validation, profile persistence and subsequent sign-in', async ({ page }) => {
   await page.goto('/#/register');
   await page.getByRole('button', { name: 'Создать аккаунт', exact: true }).click();

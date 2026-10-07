@@ -2,7 +2,8 @@ import React, { useEffect, useId, useRef } from 'react';
 import { useApp, go } from './context';
 import { commonItems, fullName, initials, rankings } from './domain';
 
-export const asset = name => `${import.meta.env.BASE_URL}assets/${name}`;
+// CSS masks resolve relative URLs against the stylesheet, which lives in /assets/ after a build.
+export const asset = name => new URL(`${import.meta.env.BASE_URL}assets/${name}`, document.baseURI).href;
 export function Icon({ name, className = '' }) { return <span aria-hidden="true" className={`icon ${className}`} style={{ '--icon-url': `url("${asset(`${name}.svg`)}")` }} />; }
 export function Link({ to, children, className = '', ...props }) { return <a href={`#${to}`} className={className} {...props}>{children}</a>; }
 export function Avatar({ user, large = false }) { return <span aria-hidden="true" className={`avatar color-${user?.color ?? 0} ${large ? 'avatar-large' : ''}`}>{initials(user)}</span>; }
