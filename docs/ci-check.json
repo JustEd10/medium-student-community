@@ -1,9 +1,9 @@
 {
   "repository": "JustEd10/medium-student-community",
-  "runId": 37615534925,
-  "jobId": 112772835328,
-  "headSha": "2878b09bea0cd89f04ac499fadb06beba57fe6bc",
-  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37615534925",
+  "runId": 37620640917,
+  "jobId": 112789732529,
+  "headSha": "3c8bad644958f3e6d12b51a89d9bd990053c3bdd",
+  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37620640917",
   "conclusion": "success",
   "unitTests": 7,
   "endToEndTests": 16,
@@ -11,12 +11,20 @@
     "Chromium 153",
     "Firefox 155"
   ],
-  "responsiveChecks": 112,
+  "responsiveChecks": 160,
   "axeScans": 44,
   "testTarget": "Vite production build via preview",
   "productionIconAssets": "HTTP 200 and SVG content in Chromium and Firefox",
-  "artifactId": 11478849301,
+  "artifactId": 11481558280,
   "flakyTests": 0,
   "failedTests": 0,
-  "skippedTests": 0
+  "skippedTests": 0,
+  "responsiveChecksByLocale": {
+    "ru": 112,
+    "en": 48
+  },
+  "languageFilter": "Visible before opening secondary filters; shared-language priority verified",
+  "artifactSha256": "05db1787b3d4ec8796b158efe0df09fab5adb8bd8ce00561d01056751aa461fe",
+  "runtimeSourceCommit": "e811cdac46e56f77db5f7f31c537757c619b32d6",
+  "runtimeFilesMatchTestedCommit": true
 }

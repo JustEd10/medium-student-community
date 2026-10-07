@@ -1,29 +1,36 @@
 {
   "url": "https://medium-bob01.amvera.io/",
-  "checkedAt": "2026-10-07T11:43:50.643477+00:00",
-  "sourceCommit": "2878b09bea0cd89f04ac499fadb06beba57fe6bc",
-  "amveraCommit": "6fabf2e38806f00cfbe90e01d236e13bfe1023e3",
+  "checkedAt": "2026-10-07T12:26:06.785231+00:00",
+  "sourceCommit": "e811cdac46e56f77db5f7f31c537757c619b32d6",
+  "testedCommit": "3c8bad644958f3e6d12b51a89d9bd990053c3bdd",
+  "runtimeFilesMatchTestedCommit": true,
+  "amveraCommit": "9991a43bf16f0157c4729cfc09e921d5f8f5a958",
   "htmlMatchesProductionBuild": true,
   "assets": [
-    {
-      "path": "assets/index-HMkvfchf.js",
-      "status": 200,
-      "sha256": "a4c4b2e921e7d7a18b7766c00ca2c56aa1dace9e2207d1906a65efaec91766c7"
-    },
-    {
-      "path": "assets/index-BSBzkh_j.css",
-      "status": 200,
-      "sha256": "2d12b474a628ac3b853c26c2369a503e630b8ddc5f0672f13bc09de3e1809c53"
-    },
     {
       "path": "assets/arrow.svg",
       "status": 200,
       "sha256": "e8e3bd3aa3f028fc3c5bdcebce201ca64dcd77ca9cf0ead85c2c67bab01fa26e"
     },
     {
+      "path": "assets/bg-4w4DrQk-.png",
+      "status": 200,
+      "sha256": "f152d83d82fee8b5dc6426afef088b4e5517d2033a00e0b455be19bdcdbd6b70"
+    },
+    {
       "path": "assets/book.svg",
       "status": 200,
       "sha256": "1f6b335945d614111cd6014a1ee73c8343c9623aa677920150ddf2659b3d39d2"
+    },
+    {
+      "path": "assets/brand-header.png",
+      "status": 200,
+      "sha256": "fb284cc45dbab24cacbed3c82b6402c8564c87b0a17ec8ba72b911fccf062def"
+    },
+    {
+      "path": "assets/brand-hero.png",
+      "status": 200,
+      "sha256": "73f0a47a6bfcdf23cebcd203951ce741c18f6fd3a09029b3de767781a8352282"
     },
     {
       "path": "assets/chat.svg",
@@ -66,15 +73,16 @@
       "sha256": "0a63183dde8c1d715b5d47f656b7506edf6cf5bc3acf753e0d530602c9bc3662"
     }
   ],
-  "amveraStatus": "Запущено",
-  "replicas": {
-    "running": 1,
-    "desired": 1
+  "currentAvailability": {
+    "checkedAt": "2026-10-07T14:41:08.119147+00:00",
+    "httpStatus": 503,
+    "amveraStatus": "Остановлено",
+    "replicas": {
+      "running": 0,
+      "desired": 0
+    },
+    "restartPendingUserClarification": true
   },
-  "safariVisualChecks": [
-    "Обновлённая главная на русском и английском",
-    "Вопросы и описание раздела",
-    "Правила пятизвёздочного рейтинга",
-    "Логотип и иконки меню и фильтров"
-  ]
+  "productionJavaScriptCssVerified": false,
+  "archiveSha256": "3275c567761a0970911d01c3e63e03cb27720e6e8484887e9c8c0c3ecfe4ddbb"
 }
