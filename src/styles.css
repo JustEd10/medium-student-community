@@ -50,18 +50,22 @@ h1:focus, main:focus { outline: none; }
 .text-link { color: var(--purple-ink); border: 0; background: transparent; padding: 10px 0; min-height: 44px; display: inline-flex; align-items: center; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
 .icon-button { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--ink); flex: 0 0 auto; }
 .icon-button:hover { background: #ded3f3; }
-.site-header { position: sticky; top: 0; z-index: 30; background: var(--header); border-bottom: 1px solid #ddcafa; }
-.header-inner { max-width: 1600px; min-height: 64px; margin: auto; padding: 8px 24px; display: flex; align-items: center; gap: 12px; }
+.site-header { position: sticky; top: 0; z-index: 30; isolation: isolate; background: var(--header); border-bottom: 1px solid #ddcafa; }
+/* Continue the exported wave through the logo row instead of hiding it under the header. */
+.site-header::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background-image: linear-gradient(90deg,transparent 240px,var(--header) 480px),url('./bg.png'); background-position: left top; background-size: auto,max(100vw,calc(100dvh * 1.5397)) auto; background-repeat: no-repeat; }
+.header-inner { max-width: 1600px; min-height: 64px; margin: auto; padding: 8px 24px; display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 12px; }
+.brand-zone { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .brand { display: flex; align-items: center; flex: 0 0 auto; gap: 4px; }
 .brand img { width: 52px; height: 35px; object-fit: contain; filter: drop-shadow(0 0 5px #884cfc55); }
 .brand span { font-size: 18px; color: #111; font-weight: 800; letter-spacing: -.5px; }
 .brand:hover { text-decoration: none; }
 .language-button { border: 0; background: #b7bcff; border-radius: 24px; min-height: 44px; padding: 8px 12px; color: #2f335e; font-size: 12px; }
-.desktop-nav { display: flex; align-items: center; justify-content: center; gap: 8px; margin: auto; }
-.desktop-nav a { padding: 10px 12px; min-height: 44px; min-width: 116px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #8b56d9; color: white; font-size: 13px; font-weight: 500; border: 1px solid #8b56d9; box-shadow: 0 2px 6px #8b56d912; }
-.desktop-nav a.active { background: #dfebff; border-color: #b8c6eb; color: #24263b; }
-.desktop-nav a:hover { text-decoration: none; filter: brightness(.97); box-shadow: 0 3px 10px #7954b926; }
-.header-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.desktop-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); align-items: center; width: 560px; gap: 4px; padding: 4px; margin: 0; border: 1px solid #d9c8ef; border-radius: 22px; background: #ffffff8c; box-shadow: 0 4px 18px #77529812; }
+.desktop-nav a { padding: 10px 8px; min-height: 44px; min-width: 0; display: flex; align-items: center; justify-content: center; border-radius: 17px; color: #594275; font-size: 13px; font-weight: 500; border: 1px solid transparent; white-space: nowrap; }
+.desktop-nav a.active { background: #8651cc; border-color: #7a45c0; color: white; box-shadow: 0 3px 9px #7949b92e; }
+.desktop-nav a:hover { text-decoration: none; background: #eee5fb; border-color: #e1d4f1; box-shadow: 0 2px 8px #7954b915; }
+.desktop-nav a.active:hover { background: #7c48c3; border-color: #7040b2; }
+.header-actions { display: flex; align-items: center; justify-self: end; gap: 10px; margin-left: 0; }
 .button-header { min-height: 44px; font-size: 14px; padding: 9px 18px; background: #8b56d9; color: white; white-space: nowrap; flex-shrink: 0; }
 .header-join-short { display: none; }
 .avatar { width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; flex: 0 0 auto; background: #b487f7; color: #36205c; font-size: 19px; }
@@ -342,18 +346,25 @@ input[type=checkbox] { accent-color: #6542a4; width: 20px; height: 20px; flex: 0
 .toast.visible { transform: translate(-50%,0); opacity: 1; }
 .storage-error { background: #fff0e2; border: 1px solid #c98238; padding: 16px; border-radius: 14px; }
 @media (min-width: 901px) {
-  .header-inner { max-width: 1512px; min-height: 54px; padding: 5px 9px; }
+  .header-inner { max-width: 1512px; min-height: 64px; padding: 5px 9px; }
   .brand span { font-size: 16px; }
   .language-button, .button-header { position: relative; isolation: isolate; background: transparent; border: 0; }
   .language-button::before, .button-header::before { content: ''; position: absolute; z-index: -1; inset: 6px 0; border-radius: 12px; background: #8b56d9; pointer-events: none; }
   .language-button { min-width: 67px; }
   .language-button::before { background: #b7bcff; }
   .button-header { min-width: 179px; font-size: 16px; }
-  .button-header::before { border-radius: 6px; }
+  .button-header::before { border-radius: 12px; }
 }
 @media (max-width: 1200px) {
-  .desktop-nav { gap: 10px; }
-  .desktop-nav a { min-width: 100px; padding: 10px; }
+  .desktop-nav { width: 440px; }
+  .desktop-nav a { padding-inline: 4px; font-size: 12px; }
+  .brand-zone { gap: 8px; }
+  .brand img { width: 44px; }
+  .brand span { font-size: 14px; }
+  .language-button { min-width: 50px; padding-inline: 8px; }
+  .button-header { min-width: 70px; padding-inline: 12px; font-size: 13px; }
+  .header-join-full { display: none; }
+  .header-join-short { display: inline; }
   .header-inner { padding-inline: 16px; gap: 8px; }
   .site-main { padding-inline: 32px; }
   .hero { padding-inline: 40px; gap: 32px; }
@@ -371,7 +382,9 @@ input[type=checkbox] { accent-color: #6542a4; width: 20px; height: 20px; flex: 0
 }
 @media (max-width: 900px) {
   .desktop-nav { display: none; }
-  .header-inner { min-height: 68px; }
+  .header-inner { display: flex; min-height: 68px; }
+  .brand-zone { display: contents; }
+  .header-actions { margin-left: auto; }
   .site-main { padding: 32px 24px 40px; }
   .hero { min-height: auto; padding: 20px 16px 50px; grid-template-columns: minmax(0,1.6fr) minmax(200px,1fr); }
   .hero h1 { font-size: 48px; }
