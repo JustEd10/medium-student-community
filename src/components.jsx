@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useId, useLayoutEffect, useRef, useState } from 'react';
 import { useApp, go } from './context';
 import { commonItems, fullName, initials, rankings } from './domain';
 
@@ -15,11 +15,16 @@ export function Field({ label, error, id, children, className = '' }) {
   return <div className={`field ${className}`}><label htmlFor={controlId}>{label}</label>{React.cloneElement(children, { id: controlId, 'aria-invalid': error ? 'true' : undefined, 'aria-describedby': error ? `${controlId}-error` : children.props['aria-describedby'] })}{error && <p id={`${controlId}-error`} className="field-error">{error}</p>}</div>;
 }
 export function FormErrors({ errors }) { const { t } = useApp(); const list = Object.values(errors).filter(Boolean); return list.length ? <div className="form-errors" role="alert"><strong>{t('Проверь поля формы', 'Please check the form')}</strong><ul>{list.map((e, i) => <li key={i}>{e}</li>)}</ul></div> : null; }
-export function Dialog({ open, onClose, onAfterClose, title, children, className = '' }) {
-  const dialog = useRef(null); const closeTimer = useRef(null); const titleId = useId(); const { t } = useApp(); const [phase,setPhase] = useState('closed');
-  useEffect(() => {
+export function Dialog({ open, onClose, onAfterClose, navigationKey = '', title, children, className = '' }) {
+  const dialog = useRef(null); const closeTimer = useRef(null); const shownRoute = useRef(navigationKey); const titleId = useId(); const { t } = useApp(); const [phase,setPhase] = useState('closed');
+  useLayoutEffect(() => {
     clearTimeout(closeTimer.current);
-    if (open) {
+    const navigated = shownRoute.current !== navigationKey;
+    shownRoute.current = navigationKey;
+    if (navigated && dialog.current.open) {
+      // A new page must be immediately interactive, including its form fields.
+      dialog.current.close(); setPhase('closed');
+    } else if (open) {
       setPhase('open');
       if (!dialog.current.open) dialog.current.showModal();
     } else if (dialog.current.open) {
@@ -32,7 +37,7 @@ export function Dialog({ open, onClose, onAfterClose, title, children, className
       }
     }
     return () => clearTimeout(closeTimer.current);
-  }, [open]);
+  }, [open,navigationKey]);
   return <dialog ref={dialog} data-phase={phase} className={`dialog ${className}`} aria-labelledby={titleId} onCancel={e => { e.preventDefault(); onClose(); }} onClose={() => { onClose(); onAfterClose?.(); }} onClick={e => { if (e.target === e.currentTarget && (e.clientX < e.currentTarget.getBoundingClientRect().left || e.clientX > e.currentTarget.getBoundingClientRect().right || e.clientY < e.currentTarget.getBoundingClientRect().top || e.clientY > e.currentTarget.getBoundingClientRect().bottom)) onClose(); }}><div className="dialog-heading"><h2 id={titleId}>{title}</h2><button type="button" className="icon-button close-button" onClick={onClose} aria-label={t('Закрыть', 'Close')}>×</button></div>{children}</dialog>;
 }
 export function SegmentedNav({ items, activeIndex, label, className = '' }) {
