@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useApp, useRoute } from './context';
 import { BottomNav, Dialog, Empty, Header, Link, MenuContent, PageTitle } from './components';
 import { Auth, Home } from './HomeAuth';
@@ -9,7 +9,7 @@ import { Chats } from './Chats';
 
 export default function App() {
   const route = useRoute(); const { t, notice, storageError, locale } = useApp(); const [menu,setMenu] = useState(false); const main = useRef(null);
-  useEffect(() => { setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' }); requestAnimationFrame(() => main.current?.querySelector('h1')?.focus({ preventScroll: true })); }, [route.path, route.search.toString()]);
+  useLayoutEffect(() => { setMenu(false); window.scrollTo({ top: 0, behavior: 'instant' }); main.current?.querySelector('h1')?.focus({ preventScroll: true }); }, [route.path, route.search.toString()]);
   useEffect(() => { document.title = `${main.current?.querySelector('h1')?.textContent || t('Медиум','Medium')} · ${t('Медиум','Medium')}`; }, [route.path,locale]);
   let page;
   const parts = route.path.split('/').filter(Boolean);

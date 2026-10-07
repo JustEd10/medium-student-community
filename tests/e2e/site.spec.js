@@ -36,6 +36,7 @@ test('Registration, validation, profile persistence and subsequent sign-in', asy
   await page.goto('/#/login');
   await page.getByLabel('Почта', { exact: true }).fill('irina@example.invalid');
   await page.getByLabel('Пароль', { exact: true }).fill('wrong-password');
+  await expect(page.getByLabel('Почта', { exact: true })).toHaveValue('irina@example.invalid');
   await expect(page.getByLabel('Пароль', { exact: true })).toHaveValue('wrong-password');
   await page.getByRole('button', { name: 'Войти', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('Почта или пароль не подходят');
