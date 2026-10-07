@@ -1,11 +1,16 @@
 {
   "url": "https://medium-bob01.amvera.io/",
-  "checkedAt": "2026-10-07T14:42:42.737477+00:00",
-  "sourceCommit": "e811cdac46e56f77db5f7f31c537757c619b32d6",
-  "testedCommit": "3c8bad644958f3e6d12b51a89d9bd990053c3bdd",
+  "checkedAt": "2026-10-07T15:31:36.097352+00:00",
+  "sourceCommit": "d7f18ee098d69a8da5d3b5033d3b17feeb0b169a",
+  "testedCommit": "d7f18ee098d69a8da5d3b5033d3b17feeb0b169a",
   "runtimeFilesMatchTestedCommit": true,
-  "amveraCommit": "9991a43bf16f0157c4729cfc09e921d5f8f5a958",
+  "amveraCommit": "c48a15669a4857e537cd3b6e5f8f60ae04bbb5fe",
   "htmlMatchesProductionBuild": true,
+  "html": {
+    "path": "index.html",
+    "status": 200,
+    "sha256": "091b0b388cdd746d1d8bbd3a97140b0d51f38b7772033dd7271091237ff7615a"
+  },
   "productionJavaScriptCssVerified": true,
   "assets": [
     {
@@ -54,14 +59,14 @@
       "sha256": "9adaec192131c3ad7913ca781474a099394d5fa358d8090ad1c408ec59298789"
     },
     {
-      "path": "assets/index-CqKVpB-B.js",
+      "path": "assets/index-D5FU_zZ6.js",
       "status": 200,
-      "sha256": "0139292f2f579d11e89296ea718a275e24aef6ce87f357f85d8494eb856986f3"
+      "sha256": "bf5bb3790f0657801d44d176045ba9aefba5826fc392ea66c980d64a5e1140c2"
     },
     {
-      "path": "assets/index-Do6Zkf5-.css",
+      "path": "assets/index-DMRf6nn1.css",
       "status": 200,
-      "sha256": "42dcde35fe158a470d4180674924f9e411d182d26e303fb81b6156e7c60158eb"
+      "sha256": "09f3ca8b25412018b918a71d833081606e88806b067b0bd62b71d2f7fb9ced4c"
     },
     {
       "path": "assets/menu.svg",
@@ -84,19 +89,34 @@
       "sha256": "0a63183dde8c1d715b5d47f656b7506edf6cf5bc3acf753e0d530602c9bc3662"
     }
   ],
-  "archiveSha256": "3275c567761a0970911d01c3e63e03cb27720e6e8484887e9c8c0c3ecfe4ddbb",
+  "archiveSha256": "5e5bfe542697c60a814300d61d4622403919e60089091fe911fb72a0f9457cd1",
   "amveraStatus": "Запущено",
   "replicas": {
     "running": 1,
     "desired": 1
   },
-  "availabilityRecoveredAfterZeroReplicas": true,
-  "safariCheckedAt": "2026-10-07T14:45:12.846334+00:00",
-  "safariVisualChecks": [
-    "Главная на русском и английском с указанием основной аудитории",
-    "Фон, логотип и цветная подсветка карточек",
-    "Выбор языка перед поиском и закрытыми дополнительными фильтрами",
-    "Раздел вопросов, рейтинг и подписи счётчиков",
-    "Правила оценки от 1 до 5 звёзд"
-  ]
+  "ciRunId": 37642668341,
+  "ciSuccess": true,
+  "uiCheckedAt": "2026-10-07T15:40:34.507958+00:00",
+  "safariUiChecks": [
+    "Question back button navigates to the question list",
+    "Profile label: Место в рейтинге Медиума",
+    "English profile label: Rank in Medium"
+  ],
+  "mobileLiveChecks": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "guestHome": "Brand background, gradient, logo glow and compact header visually checked",
+    "questionBackButton": {
+      "height": 48,
+      "padding": "12px 18px",
+      "navigationConfirmed": true
+    },
+    "screenshots": [
+      "outputs/Медиум — мобильные правки.png",
+      "outputs/Медиум — кнопка возврата.png"
+    ]
+  }
 }
