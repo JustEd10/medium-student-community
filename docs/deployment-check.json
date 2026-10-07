@@ -1,15 +1,15 @@
 {
   "url": "https://medium-bob01.amvera.io/",
-  "checkedAt": "2026-10-07T15:31:36.097352+00:00",
-  "sourceCommit": "d7f18ee098d69a8da5d3b5033d3b17feeb0b169a",
-  "testedCommit": "d7f18ee098d69a8da5d3b5033d3b17feeb0b169a",
+  "checkedAt": "2026-10-07T18:45:17.063420+00:00",
+  "sourceCommit": "ac587ab9955c0aa181a3ca810f2ecb129f8c2130",
+  "testedCommit": "ac587ab9955c0aa181a3ca810f2ecb129f8c2130",
   "runtimeFilesMatchTestedCommit": true,
-  "amveraCommit": "c48a15669a4857e537cd3b6e5f8f60ae04bbb5fe",
+  "amveraCommit": "a9ad40424e5b84b9282ca3368e9f08e498c22805",
   "htmlMatchesProductionBuild": true,
   "html": {
     "path": "index.html",
     "status": 200,
-    "sha256": "091b0b388cdd746d1d8bbd3a97140b0d51f38b7772033dd7271091237ff7615a"
+    "sha256": "2f65ad3c4b4b6547120f1b697b9ccc70f726777b0544aeb36067d712fda51539"
   },
   "productionJavaScriptCssVerified": true,
   "assets": [
@@ -59,14 +59,14 @@
       "sha256": "9adaec192131c3ad7913ca781474a099394d5fa358d8090ad1c408ec59298789"
     },
     {
-      "path": "assets/index-D5FU_zZ6.js",
+      "path": "assets/index-Bh1-XxhA.js",
       "status": 200,
-      "sha256": "bf5bb3790f0657801d44d176045ba9aefba5826fc392ea66c980d64a5e1140c2"
+      "sha256": "75bf836bed7bcb46297f102b15e0bbbfe1eab789cba82e855bc21bbb6f7c384f"
     },
     {
-      "path": "assets/index-DMRf6nn1.css",
+      "path": "assets/index-CEBUEuL7.css",
       "status": 200,
-      "sha256": "09f3ca8b25412018b918a71d833081606e88806b067b0bd62b71d2f7fb9ced4c"
+      "sha256": "d4d6e3a0c2a50584f7804368b29e9fa81cd659e225626ffa55dfa0d302dc9d24"
     },
     {
       "path": "assets/menu.svg",
@@ -89,34 +89,31 @@
       "sha256": "0a63183dde8c1d715b5d47f656b7506edf6cf5bc3acf753e0d530602c9bc3662"
     }
   ],
-  "archiveSha256": "5e5bfe542697c60a814300d61d4622403919e60089091fe911fb72a0f9457cd1",
+  "archiveSha256": "55ca82d2a2bd6fdf0d7eff3db549ba36cccae852c8d0b6d7371e4d5411cdfb34",
   "amveraStatus": "Запущено",
   "replicas": {
     "running": 1,
     "desired": 1
   },
-  "ciRunId": 37642668341,
+  "ciRunId": 37667184941,
   "ciSuccess": true,
-  "uiCheckedAt": "2026-10-07T15:40:34.507958+00:00",
-  "safariUiChecks": [
-    "Question back button navigates to the question list",
-    "Profile label: Место в рейтинге Медиума",
-    "English profile label: Rank in Medium"
-  ],
+  "archiveRuntimeFileCount": 33,
+  "uiCheckedAt": "2026-10-07T19:02:37.083337+00:00",
   "mobileLiveChecks": {
     "viewport": {
       "width": 390,
       "height": 844
     },
-    "guestHome": "Brand background, gradient, logo glow and compact header visually checked",
-    "questionBackButton": {
-      "height": 48,
-      "padding": "12px 18px",
-      "navigationConfirmed": true
-    },
+    "horizontalOverflow": false,
+    "tabIndicatorDuration": "0.24s",
+    "tabContentOpacity": "1",
+    "menuAnimation": "dialog-enter",
+    "menuFocusContained": true,
+    "menuNavigationClosesImmediately": true,
+    "newHeadingFocusedAfterMenuNavigation": true,
     "screenshots": [
-      "outputs/Медиум — мобильные правки.png",
-      "outputs/Медиум — кнопка возврата.png"
+      "outputs/Медиум — анимации на сайте.png",
+      "outputs/Медиум — переключение вкладок.gif"
     ]
   }
 }

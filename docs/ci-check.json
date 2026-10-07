@@ -1,13 +1,13 @@
 {
   "repository": "JustEd10/medium-student-community",
-  "runId": 37642668341,
-  "jobId": 112864950142,
-  "headSha": "d7f18ee098d69a8da5d3b5033d3b17feeb0b169a",
-  "runtimeSourceCommit": "d7f18ee098d69a8da5d3b5033d3b17feeb0b169a",
-  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37642668341",
+  "runId": 37667184941,
+  "jobId": 112949299189,
+  "headSha": "ac587ab9955c0aa181a3ca810f2ecb129f8c2130",
+  "runtimeSourceCommit": "ac587ab9955c0aa181a3ca810f2ecb129f8c2130",
+  "url": "https://github.com/JustEd10/medium-student-community/actions/runs/37667184941",
   "conclusion": "success",
   "unitTests": 7,
-  "endToEndTests": 27,
+  "endToEndTests": 30,
   "browsers": [
     "Chromium",
     "Firefox",
@@ -46,11 +46,11 @@
     "Last ranking link stays above bottom navigation",
     "Guest homepage axe checks in Russian and English"
   ],
-  "artifactId": 11493985116,
-  "artifactSha256": "6cf24ef694deaefea149036b1309f636e3529f635e3917d6890f590b0fbe8fce",
+  "artifactId": 11503537858,
+  "artifactSha256": "5575e063daa74ef18e7d9183a1c56f53b19883e2b7440ddf2e42f606e5c8d2d1",
   "playwrightStats": {
-    "total": 27,
-    "expected": 27,
+    "total": 30,
+    "expected": 30,
     "unexpected": 0,
     "flaky": 0,
     "skipped": 0,
@@ -58,5 +58,25 @@
   },
   "flakyTests": 0,
   "failedTests": 0,
-  "skippedTests": 0
+  "skippedTests": 0,
+  "motionVariants": 18,
+  "motionWidths": [
+    320,
+    390,
+    1440
+  ],
+  "motionPreferences": [
+    "no-preference",
+    "reduce"
+  ],
+  "motionChecks": [
+    "Modal focus containment and Escape return",
+    "Immediate menu navigation and focus on the new heading",
+    "No stale close timer after reopening",
+    "Rapid five-to-two rating replacement",
+    "Minimum 44px rating targets",
+    "Sliding tab indicator in both directions",
+    "Animation and transitions disabled for reduced motion",
+    "No horizontal overflow"
+  ]
 }
