@@ -1,11 +1,12 @@
 {
   "url": "https://medium-bob01.amvera.io/",
-  "checkedAt": "2026-10-07T12:26:06.785231+00:00",
+  "checkedAt": "2026-10-07T14:42:42.737477+00:00",
   "sourceCommit": "e811cdac46e56f77db5f7f31c537757c619b32d6",
   "testedCommit": "3c8bad644958f3e6d12b51a89d9bd990053c3bdd",
   "runtimeFilesMatchTestedCommit": true,
   "amveraCommit": "9991a43bf16f0157c4729cfc09e921d5f8f5a958",
   "htmlMatchesProductionBuild": true,
+  "productionJavaScriptCssVerified": true,
   "assets": [
     {
       "path": "assets/arrow.svg",
@@ -53,6 +54,16 @@
       "sha256": "9adaec192131c3ad7913ca781474a099394d5fa358d8090ad1c408ec59298789"
     },
     {
+      "path": "assets/index-CqKVpB-B.js",
+      "status": 200,
+      "sha256": "0139292f2f579d11e89296ea718a275e24aef6ce87f357f85d8494eb856986f3"
+    },
+    {
+      "path": "assets/index-Do6Zkf5-.css",
+      "status": 200,
+      "sha256": "42dcde35fe158a470d4180674924f9e411d182d26e303fb81b6156e7c60158eb"
+    },
+    {
       "path": "assets/menu.svg",
       "status": 200,
       "sha256": "01e20d5522a79bc52935f87662313845a565ae707af42fff8f6aaeba3d06552d"
@@ -73,16 +84,19 @@
       "sha256": "0a63183dde8c1d715b5d47f656b7506edf6cf5bc3acf753e0d530602c9bc3662"
     }
   ],
-  "currentAvailability": {
-    "checkedAt": "2026-10-07T14:41:08.119147+00:00",
-    "httpStatus": 503,
-    "amveraStatus": "Остановлено",
-    "replicas": {
-      "running": 0,
-      "desired": 0
-    },
-    "restartPendingUserClarification": true
+  "archiveSha256": "3275c567761a0970911d01c3e63e03cb27720e6e8484887e9c8c0c3ecfe4ddbb",
+  "amveraStatus": "Запущено",
+  "replicas": {
+    "running": 1,
+    "desired": 1
   },
-  "productionJavaScriptCssVerified": false,
-  "archiveSha256": "3275c567761a0970911d01c3e63e03cb27720e6e8484887e9c8c0c3ecfe4ddbb"
+  "availabilityRecoveredAfterZeroReplicas": true,
+  "safariCheckedAt": "2026-10-07T14:45:12.846334+00:00",
+  "safariVisualChecks": [
+    "Главная на русском и английском с указанием основной аудитории",
+    "Фон, логотип и цветная подсветка карточек",
+    "Выбор языка перед поиском и закрытыми дополнительными фильтрами",
+    "Раздел вопросов, рейтинг и подписи счётчиков",
+    "Правила оценки от 1 до 5 звёзд"
+  ]
 }
