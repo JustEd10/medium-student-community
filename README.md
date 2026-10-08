@@ -2,7 +2,7 @@
 
 Учебный сайт для иностранных студентов и студентов-мигрантов. В нём можно найти собеседника, задать вопрос об университете или попросить помощи с учёбой. Есть профили, чаты и рейтинг участников. Интерфейс работает на русском и английском.
 
-[Открыть сайт](https://medium-bob01.amvera.io/) · [Макет в Figma](https://www.figma.com/design/G7dWEFnumPHYJ70JP5tyie/) · [Репозиторий](https://github.com/JustEd10/medium-student-community)
+[Открыть сайт](https://medium-bob01.amvera.io/) · [Макет в Figma](https://www.figma.com/design/78urA9a9EggvJYdgLotj5L/Untitled?node-id=0-1&t=x3YhCRRbUUCU5oZ9-1) · [Репозиторий](https://github.com/JustEd10/medium-student-community)
 
 Проект написан на React и Vite. Используются шрифты Inter и Manrope.
 
