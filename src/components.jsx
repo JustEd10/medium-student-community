@@ -26,7 +26,7 @@ export function Dialog({ open, onClose, onAfterClose, navigationKey = '', title,
     const navigated = shownRoute.current !== navigationKey;
     shownRoute.current = navigationKey;
     if (navigated && dialog.current.open) {
-      // A new page must be immediately interactive, including its form fields.
+      // Close immediately on navigation so the new page is usable.
       dialog.current.close(); setPhase('closed');
     } else if (open) {
       setPhase('open');
@@ -36,14 +36,14 @@ export function Dialog({ open, onClose, onAfterClose, navigationKey = '', title,
         dialog.current.close(); setPhase('closed');
       } else {
         setPhase('closing');
-        // Keep native focus containment until the short exit finishes.
+        // Keep focus inside the dialog during the exit animation.
         closeTimer.current = setTimeout(() => { dialog.current?.close(); setPhase('closed'); }, 160);
       }
     }
     return () => clearTimeout(closeTimer.current);
   }, [open,navigationKey]);
   function nativeClose() {
-    // A queued native close event can arrive after showModal() reopened the menu.
+    // Ignore a delayed close event if the menu has reopened.
     if (dialog.current.open) return;
     onClose(); onAfterClose?.();
   }

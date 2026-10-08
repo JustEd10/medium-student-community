@@ -193,10 +193,10 @@ test('Long chat lists and messages scroll independently while the composer stays
   const response = await request.get('/assets/send.svg');
   expect(response.status()).toBe(200);
   if (testInfo.project.name === 'chromium') {
-    await mkdir('docs/screenshots', { recursive: true });
+    await mkdir('test-results/screenshots', { recursive: true });
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/#/chats/c1');
-    await page.screenshot({ path: 'docs/screenshots/desktop-long-chat.png', fullPage: true });
+    await page.screenshot({ path: 'test-results/screenshots/desktop-long-chat.png', fullPage: true });
   }
 });
 
@@ -248,12 +248,12 @@ test('All screens fit desktop, tablet and narrow phones without runtime errors',
   await page.getByRole('button', { name: 'Переключить интерфейс на русский' }).click();
   expect(errors).toEqual([]);
   if (testInfo.project.name === 'chromium') {
-    await mkdir('docs/screenshots', { recursive: true });
+    await mkdir('test-results/screenshots', { recursive: true });
     for (const [prefix,width,height] of [['desktop',1440,900],['mobile',390,844]]) {
       await page.setViewportSize({ width,height });
       for (const [name,route] of [['home','/'],['people','/people'],['profile','/profile'],['questions','/questions'],['answer-rating','/questions/q1'],['leaderboard','/questions?tab=rating'],['study','/study'],['help-rating','/study?tab=need'],['chat','/chats/c1']]) {
         await page.goto(`/#${route}`); await page.evaluate(() => document.fonts.ready);
-        await page.screenshot({ path: `docs/screenshots/${prefix}-${name}.png`, fullPage: true });
+        await page.screenshot({ path: `test-results/screenshots/${prefix}-${name}.png`, fullPage: true });
       }
     }
   }
@@ -330,10 +330,10 @@ test('Guest phone header and navigation have usable touch targets at reduced vie
       const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
       expect(accessibility.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) }))).toEqual([]);
       if (testInfo.project.name === 'chromium' && width === 390 && height === 844 && locale === 'ru') {
-        await mkdir('docs/screenshots', { recursive: true });
-        await page.screenshot({ path: 'docs/screenshots/mobile-guest-home.png', fullPage: true });
+        await mkdir('test-results/screenshots', { recursive: true });
+        await page.screenshot({ path: 'test-results/screenshots/mobile-guest-home.png', fullPage: true });
         await page.goto('/#/questions/q1');
-        await page.screenshot({ path: 'docs/screenshots/mobile-guest-answer.png', fullPage: true });
+        await page.screenshot({ path: 'test-results/screenshots/mobile-guest-answer.png', fullPage: true });
       }
       await page.locator('.language-button').click();
       await page.goto('/#/');

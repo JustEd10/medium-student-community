@@ -4,7 +4,6 @@
   --motion-normal: 240ms;
 }
 
-/* Feedback stays on controls; the page and brand artwork remain still. */
 .button, .icon-button, .back-link {
   transition: background-color var(--motion-fast), filter var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast) var(--motion-ease);
 }

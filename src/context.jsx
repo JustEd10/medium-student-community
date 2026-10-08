@@ -22,7 +22,7 @@ export function AppProvider({ children }) {
   useEffect(() => { document.documentElement.lang = locale; }, [locale]);
   useEffect(() => { if (!notice) return; const id = setTimeout(() => setNotice(''), 5000); return () => clearTimeout(id); }, [notice]);
   useEffect(() => {
-    const sync = e => { if (e.key !== STORAGE_KEY || !e.newValue) return; try { const next = JSON.parse(e.newValue); if (validState(next)) setState(next); } catch { /* Keep the current usable state when a storage event is malformed. */ } };
+    const sync = e => { if (e.key !== STORAGE_KEY || !e.newValue) return; try { const next = JSON.parse(e.newValue); if (validState(next)) setState(next); } catch { /* Ignore invalid storage events. */ } };
     window.addEventListener('storage', sync); return () => window.removeEventListener('storage', sync);
   }, []);
   const me = state.users.find(u => u.id === state.session) || null;
