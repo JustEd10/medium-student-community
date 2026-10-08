@@ -61,11 +61,14 @@ h1:focus, main:focus { outline: none; }
 .brand span { font-size: 18px; color: #111; font-weight: 800; letter-spacing: -.5px; }
 .brand:hover { text-decoration: none; }
 .language-button { border: 0; background: #b7bcff; border-radius: 24px; min-height: 44px; padding: 8px 12px; color: #2f335e; font-size: 12px; }
-.desktop-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); align-items: center; width: 560px; gap: 4px; padding: 4px; margin: 0; border: 1px solid #d9c8ef; border-radius: 22px; background: #ffffff8c; box-shadow: 0 4px 18px #77529812; }
-.desktop-nav a { padding: 10px 8px; min-height: 44px; min-width: 0; display: flex; align-items: center; justify-content: center; border-radius: 17px; color: #594275; font-size: 13px; font-weight: 500; border: 1px solid transparent; white-space: nowrap; }
-.desktop-nav a.active { background: #8651cc; border-color: #7a45c0; color: white; box-shadow: 0 3px 9px #7949b92e; }
-.desktop-nav a:hover { text-decoration: none; background: #eee5fb; border-color: #e1d4f1; box-shadow: 0 2px 8px #7954b915; }
-.desktop-nav a.active:hover { background: #7c48c3; border-color: #7040b2; }
+.desktop-nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); align-items: center; width: 548px; gap: 28px; padding: 0; margin: 0; }
+/* Keep the 24px Figma pills inside a 44px click target. */
+.desktop-nav a { position: relative; isolation: isolate; padding: 0 5px; min-height: 44px; min-width: 0; display: flex; align-items: center; justify-content: center; border-radius: 11px; color: #fff; font-size: 12px; line-height: 15px; font-weight: 500; white-space: nowrap; }
+.desktop-nav a::before { content: ''; position: absolute; z-index: -1; top: 50%; left: 0; right: 0; height: 24px; transform: translateY(-50%); border-radius: 11px; background: #b089ff; pointer-events: none; }
+.desktop-nav a.active { color: #000; }
+.desktop-nav a.active::before { background: #dfeaff; }
+.desktop-nav a:hover { text-decoration: none; }
+.desktop-nav a:hover::before { filter: brightness(.97); }
 .header-actions { display: flex; align-items: center; justify-self: end; gap: 10px; margin-left: 0; }
 .button-header { min-height: 44px; font-size: 14px; padding: 9px 18px; background: #8b56d9; color: white; white-space: nowrap; flex-shrink: 0; }
 .header-join-short { display: none; }
@@ -354,8 +357,7 @@ input[type=checkbox] { accent-color: #6542a4; width: 20px; height: 20px; flex: 0
   .button-header::before { border-radius: 12px; }
 }
 @media (max-width: 1200px) {
-  .desktop-nav { width: 440px; }
-  .desktop-nav a { padding-inline: 4px; font-size: 12px; }
+  .desktop-nav { width: 488px; gap: 8px; }
   .brand-zone { gap: 8px; }
   .brand img { width: 44px; }
   .brand span { font-size: 14px; }
