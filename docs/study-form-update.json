@@ -1,0 +1,137 @@
+{
+  "checkedAt": "2026-10-08T05:14:39.444636+00:00",
+  "url": "https://medium-bob01.amvera.io/",
+  "sourceCommit": "f7a4a8193e84598d12ac93760e7b4495eef1d075",
+  "archiveSha256": "43f451d2761fd0415107b2bdb09e872344378bef476f42b32456184ff881363b",
+  "amveraCommit": "229a0124429180cb1e32672ab1cadf89250ef662",
+  "buildExitCode": 0,
+  "files": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "bytes": 1037,
+      "matchesLocalBuild": true,
+      "sha256": "7d50fa98bd9df8406c92fffeebd25167a9c633d481fd5138a19f6abcfa2e0b7d"
+    },
+    {
+      "path": "assets/index-XibXGzMU.js",
+      "status": 200,
+      "bytes": 220276,
+      "matchesLocalBuild": true,
+      "sha256": "0635c1b072f9c5ddf1801e58c8e77c1b65be7809f28ad8f3588fcf530baab85a"
+    },
+    {
+      "path": "assets/index-CPOqHTgI.css",
+      "status": 200,
+      "bytes": 63811,
+      "matchesLocalBuild": true,
+      "sha256": "c12c9b5856a517e2a0f6e2070c704f7d669b526b139fd1609c03b79c1525d621"
+    }
+  ],
+  "manualChecks": {
+    "checkedAt": "2026-10-08T04:38:58.100859+00:00",
+    "productionBuild": true,
+    "desktop": {
+      "viewport": 1440,
+      "formWidth": 973,
+      "layoutWidth": 1321,
+      "tipWidth": 320,
+      "buttonColor": "rgb(255, 255, 255)",
+      "horizontalOverflow": false
+    },
+    "mobile": {
+      "viewport": 390,
+      "formWidth": 343,
+      "tipBelowForm": true,
+      "questionTag": "TEXTAREA",
+      "questionWhiteSpace": "pre-wrap",
+      "questionClientWidth": 296,
+      "questionScrollWidth": 296,
+      "horizontalOverflow": false
+    },
+    "automatedTestsRun": false,
+    "navigation": {
+      "reference": {
+        "fileKey": "G7dWEFnumPHYJ70JP5tyie",
+        "nodeId": "119:3137",
+        "buttonWidth": 116,
+        "visibleButtonHeight": 24,
+        "radius": 11,
+        "gap": 28,
+        "font": "Inter Medium",
+        "fontSize": 12,
+        "normalFill": "#b089ff",
+        "normalText": "#ffffff",
+        "activeFill": "#dfeaff",
+        "activeText": "#000000"
+      },
+      "desktop": {
+        "viewport": 1440,
+        "buttonWidth": 116,
+        "visibleButtonHeight": 24,
+        "normalFill": "rgb(176, 137, 255)",
+        "activeFill": "rgb(223, 234, 255)",
+        "horizontalOverflow": false
+      },
+      "compact": {
+        "viewport": 901,
+        "navLeft": 199,
+        "languageButtonRight": 189.7578125,
+        "navRight": 687,
+        "actionsLeft": 776,
+        "horizontalOverflow": false
+      },
+      "mobile": {
+        "viewport": 390,
+        "desktopNavDisplay": "none",
+        "bottomNavDisplay": "grid",
+        "horizontalOverflow": false
+      },
+      "questionLinkOpensQuestions": true
+    }
+  },
+  "automatedTestsRun": false,
+  "publicDom": {
+    "formWidth": 973,
+    "helpReceivedColor": [
+      "rgb(255, 255, 255)"
+    ],
+    "horizontalOverflow": false,
+    "nav": [
+      {
+        "color": "rgb(255, 255, 255)",
+        "current": null,
+        "fill": "rgb(176, 137, 255)",
+        "height": "24px",
+        "text": "Главная",
+        "width": 116
+      },
+      {
+        "color": "rgb(255, 255, 255)",
+        "current": null,
+        "fill": "rgb(176, 137, 255)",
+        "height": "24px",
+        "text": "Знакомства",
+        "width": 116
+      },
+      {
+        "color": "rgb(0, 0, 0)",
+        "current": "page",
+        "fill": "rgb(223, 234, 255)",
+        "height": "24px",
+        "text": "Помощь с учёбой",
+        "width": 116
+      },
+      {
+        "color": "rgb(255, 255, 255)",
+        "current": null,
+        "fill": "rgb(176, 137, 255)",
+        "height": "24px",
+        "text": "Вопрос-ответ",
+        "width": 116
+      }
+    ],
+    "viewport": 1440
+  },
+  "screenshot": "outputs/medium-navigation-figma.png"
+}
