@@ -1,0 +1,9 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Удаление вопроса</title><style>body{margin:0;padding:28px;background:#f4f1fc;color:#24213b;font:16px/1.45 Arial}main{max-width:1100px;margin:auto}h1{font-size:25px}pre{margin:18px 0;padding:20px;background:white;border:1px solid #d6c9ed;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.5 monospace}p{color:#5e5b70}</style><main><h1>Удаление вопроса</h1><p>Вывод реальных запросов curl · 10.10.2026 · локальная исправленная версия. Токены скрыты.</p><pre>curl -sS http://127.0.0.1:4183/api/items/4 -X DELETE -H &#x27;Authorization: Bearer ТОКЕН&#x27;
+HTTP 200
+{
+  &quot;ok&quot;: true
+}</pre><pre>curl -sS http://127.0.0.1:4183/api/items/4
+HTTP 404
+{
+  &quot;error&quot;: &quot;Вопрос не найден&quot;
+}</pre></main></html>

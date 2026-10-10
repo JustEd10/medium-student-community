@@ -1,0 +1,123 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #f4f5fb;
+  color: #1f2340;
+}
+header {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e3e5f0;
+}
+h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #5b4bdb;
+}
+main {
+  max-width: 760px;
+  margin: 24px auto;
+  padding: 0 16px;
+  display: grid;
+  gap: 16px;
+}
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e3e5f0;
+}
+.card h2 {
+  margin-top: 0;
+  font-size: 18px;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+form {
+  display: grid;
+  gap: 8px;
+}
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #c9ccdf;
+}
+button {
+  background: #5b4bdb;
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+  min-height: 44px;
+}
+button.small {
+  padding: 4px 10px;
+  font-size: 13px;
+}
+button.danger {
+  background: #d64550;
+}
+.item {
+  border-top: 1px solid #eceef6;
+  padding: 12px 0;
+}
+.item h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+.meta {
+  font-size: 13px;
+  color: #6b6f8c;
+}
+.answer {
+  margin: 6px 0 0 12px;
+  padding-left: 10px;
+  border-left: 3px solid #d7d3fa;
+  font-size: 14px;
+}
+.answer-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.answer-form input {
+  flex: 1;
+  min-width: 0;
+}
+input, select, textarea { min-width: 0; max-width: 100%; }
+.item, .answer { overflow-wrap: anywhere; }
+.hint {
+  font-size: 13px;
+  color: #6b6f8c;
+  margin-bottom: 0;
+}
+#demoList {
+  margin-top: 12px;
+}
+.error {
+  color: #d64550;
+  margin: 8px 0 0;
+  min-height: 1em;
+}
+.hidden {
+  display: none;
+}
+button:disabled { opacity: 0.6; cursor: default; }
+.rating-stars { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.rating-stars button { min-width: 44px; min-height: 44px; font-size: 28px; color: #6846b8; background: #f1ebff; }
+.rating-stars button:focus-visible { outline: 2px solid #6846b8; outline-offset: 2px; }

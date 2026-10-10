@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Медиум · работа с сервером</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Медиум</h1>
+      <div id="userBox"></div>
+    </header>
+
+    <main>
+      <section id="loginBox" class="card">
+        <h2>Вход</h2>
+        <form id="loginForm">
+          <input name="login" placeholder="Логин" required />
+          <input name="password" type="password" placeholder="Пароль" required />
+          <button>Войти</button>
+        </form>
+        <p class="hint">Для проверки: user / qwerty или admin / 12345</p>
+        <p id="loginError" class="error"></p>
+      </section>
+
+      <section class="card">
+        <h2>Вопросы</h2>
+        <div class="row">
+          <button id="loadBtn">Загрузить список</button>
+          <select id="categoryFilter">
+            <option value="">Все категории</option>
+          </select>
+          <input id="searchInput" placeholder="Поиск" />
+          <select id="sortSelect">
+            <option value="new">Сначала новые</option>
+            <option value="answers">По числу ответов</option>
+          </select>
+        </div>
+        <div id="items"></div>
+      </section>
+
+      <section id="addBox" class="card hidden">
+        <h2>Задать вопрос</h2>
+        <form id="itemForm">
+          <input name="title" placeholder="Заголовок (от 8 символов)" required />
+          <textarea name="body" placeholder="Текст вопроса"></textarea>
+          <select name="category"></select>
+          <button>Опубликовать</button>
+        </form>
+        <p id="itemError" class="error"></p>
+      </section>
+
+      <section id="myBox" class="card hidden">
+        <h2>Мои записи</h2>
+        <div id="myRecords"></div>
+      </section>
+
+      <section class="card">
+        <h2>Проверка связи с сервером</h2>
+        <button id="demoBtn">Загрузить демо-список</button>
+        <p class="hint">Тестовый массив с /api/demo, он прописан прямо в коде сервера</p>
+        <div id="demoList"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

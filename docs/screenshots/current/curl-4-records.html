@@ -1,0 +1,35 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Связанные ответы и «Мои записи»</title><style>body{margin:0;padding:28px;background:#f4f1fc;color:#24213b;font:16px/1.45 Arial}main{max-width:1100px;margin:auto}h1{font-size:25px}pre{margin:18px 0;padding:20px;background:white;border:1px solid #d6c9ed;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.5 monospace}p{color:#5e5b70}</style><main><h1>Связанные ответы и «Мои записи»</h1><p>Вывод реальных запросов curl · 10.10.2026 · локальная исправленная версия. Токены скрыты.</p><pre>curl -sS http://127.0.0.1:4183/api/records -X POST -H &#x27;Content-Type: application/json&#x27; -d &#x27;{&quot;item_id&quot;:4,&quot;body&quot;:&quot;Давайте выберем время после занятий и встретимся в библиотеке.&quot;}&#x27; -H &#x27;Authorization: Bearer ТОКЕН&#x27;
+HTTP 201
+{
+  &quot;id&quot;: 3,
+  &quot;item_id&quot;: 4,
+  &quot;author&quot;: &quot;user&quot;,
+  &quot;body&quot;: &quot;Давайте выберем время после занятий и встретимся в библиотеке.&quot;,
+  &quot;rating&quot;: null,
+  &quot;createdAt&quot;: &quot;2026-10-10T13:55:48.151Z&quot;,
+  &quot;item_title&quot;: &quot;Где встречается разговорный клуб?&quot;
+}</pre><pre>curl -sS &#x27;http://127.0.0.1:4183/api/records?item_id=4&#x27;
+HTTP 200
+[
+  {
+    &quot;id&quot;: 3,
+    &quot;item_id&quot;: 4,
+    &quot;author&quot;: &quot;user&quot;,
+    &quot;body&quot;: &quot;Давайте выберем время после занятий и встретимся в библиотеке.&quot;,
+    &quot;rating&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-10T13:55:48.151Z&quot;,
+    &quot;item_title&quot;: &quot;Где встречается разговорный клуб?&quot;
+  }
+]</pre><pre>curl -sS http://127.0.0.1:4183/api/records/my -H &#x27;Authorization: Bearer ТОКЕН&#x27;
+HTTP 200
+[
+  {
+    &quot;id&quot;: 3,
+    &quot;item_id&quot;: 4,
+    &quot;author&quot;: &quot;user&quot;,
+    &quot;body&quot;: &quot;Давайте выберем время после занятий и встретимся в библиотеке.&quot;,
+    &quot;rating&quot;: null,
+    &quot;createdAt&quot;: &quot;2026-10-10T13:55:48.151Z&quot;,
+    &quot;item_title&quot;: &quot;Где встречается разговорный клуб?&quot;
+  }
+]</pre></main></html>

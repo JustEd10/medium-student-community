@@ -1,0 +1,189 @@
+Вывод реальных запросов curl — 10.10.2026
+Локальная исправленная версия: http://127.0.0.1:4183
+Токены в материалах скрыты. Учебные учётные записи взяты из задания.
+
+
+Сервер и JSON
+
+curl -sS http://127.0.0.1:4183/hello
+HTTP 200
+Привет, это сервер моего сайта
+
+curl -sS http://127.0.0.1:4183/time
+HTTP 200
+{
+  "time": "2026-10-10T13:55:48.092Z"
+}
+
+curl -sS http://127.0.0.1:4183/random
+HTTP 200
+{
+  "random": 88
+}
+
+curl -sS http://127.0.0.1:4183/api/demo
+HTTP 200
+[
+  {
+    "id": 1,
+    "title": "Первый элемент",
+    "price": 250
+  },
+  {
+    "id": 2,
+    "title": "Второй элемент",
+    "price": 280
+  },
+  {
+    "id": 3,
+    "title": "Третий элемент",
+    "price": 180
+  }
+]
+
+Вопросы с сервера
+
+curl -sS http://127.0.0.1:4183/api/items
+HTTP 200
+[
+  {
+    "id": 1,
+    "title": "Когда можно получить студенческий билет?",
+    "body": "Подала документы и уже хожу на занятия. Где узнать о готовности билета?",
+    "category": "Документы",
+    "author": "alina",
+    "createdAt": "2026-10-06T10:00:00.000Z",
+    "answersCount": 1,
+    "bodyLength": 71
+  },
+  {
+    "id": 2,
+    "title": "Где найти расписание занятий?",
+    "body": "На сайте много разделов на русском, не могу найти расписание своей группы.",
+    "category": "Учёба",
+    "author": "user",
+    "createdAt": "2026-10-06T09:00:00.000Z",
+    "answersCount": 1,
+    "bodyLength": 74
+  },
+  {
+    "id": 3,
+    "title": "Кто хочет практиковать русский и английский?",
+    "body": "Предлагаю встречаться после занятий и общаться на двух языках.",
+    "category": "Языки",
+    "author": "wei",
+    "createdAt": "2026-10-06T08:00:00.000Z",
+    "answersCount": 0,
+    "bodyLength": 62
+  }
+]
+
+curl -sS http://127.0.0.1:4183/api/items/1
+HTTP 200
+{
+  "id": 1,
+  "title": "Когда можно получить студенческий билет?",
+  "body": "Подала документы и уже хожу на занятия. Где узнать о готовности билета?",
+  "category": "Документы",
+  "author": "alina",
+  "createdAt": "2026-10-06T10:00:00.000Z",
+  "answersCount": 1,
+  "bodyLength": 71,
+  "answers": [
+    {
+      "id": 1,
+      "item_id": 1,
+      "author": "wei",
+      "body": "Наша группа узнавала через куратора, напиши ему или старосте.",
+      "rating": null,
+      "createdAt": "2026-10-06T10:05:00.000Z"
+    }
+  ]
+}
+
+Вход и создание вопроса
+
+curl -sS http://127.0.0.1:4183/api/login -X POST -H 'Content-Type: application/json' -d '{"login":"admin","password":"12345"}'
+HTTP 200
+{
+  "token": "[токен скрыт]",
+  "login": "admin",
+  "role": "admin"
+}
+
+curl -sS http://127.0.0.1:4183/api/login -X POST -H 'Content-Type: application/json' -d '{"login":"user","password":"qwerty"}'
+HTTP 200
+{
+  "token": "[токен скрыт]",
+  "login": "user",
+  "role": "user"
+}
+
+curl -sS http://127.0.0.1:4183/api/items -X POST -H 'Content-Type: application/json' -d '{"title":"Где встречается разговорный клуб?","body":"Хочу практиковать русский после занятий.","category":"Языки"}' -H 'Authorization: Bearer ТОКЕН'
+HTTP 201
+{
+  "id": 4,
+  "title": "Где встречается разговорный клуб?",
+  "body": "Хочу практиковать русский после занятий.",
+  "category": "Языки",
+  "author": "admin",
+  "createdAt": "2026-10-10T13:55:48.144Z",
+  "answersCount": 0,
+  "bodyLength": 40
+}
+
+Связанные ответы и «Мои записи»
+
+curl -sS http://127.0.0.1:4183/api/records -X POST -H 'Content-Type: application/json' -d '{"item_id":4,"body":"Давайте выберем время после занятий и встретимся в библиотеке."}' -H 'Authorization: Bearer ТОКЕН'
+HTTP 201
+{
+  "id": 3,
+  "item_id": 4,
+  "author": "user",
+  "body": "Давайте выберем время после занятий и встретимся в библиотеке.",
+  "rating": null,
+  "createdAt": "2026-10-10T13:55:48.151Z",
+  "item_title": "Где встречается разговорный клуб?"
+}
+
+curl -sS 'http://127.0.0.1:4183/api/records?item_id=4'
+HTTP 200
+[
+  {
+    "id": 3,
+    "item_id": 4,
+    "author": "user",
+    "body": "Давайте выберем время после занятий и встретимся в библиотеке.",
+    "rating": null,
+    "createdAt": "2026-10-10T13:55:48.151Z",
+    "item_title": "Где встречается разговорный клуб?"
+  }
+]
+
+curl -sS http://127.0.0.1:4183/api/records/my -H 'Authorization: Bearer ТОКЕН'
+HTTP 200
+[
+  {
+    "id": 3,
+    "item_id": 4,
+    "author": "user",
+    "body": "Давайте выберем время после занятий и встретимся в библиотеке.",
+    "rating": null,
+    "createdAt": "2026-10-10T13:55:48.151Z",
+    "item_title": "Где встречается разговорный клуб?"
+  }
+]
+
+Удаление вопроса
+
+curl -sS http://127.0.0.1:4183/api/items/4 -X DELETE -H 'Authorization: Bearer ТОКЕН'
+HTTP 200
+{
+  "ok": true
+}
+
+curl -sS http://127.0.0.1:4183/api/items/4
+HTTP 404
+{
+  "error": "Вопрос не найден"
+}

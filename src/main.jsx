@@ -12,4 +12,10 @@ import './motion.css';
 import App from './App';
 import { AppProvider } from './context';
 
-createRoot(document.getElementById('root')).render(<React.StrictMode><AppProvider><App /></AppProvider></React.StrictMode>);
+createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <AppProvider>
+      <App />
+    </AppProvider>
+  </React.StrictMode>,
+);

@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.env
+.env.*
+server/storage
+docs/screenshots
+*.zip
+*.tar.gz
+test-results
+playwright-report
+work

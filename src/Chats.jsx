@@ -1,15 +1,42 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useApp } from './context';
-import { fullName, sendMessage } from './domain';
-import { Avatar, Empty, Field, FormErrors, Icon, Link, LoginGate, PageTitle, Tags } from './components';
+import { fullName } from './domain';
+import {
+  Avatar,
+  Empty,
+  Field,
+  FormErrors,
+  Icon,
+  Link,
+  LoginGate,
+  PageTitle,
+  Tags,
+} from './components';
 
 export function Chats({ id }) {
-  const { state, me, setState, t, locale } = useApp(); const [body,setBody] = useState(''); const [errors,setErrors] = useState({}); const listRef = useRef(null); const formRef = useRef(null);
+  const { state, me, act, t, locale } = useApp();
+  const [body, setBody] = useState('');
+  const [errors, setErrors] = useState({});
+  const listRef = useRef(null);
+  const formRef = useRef(null);
   const inputRef = useRef(null);
-  const chats = state.chats.filter(c => c.members.includes(me?.id)).sort((a,b) => (b.messages.at(-1)?.createdAt || 0) - (a.messages.at(-1)?.createdAt || 0));
-  const current = id ? chats.find(c => c.id === id) : chats[0]; const partner = current && state.users.find(u => u.id === current.members.find(m => m !== me?.id));
-  useEffect(() => { setBody(''); setErrors({}); }, [current?.id]);
-  useEffect(() => { if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight; }, [current?.id,current?.messages.length]);
+  const sending = useRef(false);
+  const activeChat = useRef(null);
+  const [pending, setPending] = useState(false);
+  const chats = state.chats
+    .filter((c) => c.members.includes(me?.id))
+    .sort((a, b) => (b.messages.at(-1)?.createdAt || 0) - (a.messages.at(-1)?.createdAt || 0));
+  const current = id ? chats.find((c) => c.id === id) : chats[0];
+  activeChat.current = current?.id;
+  const partner =
+    current && state.users.find((u) => u.id === current.members.find((m) => m !== me?.id));
+  useEffect(() => {
+    setBody('');
+    setErrors({});
+  }, [current?.id]);
+  useEffect(() => {
+    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+  }, [current?.id, current?.messages.length]);
   useLayoutEffect(() => {
     function resizeInput() {
       const input = inputRef.current;
@@ -25,11 +52,208 @@ export function Chats({ id }) {
     resizeInput();
     window.addEventListener('resize', resizeInput);
     return () => window.removeEventListener('resize', resizeInput);
-  }, [body,current?.id]);
-  if (!me) return <LoginGate next={id ? `/chats/${id}` : '/chats'} title={t('Общение','Messages')} />;
-  if (id && !current) return <Empty title={t('Диалог не найден','Conversation not found')}><Link to="/chats" className="button">{t('Все сообщения','All messages')}</Link></Empty>;
-  function submit(e) { e.preventDefault(); if (!body.trim()) { setErrors({ body: t('Напиши сообщение.','Write a message.') }); return; } setState(s => sendMessage(s,me.id,current.id,body));setBody('');setErrors({}); }
-  const date = value => new Intl.DateTimeFormat(locale === 'ru' ? 'ru-RU' : 'en-GB', { day: 'numeric', month: 'long' }).format(value);
-  const time = value => new Intl.DateTimeFormat(locale === 'ru' ? 'ru-RU' : 'en-GB', { hour: '2-digit', minute: '2-digit' }).format(value);
-  return <><PageTitle title={t('Общение','Messages')} description={t('Твои разговоры со студентами','Your conversations with other students')} /><div className={`chats-layout ${id ? 'chat-open' : ''}`}><aside className="conversation-list panel" aria-label={t('Список диалогов','Conversations')}><h2>{t('Сообщения','Messages')}</h2><div className="conversation-scroll" role="region" aria-label={t('Диалоги','Chat list')} tabIndex={0}>{chats.length ? chats.map(chat => { const user = state.users.find(u => u.id === chat.members.find(m => m !== me.id)); return <Link to={`/chats/${chat.id}`} key={chat.id} className={current?.id === chat.id ? 'conversation active' : 'conversation'} aria-current={current?.id === chat.id ? 'page' : undefined}><Avatar user={user} /><span><strong>{fullName(user)}</strong><small>{chat.messages.at(-1)?.body || t('Начни разговор','Start a conversation')}</small></span></Link>; }) : <p className="muted">{t('Здесь появятся твои диалоги.','Your conversations will appear here.')}</p>}</div><Link to="/people" className="text-link">{t('Найти новых людей','Meet new people')}</Link></aside><section className="chat-panel panel" aria-label={t('Переписка','Conversation')}>{current ? <><Link to="/chats" className="back-link mobile-back">← {t('Все сообщения','All messages')}</Link><Link to={`/people/${partner.id}`} className="chat-person person-heading"><Avatar user={partner} /><div><h2>{fullName(partner)}</h2><Tags values={partner.languages} /></div></Link><div className="message-scroll" ref={listRef} aria-label={t('Сообщения диалога','Conversation messages')} tabIndex={0}>{current.messages.length ? current.messages.map((message,index) => <React.Fragment key={message.id}>{(index === 0 || date(message.createdAt) !== date(current.messages[index - 1].createdAt)) && <p className="message-date">{date(message.createdAt)}</p>}<article className={`message ${message.senderId === me.id ? 'outgoing' : 'incoming'}`} aria-label={message.senderId === me.id ? t('Твоё сообщение','Your message') : fullName(partner)}><p>{message.body}</p><time dateTime={new Date(message.createdAt).toISOString()}>{time(message.createdAt)}</time></article></React.Fragment>) : <Empty title={t('Начните с приветствия','Start with a hello')} description={t('Расскажи, что у вас общего.','Talk about what you have in common.')} />}</div><form ref={formRef} className="message-form" onSubmit={submit} noValidate><FormErrors errors={errors} /><Field label={t('Написать сообщение','Write a message')} error={errors.body} className="message-field" endAdornment={<button type="submit" className="icon-button send-button" aria-label={t('Отправить сообщение','Send message')}><Icon name="send" /></button>}><textarea ref={inputRef} rows={1} value={body} onChange={e => setBody(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); formRef.current.requestSubmit(); } }} maxLength={2000} required placeholder={t('Написать сообщение','Write a message')} /></Field><p className="message-key-hint">{t('Enter отправляет сообщение. Shift + Enter добавляет новую строку.','Enter sends the message. Shift + Enter adds a new line.')}</p></form></> : <Empty title={t('Выбери собеседника','Choose someone to talk to')} description={t('Познакомься с людьми и начни общение.','Meet people and start a conversation.')}><Link to="/people" className="button">{t('Знакомства','Meet people')}</Link></Empty>}</section></div></>;
+  }, [body, current?.id]);
+  if (!me)
+    return <LoginGate next={id ? `/chats/${id}` : '/chats'} title={t('Общение', 'Messages')} />;
+  if (id && !current)
+    return (
+      <Empty title={t('Диалог не найден', 'Conversation not found')}>
+        <Link to="/chats" className="button">
+          {t('Все сообщения', 'All messages')}
+        </Link>
+      </Empty>
+    );
+  async function submit(e) {
+    e.preventDefault();
+    if (sending.current) return;
+    if (!body.trim()) {
+      setErrors({ body: t('Напиши сообщение.', 'Write a message.') });
+      return;
+    }
+    const chatId = current.id;
+    const sentBody = body;
+    sending.current = true;
+    setPending(true);
+    try {
+      if (await act('sendMessage', { chatId, body: sentBody })) {
+        if (activeChat.current === chatId) {
+          setBody(value => value === sentBody ? '' : value);
+          setErrors({});
+        }
+      }
+    } finally {
+      sending.current = false;
+      setPending(false);
+    }
+  }
+  const date = (value) =>
+    new Intl.DateTimeFormat(locale === 'ru' ? 'ru-RU' : 'en-GB', {
+      day: 'numeric',
+      month: 'long',
+    }).format(value);
+  const time = (value) =>
+    new Intl.DateTimeFormat(locale === 'ru' ? 'ru-RU' : 'en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(value);
+  return (
+    <>
+      <PageTitle
+        title={t('Общение', 'Messages')}
+        description={t('Твои разговоры со студентами', 'Your conversations with other students')}
+      />
+      <div className={`chats-layout ${id ? 'chat-open' : ''}`}>
+        <aside
+          className="conversation-list panel"
+          aria-label={t('Список диалогов', 'Conversations')}
+        >
+          <h2>{t('Сообщения', 'Messages')}</h2>
+          <div
+            className="conversation-scroll"
+            role="region"
+            aria-label={t('Диалоги', 'Chat list')}
+            tabIndex={0}
+          >
+            {chats.length ? (
+              chats.map((chat) => {
+                const user = state.users.find(
+                  (u) => u.id === chat.members.find((m) => m !== me.id),
+                );
+                return (
+                  <Link
+                    to={`/chats/${chat.id}`}
+                    key={chat.id}
+                    className={current?.id === chat.id ? 'conversation active' : 'conversation'}
+                    aria-current={current?.id === chat.id ? 'page' : undefined}
+                  >
+                    <Avatar user={user} />
+                    <span>
+                      <strong>{fullName(user)}</strong>
+                      <small>
+                        {chat.messages.at(-1)?.body || t('Начни разговор', 'Start a conversation')}
+                      </small>
+                    </span>
+                  </Link>
+                );
+              })
+            ) : (
+              <p className="muted">
+                {t('Здесь появятся твои диалоги.', 'Your conversations will appear here.')}
+              </p>
+            )}
+          </div>
+          <Link to="/people" className="text-link">
+            {t('Найти новых людей', 'Meet new people')}
+          </Link>
+        </aside>
+        <section className="chat-panel panel" aria-label={t('Переписка', 'Conversation')}>
+          {current ? (
+            <>
+              <Link to="/chats" className="back-link mobile-back">
+                ← {t('Все сообщения', 'All messages')}
+              </Link>
+              <Link to={`/people/${partner.id}`} className="chat-person person-heading">
+                <Avatar user={partner} />
+                <div>
+                  <h2>{fullName(partner)}</h2>
+                  <Tags values={partner.languages} />
+                </div>
+              </Link>
+              <div
+                className="message-scroll"
+                ref={listRef}
+                aria-label={t('Сообщения диалога', 'Conversation messages')}
+                tabIndex={0}
+              >
+                {current.messages.length ? (
+                  current.messages.map((message, index) => (
+                    <React.Fragment key={message.id}>
+                      {(index === 0 ||
+                        date(message.createdAt) !==
+                          date(current.messages[index - 1].createdAt)) && (
+                        <p className="message-date">{date(message.createdAt)}</p>
+                      )}
+                      <article
+                        className={`message ${message.senderId === me.id ? 'outgoing' : 'incoming'}`}
+                        aria-label={
+                          message.senderId === me.id
+                            ? t('Твоё сообщение', 'Your message')
+                            : fullName(partner)
+                        }
+                      >
+                        <p>{message.body}</p>
+                        <time dateTime={new Date(message.createdAt).toISOString()}>
+                          {time(message.createdAt)}
+                        </time>
+                      </article>
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <Empty
+                    title={t('Начните с приветствия', 'Start with a hello')}
+                    description={t(
+                      'Расскажи, что у вас общего.',
+                      'Talk about what you have in common.',
+                    )}
+                  />
+                )}
+              </div>
+              <form ref={formRef} className="message-form" onSubmit={submit} aria-busy={pending} noValidate>
+                <FormErrors errors={errors} />
+                <Field
+                  label={t('Написать сообщение', 'Write a message')}
+                  error={errors.body}
+                  className="message-field"
+                  endAdornment={
+                    <button
+                      type="submit"
+                      className="icon-button send-button"
+                      disabled={pending}
+                      aria-label={t('Отправить сообщение', 'Send message')}
+                    >
+                      <Icon name="send" />
+                    </button>
+                  }
+                >
+                  <textarea
+                    ref={inputRef}
+                    rows={1}
+                    value={body}
+                    onChange={(e) => setBody(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                        e.preventDefault();
+                        formRef.current.requestSubmit();
+                      }
+                    }}
+                    maxLength={2000}
+                    required
+                    placeholder={t('Написать сообщение', 'Write a message')}
+                  />
+                </Field>
+                <p className="message-key-hint">
+                  {t(
+                    'Enter отправляет сообщение. Shift + Enter добавляет новую строку.',
+                    'Enter sends the message. Shift + Enter adds a new line.',
+                  )}
+                </p>
+              </form>
+            </>
+          ) : (
+            <Empty
+              title={t('Выбери собеседника', 'Choose someone to talk to')}
+              description={t(
+                'Познакомься с людьми и начни общение.',
+                'Meet people and start a conversation.',
+              )}
+            >
+              <Link to="/people" className="button">
+                {t('Знакомства', 'Meet people')}
+              </Link>
+            </Empty>
+          )}
+        </section>
+      </div>
+    </>
+  );
 }

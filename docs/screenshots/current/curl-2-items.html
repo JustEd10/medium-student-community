@@ -1,0 +1,55 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Вопросы с сервера</title><style>body{margin:0;padding:28px;background:#f4f1fc;color:#24213b;font:16px/1.45 Arial}main{max-width:1100px;margin:auto}h1{font-size:25px}pre{margin:18px 0;padding:20px;background:white;border:1px solid #d6c9ed;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.5 monospace}p{color:#5e5b70}</style><main><h1>Вопросы с сервера</h1><p>Вывод реальных запросов curl · 10.10.2026 · локальная исправленная версия. Токены скрыты.</p><pre>curl -sS http://127.0.0.1:4183/api/items
+HTTP 200
+[
+  {
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;Когда можно получить студенческий билет?&quot;,
+    &quot;body&quot;: &quot;Подала документы и уже хожу на занятия. Где узнать о готовности билета?&quot;,
+    &quot;category&quot;: &quot;Документы&quot;,
+    &quot;author&quot;: &quot;alina&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-06T10:00:00.000Z&quot;,
+    &quot;answersCount&quot;: 1,
+    &quot;bodyLength&quot;: 71
+  },
+  {
+    &quot;id&quot;: 2,
+    &quot;title&quot;: &quot;Где найти расписание занятий?&quot;,
+    &quot;body&quot;: &quot;На сайте много разделов на русском, не могу найти расписание своей группы.&quot;,
+    &quot;category&quot;: &quot;Учёба&quot;,
+    &quot;author&quot;: &quot;user&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-06T09:00:00.000Z&quot;,
+    &quot;answersCount&quot;: 1,
+    &quot;bodyLength&quot;: 74
+  },
+  {
+    &quot;id&quot;: 3,
+    &quot;title&quot;: &quot;Кто хочет практиковать русский и английский?&quot;,
+    &quot;body&quot;: &quot;Предлагаю встречаться после занятий и общаться на двух языках.&quot;,
+    &quot;category&quot;: &quot;Языки&quot;,
+    &quot;author&quot;: &quot;wei&quot;,
+    &quot;createdAt&quot;: &quot;2026-10-06T08:00:00.000Z&quot;,
+    &quot;answersCount&quot;: 0,
+    &quot;bodyLength&quot;: 62
+  }
+]</pre><pre>curl -sS http://127.0.0.1:4183/api/items/1
+HTTP 200
+{
+  &quot;id&quot;: 1,
+  &quot;title&quot;: &quot;Когда можно получить студенческий билет?&quot;,
+  &quot;body&quot;: &quot;Подала документы и уже хожу на занятия. Где узнать о готовности билета?&quot;,
+  &quot;category&quot;: &quot;Документы&quot;,
+  &quot;author&quot;: &quot;alina&quot;,
+  &quot;createdAt&quot;: &quot;2026-10-06T10:00:00.000Z&quot;,
+  &quot;answersCount&quot;: 1,
+  &quot;bodyLength&quot;: 71,
+  &quot;answers&quot;: [
+    {
+      &quot;id&quot;: 1,
+      &quot;item_id&quot;: 1,
+      &quot;author&quot;: &quot;wei&quot;,
+      &quot;body&quot;: &quot;Наша группа узнавала через куратора, напиши ему или старосте.&quot;,
+      &quot;rating&quot;: null,
+      &quot;createdAt&quot;: &quot;2026-10-06T10:05:00.000Z&quot;
+    }
+  ]
+}</pre></main></html>
