@@ -1,0 +1,79 @@
+{
+  "checked_at": "2026-10-10T14:48:08.494939+00:00",
+  "base_url": "https://medium-bob01.amvera.io",
+  "checks": [
+    {
+      "path": "/hello",
+      "method": "GET",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": null
+    },
+    {
+      "path": "/api/app/state",
+      "method": "GET",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "no-store",
+      "guest": true,
+      "private_chats": false,
+      "state_keys": [
+        "users",
+        "questions",
+        "answers",
+        "helpRequests",
+        "chats"
+      ]
+    },
+    {
+      "path": "/app/",
+      "method": "GET",
+      "status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "cache_control": "public, max-age=0"
+    },
+    {
+      "path": "/",
+      "method": "GET",
+      "status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "cache_control": "public, max-age=0",
+      "assets": [
+        "/assets/index-Bbig7VSw.js",
+        "/assets/index-CPJ2EkuY.css"
+      ]
+    },
+    {
+      "path": "/api/app/auth/demo",
+      "method": "POST",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "no-store",
+      "demo_user": "alina",
+      "token_received": true
+    },
+    {
+      "path": "/api/app/state",
+      "method": "GET",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "no-store"
+    },
+    {
+      "path": "/api/app/auth/logout",
+      "method": "POST",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "no-store"
+    },
+    {
+      "path": "/api/app/state",
+      "method": "GET",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "no-store",
+      "logged_out_token_rejected": true
+    }
+  ],
+  "success": true
+}
