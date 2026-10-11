@@ -388,3 +388,36 @@ test('AI review queue stays admin-only and does not hide publications', async ()
   assert.equal(dismissed.data.state.aiReviews[key].status, 'dismissed');
   assert.ok(dismissed.data.state.questions.some(q => q.id === created.data.id));
 });
+
+test('people visibility belongs to the authenticated owner and preserves activity', async () => {
+  const user = (await post('/api/app/auth/register', { email: 'visibility@example.test', password: fixturePassword, name: 'Visibility Fixture' })).data;
+  const other = (await post('/api/app/auth/register', { email: 'visibility-other@example.test', password: fixturePassword, name: 'Other Fixture' })).data;
+  const action = (session, type, args) => post('/api/app/act', { type, args }, session?.token);
+  await action(user, 'saveProfile', { firstName: 'Visibility', lastName: 'Fixture', direction: 'IT', course: 1,
+    languages: ['Русский'], interests: ['Музыка'], about: 'Private profile biography', skills: ['Python'] });
+  assert.equal((await action(null, 'setPeopleVisibility', { visible: false })).status, 401);
+  assert.equal((await action(user, 'setPeopleVisibility', { visible: 'false' })).status, 400);
+  // An injected target ID never changes another account's setting.
+  await action(other, 'setPeopleVisibility', { visible: false, id: user.me });
+  assert.notEqual((await call('/api/app/state', { token: user.token })).data.state.users.find(u => u.id === user.me).peopleVisible, false);
+  const hidden = await action(user, 'setPeopleVisibility', { visible: false });
+  assert.equal(hidden.status, 200);
+  const own = hidden.data.state.users.find(u => u.id === user.me);
+  assert.equal(own.peopleVisible, false);
+  assert.equal(own.about, 'Private profile biography');
+  for (const token of [undefined, other.token]) {
+    const publicUser = (await call('/api/app/state', { token })).data.state.users.find(u => u.id === user.me);
+    assert.equal(publicUser.peopleVisible, false);
+    assert.equal(publicUser.about, '');
+    assert.deepEqual(publicUser.interests, []);
+    assert.deepEqual(publicUser.skills, ['Python']);
+  }
+  assert.equal((await action(user, 'addQuestion', { title: 'Can a hidden profile ask questions?', body: '', category: 'Кампус', autoAI: false })).status, 200);
+  const fresh = (await post('/api/app/auth/login', { email: 'visibility@example.test', password: fixturePassword })).data;
+  assert.equal(fresh.state.users.find(u => u.id === user.me).peopleVisible, false);
+  const restored = await action(fresh, 'setPeopleVisibility', { visible: true });
+  assert.equal(restored.status, 200);
+  const publicUser = (await call('/api/app/state')).data.state.users.find(u => u.id === user.me);
+  assert.equal(publicUser.about, 'Private profile biography');
+  assert.deepEqual(publicUser.interests, ['Музыка']);
+});

@@ -312,6 +312,7 @@ export function validState(value) {
     validCredential(u.credential) &&
     (u.bannedAt == null || (Number.isFinite(u.bannedAt) && isUser(u.bannedBy))) &&
     (u.studyHelpVisible === undefined || typeof u.studyHelpVisible === 'boolean') &&
+    (u.peopleVisible === undefined || typeof u.peopleVisible === 'boolean') &&
     (u.role === undefined || ['user', 'admin'].includes(u.role)) &&
     (u.role !== 'admin' || (u.credential && isText(u.login) && u.login.trim().length > 0 && u.login.length <= 100));
 
@@ -371,4 +372,9 @@ export function setStudyHelpVisibility(state, actor, visible) {
   requireMember(state, actor);
   if (typeof visible !== 'boolean') fail('INVALID_DATA');
   return { ...state, users: state.users.map(u => u.id === actor ? { ...u, studyHelpVisible: visible } : u) };
+}
+export function setPeopleVisibility(state, actor, visible) {
+  requireMember(state, actor);
+  if (typeof visible !== 'boolean') fail('INVALID_DATA');
+  return { ...state, users: state.users.map(u => u.id === actor ? { ...u, peopleVisible: visible } : u) };
 }

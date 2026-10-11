@@ -361,7 +361,7 @@ export function Study({ tab }) {
                       </button>
                       {offered && (
                         <p className="offered-note">
-                          {t('Ты предложил помощь', 'You offered to help')}
+                          <span>{t('Ты предложил помощь', 'You offered to help')}</span>
                           <button type="button" className="text-link" onClick={() => act('withdrawHelp', { helpId: request.id })}>{t('Отозвать отклик', 'Withdraw offer')}</button>
                         </p>
                       )}

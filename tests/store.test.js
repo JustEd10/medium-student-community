@@ -23,6 +23,7 @@ test('state survives a new process; expired and legacy sessions do not', () => {
       let state = sendMessage(seed, 'alina', 'c1', 'Сохранённое сообщение', 'persisted-client-id');
       state = markChatRead(state, 'wei', 'c1', state.chats[0].messages.at(-1).id);
       state.users.find(u => u.id === 'alina').about = 'Сохранённый профиль';
+      state.users.find(u => u.id === 'alina').peopleVisible = false;
       commit({ state, sessions: {
         ['a'.repeat(48)]: { userId: 'alina', expiresAt: Date.now() + 60000 },
         ['b'.repeat(48)]: { userId: 'alina', expiresAt: 1 },
@@ -35,11 +36,11 @@ test('state survives a new process; expired and legacy sessions do not', () => {
     const reopened = inStore(dir, `
       import { db } from './server/store.js';
       const message = db.state.chats[0].messages.at(-1);
-      console.log(JSON.stringify({ about: db.state.users.find(u => u.id === 'alina').about, tokens: Object.keys(db.sessions),
+      console.log(JSON.stringify({ about: db.state.users.find(u => u.id === 'alina').about, peopleVisible: db.state.users.find(u => u.id === 'alina').peopleVisible, tokens: Object.keys(db.sessions),
         clientId: message.clientId, read: Number.isFinite(message.readAt) && message.readAt >= message.createdAt }));
     `);
     assert.equal(reopened.status, 0, reopened.stderr);
-    assert.deepEqual(JSON.parse(reopened.stdout), { about: 'Сохранённый профиль', tokens: ['a'.repeat(48)],
+    assert.deepEqual(JSON.parse(reopened.stdout), { about: 'Сохранённый профиль', peopleVisible: false, tokens: ['a'.repeat(48)],
       clientId: 'persisted-client-id', read: true });
   } finally {
     rmSync(dir, { recursive: true, force: true });

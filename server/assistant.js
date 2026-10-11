@@ -10,12 +10,11 @@ export function assistantUser(req) {
 }
 const attempts = new Map();
 const pending = new Map();
-let active = 0;
 function consume(userId) {
   const now = Date.now();
   for (const [id, entry] of attempts) if (entry.until <= now) attempts.delete(id);
   const entry = attempts.get(userId) || { count: 0, until: now + 300000 };
-  if (entry.count >= 5 || active >= 2) throw ragError('AI_BUSY', 429);
+  if (entry.count >= 5) throw ragError('AI_BUSY', 429);
   entry.count += 1;
   attempts.set(userId, entry);
 }
@@ -33,19 +32,22 @@ export function answerPublishedQuestion(questionId, userId) {
   if (!user || (question.authorId !== userId && user.role !== 'admin')) return Promise.reject(ragError('AI_NOT_ALLOWED', 403));
   if (question.aiResponse?.status === 'ready') return Promise.resolve(question.aiResponse);
   try { consume(userId); } catch (err) { return Promise.reject(err); }
-  active += 1;
   const job = (async () => {
     try {
       saveResponse(questionId, { status: 'pending', createdAt: Date.now() });
       if (!providerConfigured()) throw ragError('AI_NOT_CONFIGURED');
-      const response = { ...await generateUniversityAnswer(`${question.title}\n${question.body}`), status: 'ready' };
+      const response = { ...await generateUniversityAnswer(`${question.title}\n${question.body}`, undefined, { canRun: () =>
+        db.state.questions.some(q => q.id === questionId && q.deletedAt == null && q.title === question.title && q.body === question.body) &&
+        db.state.users.some(u => u.id === userId && u.credential && u.deletedAt == null && u.bannedAt == null) &&
+        db.state.users.some(u => u.id === question.authorId && u.deletedAt == null && u.bannedAt == null)
+      }), status: 'ready' };
       saveResponse(questionId, response);
       return response;
     } catch (err) {
       // Provider responses, credentials and request bodies never enter logs or public errors.
-      try { saveResponse(questionId, { status: 'error', error: ['AI_NOT_CONFIGURED', 'AI_BUSY'].includes(err.message) ? err.message : 'AI_UNAVAILABLE', createdAt: Date.now() }); } catch { /* storage errors are reported by next request */ }
+      try { saveResponse(questionId, { status: 'error', error: ['AI_NOT_CONFIGURED', 'AI_BUSY', 'AI_QUEUE_FULL', 'AI_QUEUE_TIMEOUT'].includes(err.message) ? err.message : 'AI_UNAVAILABLE', createdAt: Date.now() }); } catch { /* storage errors are reported by next request */ }
       throw err.status ? err : ragError('AI_UNAVAILABLE');
-    } finally { active -= 1; pending.delete(questionId); }
+    } finally { pending.delete(questionId); }
   })();
   pending.set(questionId, job);
   return job;
@@ -74,13 +76,12 @@ export function createAssistantRouter() {
       if (typeof req.body.question !== 'string' || req.body.question.trim().length < 8 || req.body.question.length > 2200) throw ragError('AI_INVALID_QUESTION', 400);
       consume(user.id);
       if (!providerConfigured()) throw ragError('AI_NOT_CONFIGURED');
-      active += 1;
-      let answer;
-      try { answer = await generateUniversityAnswer(req.body.question); } finally { active -= 1; }
+      const answer = await generateUniversityAnswer(req.body.question, undefined, { canRun: () => Boolean(assistantUser(req)) });
       if (!assistantUser(req)) return res.status(401).json({ error: 'AUTH_REQUIRED' });
       res.json({ answer });
     } catch (err) {
-      const error = ['AI_NOT_CONFIGURED', 'AI_BUSY', 'AI_INVALID_QUESTION', 'AI_NOT_ALLOWED', 'NOT_FOUND'].includes(err.message) ? err.message : 'AI_UNAVAILABLE';
+      if (!assistantUser(req)) return res.status(401).json({ error: 'AUTH_REQUIRED' });
+      const error = ['AI_NOT_CONFIGURED', 'AI_BUSY', 'AI_QUEUE_FULL', 'AI_QUEUE_TIMEOUT', 'AI_INVALID_QUESTION', 'AI_NOT_ALLOWED', 'NOT_FOUND'].includes(err.message) ? err.message : 'AI_UNAVAILABLE';
       res.status(err.status || 503).json({ error });
     }
   });

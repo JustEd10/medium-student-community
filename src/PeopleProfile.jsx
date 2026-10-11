@@ -30,6 +30,7 @@ export function People() {
     .filter(
       (u) =>
         u.id !== me?.id &&
+        u.peopleVisible !== false &&
         u.direction &&
         matches(
           [fullName(u), u.direction, u.about, ...u.interests, ...u.languages].join(' '),
@@ -188,6 +189,15 @@ export function Profile() {
   const { state, me, act, t, notify } = useApp();
   const [values, setValues] = useState(() => profileValues(me));
   const [errors, setErrors] = useState({});
+  const [visibilityBusy, setVisibilityBusy] = useState(false);
+  async function changeVisibility() {
+    if (visibilityBusy) return;
+    setVisibilityBusy(true);
+    try {
+      if (await act('setPeopleVisibility', { visible: me.peopleVisible === false }))
+        notify(t('Видимость анкеты обновлена.', 'Profile visibility updated.'));
+    } finally { setVisibilityBusy(false); }
+  }
   useEffect(() => {
     setValues(profileValues(me));
     setErrors({});
@@ -358,6 +368,14 @@ export function Profile() {
               placeholder={t('Например: Python, русский язык', 'For example: Python, Russian')}
             />
           </Field>
+          <div className="profile-visibility">
+            <div><strong>{t('Показывать анкету в знакомствах', 'Show my profile in People')}</strong>
+              <p className="muted">{t('Если выключить, другие студенты не увидят анкету в знакомствах. Чаты и помощь с учёбой останутся доступны. Настройка сохраняется сразу.', 'When disabled, other students cannot view your dating profile. Chats and study help remain available. This setting saves immediately.')}</p>
+            </div>
+            <button type="button" role="switch" aria-checked={me.peopleVisible !== false}
+              aria-label={t('Показывать анкету в знакомствах', 'Show my profile in People')}
+              className="visibility-switch" disabled={visibilityBusy} onClick={changeVisibility}><span /></button>
+          </div>
           <p className="ai-privacy">{t('Публичные поля анкеты проверяет GigaChat. Решения о модерации принимает администратор.', 'GigaChat reviews public profile fields. Moderation decisions are made by an administrator.')}</p>
           <button type="submit" className="button profile-save-mobile">
             {t('Сохранить и найти людей', 'Save and find people')}
@@ -395,7 +413,7 @@ export function Person({ id }) {
   const table = rankings(state);
   const rank = table.findIndex((r) => r.user.id === id);
   const score = table[rank];
-  if (!user)
+  if (!user || (user.peopleVisible === false && user.id !== me?.id && me?.role !== 'admin'))
     return (
       <Empty title={t('Профиль не найден', 'Profile not found')}>
         <Link to="/people" className="button">

@@ -11,6 +11,7 @@ import {
   addAnswer,
   withdrawHelp,
   setStudyHelpVisibility,
+  setPeopleVisibility,
   addHelp,
   addQuestion,
   completeHelp,
@@ -58,7 +59,9 @@ function publicState(userId) {
   const questionIds = new Set(questions.map(q => q.id));
   return {
     users: s.users.filter(u => alive.has(u.id)).map(({ credential, login, email, role, ...u }) =>
-      u.id === userId ? { ...u, email, role: role || 'user' } : { ...u, email: '', ...(administrator ? { role: role || 'user' } : {}) },
+      u.id === userId ? { ...u, email, role: role || 'user' } : { ...u,
+        ...(!administrator && u.peopleVisible === false ? { about: '', interests: [] } : {}),
+        email: '', ...(administrator ? { role: role || 'user' } : {}) },
     ),
     questions,
     answers: s.answers.filter(a => a.deletedAt == null && alive.has(a.authorId) && questionIds.has(a.questionId)),
@@ -193,6 +196,7 @@ const actions = {
   setUserBan: (s, me, a) => setUserBan(s, me, text(a.id, 100), a.banned),
   withdrawHelp: (s, me, a) => withdrawHelp(s, me, text(a.helpId, 100)),
   setStudyHelpVisibility: (s, me, a) => setStudyHelpVisibility(s, me, a.visible),
+  setPeopleVisibility: (s, me, a) => setPeopleVisibility(s, me, a.visible),
   restoreContent: (s, me, a) => restoreContent(s, me, text(a.kind, 20), text(a.id, 100)),
   saveProfile: (s, me, a) => {
     if (!['number', 'string'].includes(typeof a.course)) throw new Error('INVALID_PROFILE');
