@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useApp } from './context';
-import { fullName } from './domain';
+import { fullName, uid } from './domain';
+import { DeleteControl } from './AdminModeration';
 import {
   Avatar,
   Empty,
@@ -23,6 +24,10 @@ export function Chats({ id }) {
   const sending = useRef(false);
   const activeChat = useRef(null);
   const [pending, setPending] = useState(false);
+  const [outbox, setOutbox] = useState([]);
+  const reading = useRef(new Set());
+  const actRef = useRef(act);
+  actRef.current = act;
   const chats = state.chats
     .filter((c) => c.members.includes(me?.id))
     .sort((a, b) => (b.messages.at(-1)?.createdAt || 0) - (a.messages.at(-1)?.createdAt || 0));
@@ -30,13 +35,59 @@ export function Chats({ id }) {
   activeChat.current = current?.id;
   const partner =
     current && state.users.find((u) => u.id === current.members.find((m) => m !== me?.id));
+  const localMessages = outbox.filter(message =>
+    message.chatId === current?.id && message.senderId === me?.id &&
+    !current.messages.some(saved => saved.clientId === message.clientId),
+  );
+  const messages = [...(current?.messages || []), ...localMessages];
+  useEffect(() => { setOutbox([]); }, [me?.id]);
   useEffect(() => {
     setBody('');
     setErrors({});
   }, [current?.id]);
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
-  }, [current?.id, current?.messages.length]);
+  }, [current?.id, current?.messages.length, localMessages.length]);
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list || !current || !me) return;
+    function markVisibleMessages() {
+      if (document.hidden || !document.hasFocus() || !list.getClientRects().length) return;
+      const clip = list.getBoundingClientRect();
+      const top = Math.max(0, clip.top);
+      const bottom = Math.min(window.innerHeight, clip.bottom);
+      const left = Math.max(0, clip.left);
+      const right = Math.min(window.innerWidth, clip.right);
+      if (bottom <= top || right <= left) return;
+      let throughId;
+      for (const element of list.querySelectorAll('[data-message-id]')) {
+        const message = current.messages.find(m => m.id === element.dataset.messageId);
+        if (!message || message.senderId === me.id || message.readAt != null) continue;
+        const box = element.getBoundingClientRect();
+        if (box.bottom > top && box.top < bottom && box.right > left && box.left < right)
+          throughId = message.id;
+      }
+      if (!throughId) return;
+      const key = `${me.id}:${current.id}:${throughId}`;
+      if (reading.current.has(key)) return;
+      reading.current.add(key);
+      actRef.current('markChatRead', { chatId: current.id, throughId }, { silent: true })
+        .finally(() => reading.current.delete(key));
+    }
+    markVisibleMessages();
+    list.addEventListener('scroll', markVisibleMessages, { passive: true });
+    window.addEventListener('scroll', markVisibleMessages, { passive: true });
+    window.addEventListener('resize', markVisibleMessages);
+    window.addEventListener('focus', markVisibleMessages);
+    document.addEventListener('visibilitychange', markVisibleMessages);
+    return () => {
+      list.removeEventListener('scroll', markVisibleMessages);
+      window.removeEventListener('scroll', markVisibleMessages);
+      window.removeEventListener('resize', markVisibleMessages);
+      window.removeEventListener('focus', markVisibleMessages);
+      document.removeEventListener('visibilitychange', markVisibleMessages);
+    };
+  }, [current?.id, current?.messages, me?.id]);
   useLayoutEffect(() => {
     function resizeInput() {
       const input = inputRef.current;
@@ -63,28 +114,62 @@ export function Chats({ id }) {
         </Link>
       </Empty>
     );
-  async function submit(e) {
+  async function send(message) {
+    if (sending.current) return;
+    sending.current = true;
+    setPending(true);
+    setErrors({});
+    setOutbox(previous => [
+      ...previous.filter(item => item.clientId !== message.clientId),
+      { ...message, status: 'sending' },
+    ]);
+    try {
+      if (await act('sendMessage', {
+        chatId: message.chatId, body: message.body, clientId: message.clientId,
+      })) {
+        setOutbox(previous => previous.filter(item => item.clientId !== message.clientId));
+        if (activeChat.current === message.chatId) {
+          setBody(value => value === message.body ? '' : value);
+          setErrors({});
+        }
+      } else {
+        setOutbox(previous => previous.map(item => item.clientId === message.clientId
+          ? { ...item, status: 'failed' } : item));
+      }
+    } finally {
+      sending.current = false;
+      setPending(false);
+    }
+  }
+  function submit(e) {
     e.preventDefault();
     if (sending.current) return;
     if (!body.trim()) {
       setErrors({ body: t('Напиши сообщение.', 'Write a message.') });
       return;
     }
-    const chatId = current.id;
-    const sentBody = body;
-    sending.current = true;
-    setPending(true);
-    try {
-      if (await act('sendMessage', { chatId, body: sentBody })) {
-        if (activeChat.current === chatId) {
-          setBody(value => value === sentBody ? '' : value);
-          setErrors({});
-        }
-      }
-    } finally {
-      sending.current = false;
-      setPending(false);
-    }
+    const failed = localMessages.find(message => message.status === 'failed' && message.body === body);
+    send(failed || {
+      id: uid(), clientId: uid(), chatId: current.id, senderId: me.id,
+      body, createdAt: Date.now(),
+    });
+  }
+  function status(message) {
+    const value = message.status || (message.readAt != null ? 'read' : 'sent');
+    const label = {
+      sending: t('Отправляется', 'Sending'), sent: t('Отправлено', 'Sent'),
+      read: t('Прочитано', 'Read'), failed: t('Не отправлено. Повторить', 'Not sent. Retry'),
+    }[value];
+    if (value === 'failed') return (
+      <button type="button" className="message-retry" disabled={pending}
+        aria-label={label} title={label} data-message-status={value} onClick={() => send(message)}>
+        <Icon name="message-failed" />{t('Повторить', 'Retry')}
+      </button>
+    );
+    return <span className={`message-status message-status-${value}`} role="img"
+      aria-label={label} title={label} data-message-status={value}>
+      <Icon name={`message-${value}`} />
+    </span>;
   }
   const date = (value) =>
     new Intl.DateTimeFormat(locale === 'ru' ? 'ru-RU' : 'en-GB', {
@@ -165,15 +250,16 @@ export function Chats({ id }) {
                 aria-label={t('Сообщения диалога', 'Conversation messages')}
                 tabIndex={0}
               >
-                {current.messages.length ? (
-                  current.messages.map((message, index) => (
+                {messages.length ? (
+                  messages.map((message, index) => (
                     <React.Fragment key={message.id}>
                       {(index === 0 ||
                         date(message.createdAt) !==
-                          date(current.messages[index - 1].createdAt)) && (
+                          date(messages[index - 1].createdAt)) && (
                         <p className="message-date">{date(message.createdAt)}</p>
                       )}
                       <article
+                        data-message-id={message.status ? undefined : message.id}
                         className={`message ${message.senderId === me.id ? 'outgoing' : 'incoming'}`}
                         aria-label={
                           message.senderId === me.id
@@ -182,9 +268,14 @@ export function Chats({ id }) {
                         }
                       >
                         <p>{message.body}</p>
-                        <time dateTime={new Date(message.createdAt).toISOString()}>
-                          {time(message.createdAt)}
-                        </time>
+                        <div className="message-meta">
+                          <time dateTime={new Date(message.createdAt).toISOString()}>
+                            {time(message.createdAt)}
+                          </time>
+                          {message.senderId === me.id && status(message)}
+                          {!message.status && (message.senderId === me.id || me.role === 'admin') &&
+                            <DeleteControl kind="message" id={message.id} label={t('Удалить сообщение', 'Delete message')} />}
+                        </div>
                       </article>
                     </React.Fragment>
                   ))

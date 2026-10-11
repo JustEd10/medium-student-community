@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createInitialState } from '../src/data.js';
+import { createSeed } from '../src/data.js';
 import {
   addQuestion,
   addAnswer,
@@ -11,13 +11,14 @@ import {
   rateHelp,
   openChat,
   sendMessage,
+  markChatRead,
   saveProfile,
   passwordCredential,
   validState,
 } from '../src/domain.js';
 
 test('rating: only the question author, new value replaces the old one', () => {
-  const initial = createInitialState();
+  const initial = createSeed();
   assert.throws(() => rateAnswer(initial, 'wei', 'a1', 5), /RATING_NOT_ALLOWED/);
   assert.throws(() => rateAnswer(initial, 'alina', 'a5', 5), /RATING_NOT_ALLOWED/);
   for (const value of [0, 6, 2.5, '5'])
@@ -36,7 +37,7 @@ test('rating: only the question author, new value replaces the old one', () => {
 });
 
 test('help: offer, complete, then rate', () => {
-  let state = createInitialState();
+  let state = createSeed();
   assert.throws(() => rateHelp(state, 'gabriel', 'h1', 5), /RATING_NOT_ALLOWED/);
   assert.throws(() => offerHelp(state, 'gabriel', 'h1'), /HELP_NOT_ALLOWED/);
 
@@ -55,7 +56,7 @@ test('help: offer, complete, then rate', () => {
 });
 
 test('questions and answers: validation, unknown user', () => {
-  const state = createInitialState();
+  const state = createSeed();
   assert.throws(
     () => addQuestion(state, 'unknown', { title: 'Valid question', body: '', category: 'Учёба' }),
     /AUTH_REQUIRED/,
@@ -78,7 +79,7 @@ test('questions and answers: validation, unknown user', () => {
 });
 
 test('chats: existing chat is reused, outsiders cannot write', () => {
-  const state = createInitialState();
+  const state = createSeed();
   assert.equal(openChat(state, 'wei', 'alina').id, 'c1');
   assert.throws(() => openChat(state, 'alina', 'alina'), /CHAT_NOT_ALLOWED/);
   assert.throws(() => sendMessage(state, 'maria', 'c1', 'Hi'), /CHAT_NOT_ALLOWED/);
@@ -91,7 +92,7 @@ test('chats: existing chat is reused, outsiders cannot write', () => {
 });
 
 test('profile: needs a language and course 1-6', () => {
-  const state = createInitialState();
+  const state = createSeed();
   const profile = { ...state.users[0] };
   assert.throws(
     () => saveProfile(state, 'alina', { ...profile, languages: [] }),
@@ -102,6 +103,36 @@ test('profile: needs a language and course 1-6', () => {
   const next = saveProfile(state, 'alina', { ...profile, firstName: ' Алина ', course: '2' });
   assert.equal(next.users[0].course, 2);
   assert.equal(next.users[0].firstName, 'Алина');
+});
+
+test('chat receipts: only the recipient can mark incoming messages through the viewed boundary', () => {
+  const initial = createSeed(); // старые сообщения без readAt остаются допустимыми
+  const sent = sendMessage(initial, 'alina', 'c1', 'Первое сообщение', 'client-first');
+  const first = sent.chats[0].messages.at(-1);
+  const later = sendMessage(sent, 'alina', 'c1', 'Новое сообщение после просмотра');
+  assert.equal(first.readAt, null);
+  assert.throws(() => markChatRead(later, 'maria', 'c1', first.id), /CHAT_NOT_ALLOWED/);
+  assert.throws(() => markChatRead(later, 'wei', 'c1', 'missing'), /NOT_FOUND/);
+  const read = markChatRead(later, 'wei', 'c1', first.id);
+  assert.ok(read.chats[0].messages.find(m => m.id === first.id).readAt >= first.createdAt);
+  assert.ok(read.chats[0].messages.find(m => m.id === 'm2').readAt);
+  assert.equal(read.chats[0].messages.find(m => m.id === 'm1').readAt, undefined);
+  assert.equal(read.chats[0].messages.at(-1).readAt, null);
+  assert.equal(later.chats[0].messages.find(m => m.id === first.id).readAt, null);
+  assert.equal(markChatRead(read, 'wei', 'c1', first.id), read);
+  assert.equal(validState(read), true);
+});
+
+test('message retry: a stable client ID prevents duplicates without accepting changed text', () => {
+  const initial = createSeed();
+  const sent = sendMessage(initial, 'alina', 'c1', 'Привет', 'retry-id');
+  assert.equal(sendMessage(sent, 'alina', 'c1', ' Привет ', 'retry-id'), sent);
+  assert.equal(sent.chats[0].messages.length, initial.chats[0].messages.length + 1);
+  assert.throws(() => sendMessage(sent, 'alina', 'c1', 'Другой текст', 'retry-id'), /INVALID_MESSAGE/);
+  for (const clientId of ['', ' ', 7, null, 'a'.repeat(101)])
+    assert.throws(() => sendMessage(initial, 'alina', 'c1', 'Привет', clientId), /INVALID_MESSAGE/);
+  const otherSender = sendMessage(sent, 'wei', 'c1', 'Привет', 'retry-id');
+  assert.equal(otherSender.chats[0].messages.length, sent.chats[0].messages.length + 1);
 });
 
 test('password: same salt gives the same hash', async () => {
@@ -115,7 +146,7 @@ test('password: same salt gives the same hash', async () => {
 });
 
 test('validState: broken data is rejected', () => {
-  assert.equal(validState(createInitialState()), true);
+  assert.equal(validState(createSeed()), true);
 
   const orphanAnswer = {
     id: 'a',
@@ -128,10 +159,44 @@ test('validState: broken data is rejected', () => {
   const broken = [
     null,
     {},
-    { ...createInitialState(), users: [null] },
-    { ...createInitialState(), questions: [null] },
-    { ...createInitialState(), session: 'unknown' },
-    { ...createInitialState(), answers: [orphanAnswer] },
+    { ...createSeed(), users: [null] },
+    { ...createSeed(), questions: [null] },
+    { ...createSeed(), session: 'unknown' },
+    { ...createSeed(), answers: [orphanAnswer] },
   ];
   for (const bad of broken) assert.equal(validState(bad), false);
+  for (const metadata of [{ readAt: NaN }, { readAt: -1 }, { readAt: 'today' },
+    { clientId: null }, { clientId: '' }, { clientId: 'a'.repeat(101) }]) {
+    const state = createSeed();
+    Object.assign(state.chats[0].messages[0], metadata);
+    assert.equal(validState(state), false);
+  }
+});
+
+
+test('undo deadline, protected roots, bans and study withdrawal', async () => {
+  const { deleteContent, restoreContent, setUserBan } = await import('../src/moderation.js');
+  const { withdrawHelp, setStudyHelpVisibility } = await import('../src/domain.js');
+  let state = createSeed();
+  state.users.push({ ...state.users[0], id: 'admin', role: 'admin' });
+  const q = state.questions[0];
+  const deleted = deleteContent(state, q.authorId, 'question', q.id);
+  assert.throws(() => restoreContent(deleted, 'admin', 'question', q.id), /RESTORE_NOT_ALLOWED/);
+  assert.equal(restoreContent(deleted, q.authorId, 'question', q.id).questions[0].deletedAt, undefined);
+  const expired = { ...deleted, questions: deleted.questions.map(item => item.id === q.id ? { ...item, deletedAt: Date.now() - 5000 } : item) };
+  assert.throws(() => restoreContent(expired, q.authorId, 'question', q.id), /RESTORE_NOT_ALLOWED/);
+  assert.throws(() => setUserBan(state, 'wei', 'alina', true), /BAN_NOT_ALLOWED/);
+  assert.throws(() => setUserBan(state, 'admin', 'admin', true), /BAN_NOT_ALLOWED/);
+  state = setUserBan(state, 'admin', 'alina', true);
+  assert.throws(() => addQuestion(state, 'alina', { title: 'Valid question', body: '', category: 'Кампус' }), /AUTH_REQUIRED/);
+  assert.equal(state.questions.length, createSeed().questions.length);
+  state = setUserBan(state, 'admin', 'alina', false);
+  assert.equal(state.users.find(u => u.id === 'alina').bannedAt, undefined);
+  state = offerHelp(state, 'wei', 'h1');
+  assert.throws(() => withdrawHelp(state, 'maria', 'h1'), /HELP_NOT_ALLOWED/);
+  state = withdrawHelp(state, 'wei', 'h1');
+  assert.ok(!state.helpRequests.find(h => h.id === 'h1').helpers.includes('wei'));
+  state = setStudyHelpVisibility(state, 'alina', false);
+  assert.equal(state.users.find(u => u.id === 'alina').studyHelpVisible, false);
+  assert.throws(() => setStudyHelpVisibility(state, 'unknown', false), /AUTH_REQUIRED/);
 });

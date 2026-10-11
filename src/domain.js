@@ -17,7 +17,7 @@ function fail(code) {
 }
 
 function requireMember(state, actor) {
-  if (!state.users.some((u) => u.id === actor)) fail('AUTH_REQUIRED');
+  if (!state.users.some((u) => u.id === actor && u.deletedAt == null && u.bannedAt == null)) fail('AUTH_REQUIRED');
 }
 
 // Все функции ниже не меняют state, а возвращают новый.
@@ -42,7 +42,7 @@ export function addQuestion(state, actor, input) {
 
 export function addAnswer(state, actor, questionId, body) {
   requireMember(state, actor);
-  if (!state.questions.some((q) => q.id === questionId)) fail('NOT_FOUND');
+  if (!state.questions.some((q) => q.id === questionId && q.deletedAt == null)) fail('NOT_FOUND');
   body = body.trim();
   if (body.length < 5 || body.length > 2000) fail('INVALID_ANSWER');
 
@@ -59,8 +59,8 @@ export function addAnswer(state, actor, questionId, body) {
 
 export function rateAnswer(state, actor, answerId, value) {
   requireMember(state, actor);
-  const answer = state.answers.find((a) => a.id === answerId);
-  const question = state.questions.find((q) => q.id === answer?.questionId);
+  const answer = state.answers.find((a) => a.id === answerId && a.deletedAt == null);
+  const question = state.questions.find((q) => q.id === answer?.questionId && q.deletedAt == null);
   if (!answer || !question) fail('NOT_FOUND');
   // оценивает только автор вопроса, и не сам себя
   if (question.authorId !== actor || answer.authorId === actor) fail('RATING_NOT_ALLOWED');
@@ -94,7 +94,7 @@ export function addHelp(state, actor, { subject, body }) {
 
 export function offerHelp(state, actor, helpId) {
   requireMember(state, actor);
-  const help = state.helpRequests.find((h) => h.id === helpId);
+  const help = state.helpRequests.find((h) => h.id === helpId && h.deletedAt == null);
   if (!help) fail('NOT_FOUND');
   if (help.authorId === actor || help.status !== 'open') fail('HELP_NOT_ALLOWED');
   return {
@@ -107,7 +107,8 @@ export function offerHelp(state, actor, helpId) {
 
 export function completeHelp(state, actor, helpId, helperId) {
   requireMember(state, actor);
-  const help = state.helpRequests.find((h) => h.id === helpId);
+  requireMember(state, helperId);
+  const help = state.helpRequests.find((h) => h.id === helpId && h.deletedAt == null);
   if (!help) fail('NOT_FOUND');
   if (help.authorId !== actor || help.status !== 'open') fail('HELP_NOT_ALLOWED');
   // выбрать можно только того, кто сам откликнулся
@@ -122,7 +123,7 @@ export function completeHelp(state, actor, helpId, helperId) {
 
 export function rateHelp(state, actor, helpId, value) {
   requireMember(state, actor);
-  const help = state.helpRequests.find((h) => h.id === helpId);
+  const help = state.helpRequests.find((h) => h.id === helpId && h.deletedAt == null);
   if (!help || help.authorId !== actor) fail('RATING_NOT_ALLOWED');
   if (help.status !== 'completed' || !help.helperId || help.helperId === actor)
     fail('RATING_NOT_ALLOWED');
@@ -135,12 +136,13 @@ export function rateHelp(state, actor, helpId, value) {
 
 // в рейтинг идут оценки и за ответы, и за помощь с учёбой
 export function rankings(state) {
-  const rows = state.users.map((user) => {
+  const rows = state.users.filter(user => user.deletedAt == null && user.role !== 'admin').map((user) => {
     const answerRatings = state.answers
-      .filter((a) => a.authorId === user.id && a.rating != null)
+      .filter((a) => a.authorId === user.id && a.rating != null && a.deletedAt == null &&
+        state.questions.some(q => q.id === a.questionId && q.deletedAt == null))
       .map((a) => a.rating);
     const helpRatings = state.helpRequests
-      .filter((h) => h.helperId === user.id && h.status === 'completed' && h.rating != null)
+      .filter((h) => h.helperId === user.id && h.status === 'completed' && h.rating != null && h.deletedAt == null)
       .map((h) => h.rating);
     const values = [...answerRatings, ...helpRatings];
     const total = values.reduce((sum, value) => sum + value, 0);
@@ -164,27 +166,57 @@ export function openChat(state, actor, partner) {
   requireMember(state, partner);
   if (actor === partner) fail('CHAT_NOT_ALLOWED');
   const existing = state.chats.find(
-    (c) => c.members.includes(actor) && c.members.includes(partner),
+    (c) => c.deletedAt == null && c.members.includes(actor) && c.members.includes(partner),
   );
   if (existing) return { state, id: existing.id };
   const chat = { id: uid(), members: [actor, partner], messages: [] };
   return { state: { ...state, chats: [...state.chats, chat] }, id: chat.id };
 }
 
-export function sendMessage(state, actor, chatId, body) {
+export function sendMessage(state, actor, chatId, body, clientId) {
   requireMember(state, actor);
-  const chat = state.chats.find((c) => c.id === chatId);
+  const chat = state.chats.find((c) => c.id === chatId && c.deletedAt == null);
   if (!chat?.members.includes(actor)) fail('CHAT_NOT_ALLOWED');
   body = body.trim();
   if (!body || body.length > 2000) fail('INVALID_MESSAGE');
+  if (clientId !== undefined) {
+    if (typeof clientId !== 'string' || !clientId.trim() || clientId.length > 100)
+      fail('INVALID_MESSAGE');
+    const existing = chat.messages.find(m => m.senderId === actor && m.clientId === clientId);
+    if (existing) {
+      if (existing.body !== body) fail('INVALID_MESSAGE');
+      return state;
+    }
+  }
 
-  const message = { id: uid(), senderId: actor, body, createdAt: Date.now() };
+  const message = {
+    id: uid(), senderId: actor, body, createdAt: Date.now(), readAt: null,
+    ...(clientId === undefined ? {} : { clientId }),
+  };
   return {
     ...state,
     chats: state.chats.map((c) =>
       c.id === chatId ? { ...c, messages: [...c.messages, message] } : c,
     ),
   };
+}
+
+export function markChatRead(state, actor, chatId, throughId) {
+  requireMember(state, actor);
+  const chat = state.chats.find(c => c.id === chatId && c.deletedAt == null);
+  if (!chat?.members.includes(actor)) fail('CHAT_NOT_ALLOWED');
+  const boundary = chat.messages.findIndex(m => m.id === throughId);
+  if (boundary < 0) fail('NOT_FOUND');
+  const readAt = Date.now();
+  let changed = false;
+  const messages = chat.messages.map((message, index) => {
+    // Сообщения, пришедшие после просмотра, остаются непрочитанными.
+    if (index > boundary || message.senderId === actor || message.readAt != null) return message;
+    changed = true;
+    return { ...message, readAt: Math.max(readAt, message.createdAt) };
+  });
+  if (!changed) return state;
+  return { ...state, chats: state.chats.map(c => c.id === chatId ? { ...c, messages } : c) };
 }
 
 export function saveProfile(state, actor, profile) {
@@ -249,6 +281,15 @@ function validCredential(c) {
   return bytes(c.salt, 16) && bytes(c.hash, 32);
 }
 
+function validAIResponse(a) {
+  if (!a || !Number.isFinite(a.createdAt)) return false;
+  if (a.status === 'pending') return true;
+  if (a.status === 'error') return ['AI_UNAVAILABLE', 'AI_BUSY', 'AI_NOT_CONFIGURED'].includes(a.error);
+  return a.status === 'ready' && typeof a.grounded === 'boolean' && isText(a.body) && a.body.length <= 6000 &&
+    Array.isArray(a.sources) && a.sources.length <= 3 && a.sources.every(s =>
+      [s.id, s.title, s.url, s.checkedAt].every(isText) && /^https:\/\/www\.rea\.ru\//.test(s.url));
+}
+
 // Проверка всего состояния целиком: и то, что прочитали с диска при старте,
 // и то, что получилось после очередного действия. Битое не сохраняем.
 export function validState(value) {
@@ -268,12 +309,17 @@ export function validState(value) {
     u.course >= 1 &&
     u.course <= 6 &&
     [u.languages, u.interests, u.skills].every(isTextList) &&
-    validCredential(u.credential);
+    validCredential(u.credential) &&
+    (u.bannedAt == null || (Number.isFinite(u.bannedAt) && isUser(u.bannedBy))) &&
+    (u.studyHelpVisible === undefined || typeof u.studyHelpVisible === 'boolean') &&
+    (u.role === undefined || ['user', 'admin'].includes(u.role)) &&
+    (u.role !== 'admin' || (u.credential && isText(u.login) && u.login.trim().length > 0 && u.login.length <= 100));
 
   const questionOk = (q) =>
     isUser(q.authorId) &&
     [q.title, q.body, q.category].every(isText) &&
-    Number.isFinite(q.createdAt);
+    Number.isFinite(q.createdAt) &&
+    (q.aiResponse === undefined || validAIResponse(q.aiResponse));
 
   const answerOk = (a) =>
     isUser(a.authorId) &&
@@ -298,7 +344,9 @@ export function validState(value) {
     if (c.members[0] === c.members[1] || !c.members.every(isUser)) return false;
     if (!Array.isArray(c.messages) || !uniqueIds(c.messages)) return false;
     return c.messages.every(
-      (m) => c.members.includes(m.senderId) && isText(m.body) && Number.isFinite(m.createdAt),
+      (m) => c.members.includes(m.senderId) && isText(m.body) && Number.isFinite(m.createdAt) &&
+        (m.readAt == null || (Number.isFinite(m.readAt) && m.readAt >= m.createdAt)) &&
+        (m.clientId === undefined || (isText(m.clientId) && m.clientId.trim().length > 0 && m.clientId.length <= 100)),
     );
   };
 
@@ -309,4 +357,18 @@ export function validState(value) {
     value.helpRequests.every(helpOk) &&
     value.chats.every(chatOk)
   );
+}
+
+export function withdrawHelp(state, actor, helpId) {
+  requireMember(state, actor);
+  const help = state.helpRequests.find(h => h.id === helpId && h.deletedAt == null);
+  if (!help) fail('NOT_FOUND');
+  if (help.status !== 'open' || !help.helpers.includes(actor)) fail('HELP_NOT_ALLOWED');
+  return { ...state, helpRequests: state.helpRequests.map(h => h.id === helpId
+    ? { ...h, helpers: h.helpers.filter(id => id !== actor) } : h) };
+}
+export function setStudyHelpVisibility(state, actor, visible) {
+  requireMember(state, actor);
+  if (typeof visible !== 'boolean') fail('INVALID_DATA');
+  return { ...state, users: state.users.map(u => u.id === actor ? { ...u, studyHelpVisible: visible } : u) };
 }

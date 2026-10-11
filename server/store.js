@@ -2,14 +2,15 @@ import fs from 'fs';
 import crypto from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createInitialState } from '../src/data.js';
+import { createEmptyState } from '../src/data.js';
 import { validState } from '../src/domain.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dir = process.env.DATA_DIR || path.join(__dirname, 'storage');
+export const dataDirectory = dir;
 const file = path.join(dir, 'db.json');
 
-export const db = { state: createInitialState(), sessions: {} };
+export const db = { state: createEmptyState(), sessions: {} };
 
 try {
   const saved = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -19,7 +20,7 @@ try {
   db.sessions = Object.fromEntries(Object.entries(saved.sessions || {}).filter(([token, session]) =>
     /^[a-f0-9]{48}$/.test(token) && session && typeof session === 'object' &&
     Number.isFinite(session.expiresAt) && session.expiresAt > Date.now() &&
-    db.state.users.some(u => u.id === session.userId),
+    db.state.users.some(u => u.id === session.userId && u.credential && u.deletedAt == null && u.bannedAt == null),
   ));
 } catch (err) {
   if (err.code !== 'ENOENT') throw new Error(`Не удалось прочитать базу ${file}: ${err.message}`);

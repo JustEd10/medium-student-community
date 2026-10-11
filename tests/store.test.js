@@ -16,7 +16,12 @@ test('state survives a new process; expired and legacy sessions do not', () => {
   try {
     const created = inStore(dir, `
       import { db, commit } from './server/store.js';
-      const state = structuredClone(db.state);
+      import { createSeed } from './src/data.js';
+      import { sendMessage, markChatRead, passwordCredential } from './src/domain.js';
+      const seed = createSeed();
+      seed.users.find(u => u.id === 'alina').credential = await passwordCredential('isolated-fixture-pass');
+      let state = sendMessage(seed, 'alina', 'c1', 'Сохранённое сообщение', 'persisted-client-id');
+      state = markChatRead(state, 'wei', 'c1', state.chats[0].messages.at(-1).id);
       state.users.find(u => u.id === 'alina').about = 'Сохранённый профиль';
       commit({ state, sessions: {
         ['a'.repeat(48)]: { userId: 'alina', expiresAt: Date.now() + 60000 },
@@ -29,10 +34,13 @@ test('state survives a new process; expired and legacy sessions do not', () => {
     assert.deepEqual(readdirSync(dir), ['db.json']);
     const reopened = inStore(dir, `
       import { db } from './server/store.js';
-      console.log(JSON.stringify({ about: db.state.users.find(u => u.id === 'alina').about, tokens: Object.keys(db.sessions) }));
+      const message = db.state.chats[0].messages.at(-1);
+      console.log(JSON.stringify({ about: db.state.users.find(u => u.id === 'alina').about, tokens: Object.keys(db.sessions),
+        clientId: message.clientId, read: Number.isFinite(message.readAt) && message.readAt >= message.createdAt }));
     `);
     assert.equal(reopened.status, 0, reopened.stderr);
-    assert.deepEqual(JSON.parse(reopened.stdout), { about: 'Сохранённый профиль', tokens: ['a'.repeat(48)] });
+    assert.deepEqual(JSON.parse(reopened.stdout), { about: 'Сохранённый профиль', tokens: ['a'.repeat(48)],
+      clientId: 'persisted-client-id', read: true });
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -51,4 +59,61 @@ test('corrupt saved data stops startup and is never replaced with demo data', ()
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('empty install and private hashed bootstrap are idempotent and reject invalid input', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'medium-admin-'));
+  try {
+    const initial = inStore(dir, `import { db } from './server/store.js'; console.log(db.state.users.length);`);
+    assert.equal(initial.status, 0, initial.stderr);
+    assert.equal(initial.stdout.trim(), '0');
+    for (const config of [null, {}, { login: 'fixture-admin', credential: { salt: [], hash: [] } }]) {
+      writeFileSync(join(dir, 'admin-bootstrap.json'), JSON.stringify(config));
+      const invalid = inStore(dir, `import { provisionAdministrator } from './server/admin.js'; provisionAdministrator();`);
+      assert.notEqual(invalid.status, 0);
+      assert.ok(!readdirSync(dir).includes('db.json'));
+    }
+    const created = inStore(dir, `
+      import fs from 'node:fs';
+      import { passwordCredential } from './src/domain.js';
+      import { db } from './server/store.js';
+      import { provisionAdministrator } from './server/admin.js';
+      fs.writeFileSync(process.env.DATA_DIR + '/admin-bootstrap.json', JSON.stringify({ login: 'fixture-admin', credential: await passwordCredential('fabricated-admin-pass') }));
+      provisionAdministrator(); provisionAdministrator();
+      console.log(JSON.stringify({ count: db.state.users.length, role: db.state.users[0].role }));
+    `);
+    assert.equal(created.status, 0, created.stderr);
+    assert.deepEqual(JSON.parse(created.stdout), { count: 1, role: 'admin' });
+    assert.ok(!readFileSync(join(dir, 'db.json'), 'utf8').includes('fabricated-admin-pass'));
+    const reopened = inStore(dir, `import { db } from './server/store.js'; import { provisionAdministrator } from './server/admin.js'; provisionAdministrator(); console.log(db.state.users.length);`);
+    assert.equal(reopened.stdout.trim(), '1');
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('bans and interrupted AI requests survive restart safely', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'medium-ban-ai-'));
+  try {
+    const created = inStore(dir, `
+      import { db, commit } from './server/store.js';
+      import { createSeed } from './src/data.js';
+      import { passwordCredential } from './src/domain.js';
+      const state = createSeed();
+      const user = state.users.find(u => u.id === 'alina');
+      user.credential = await passwordCredential('isolated-fixture-pass');
+      user.bannedAt = Date.now(); user.bannedBy = 'wei';
+      state.questions[0].aiResponse = { status: 'pending', createdAt: Date.now() };
+      commit({state,sessions:{['a'.repeat(48)]:{userId:'alina',expiresAt:Date.now()+60000}}});
+    `);
+    assert.equal(created.status, 0, created.stderr);
+    const reopened = inStore(dir, `
+      import { db } from './server/store.js';
+      import { createAssistantRouter } from './server/assistant.js';
+      createAssistantRouter();
+      console.log(JSON.stringify({ banned: db.state.users.find(u => u.id === 'alina').bannedAt != null,
+        sessions: Object.keys(db.sessions).length, ai: db.state.questions[0].aiResponse.status,
+        preserved: db.state.questions.length > 0 }));
+    `);
+    assert.equal(reopened.status, 0, reopened.stderr);
+    assert.deepEqual(JSON.parse(reopened.stdout), { banned: true, sessions: 0, ai: 'error', preserved: true });
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });

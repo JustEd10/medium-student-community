@@ -34,8 +34,8 @@ npm run dev
 | `GET /hello`, `/time`, `/random` | Приветствие, время и случайное число |
 | `GET /api/app/state` | Данные основного сайта |
 | `POST /api/app/auth/register`, `/api/app/auth/login` | Регистрация и вход |
-| `POST /api/app/auth/demo`, `/api/app/auth/logout` | Демо-вход и выход |
-| `POST /api/app/act` | Вопросы, ответы, помощь, сообщения и профиль |
+| `POST /api/app/auth/logout` | Выход |
+| `POST /api/app/act` | Вопросы, ответы, помощь, сообщения, профиль и удаление своих публикаций |
 | `/api/items`, `/api/records` | Учебное REST API вопросов и ответов |
 
 ```bash

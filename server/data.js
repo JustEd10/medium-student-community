@@ -3,7 +3,6 @@
 export const CATEGORIES = ['Документы', 'Учёба', 'Кампус', 'Языки', 'События'];
 
 export const users = [
-  { login: 'admin', password: '12345', role: 'admin' },
   { login: 'user', password: 'qwerty', role: 'user' },
   { login: 'alina', password: 'alina2026', role: 'user' },
   { login: 'wei', password: 'wei2026', role: 'user' },

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DeleteControl } from './AdminModeration';
 import { useApp, go } from './context';
 import { commonItems, fullName, matches } from './domain';
 import {
@@ -21,6 +22,7 @@ function MyRequest({ request }) {
   return (
     <article className="my-request panel">
       <h3>{request.subject}</h3>
+      <DeleteControl kind="help" id={request.id} label={t('Снять запрос', 'Withdraw request')} />
       <p>{request.body}</p>
       {request.status === 'completed' ? (
         <p className="completed-badge">
@@ -311,6 +313,7 @@ export function Study({ tab }) {
                       {offered && (
                         <p className="offered-note">
                           {t('Ты предложил помощь', 'You offered to help')}
+                          <button type="button" className="text-link" onClick={() => act('withdrawHelp', { helpId: request.id })}>{t('Отозвать отклик', 'Withdraw offer')}</button>
                         </p>
                       )}
                     </article>

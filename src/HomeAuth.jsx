@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useApp, go } from './context';
-import { DEMO_USERS } from './data';
-import { fullName } from './domain';
 import { asset, Field, FormErrors, Link, PageTitle } from './components';
 
 export function Home() {
@@ -96,12 +94,11 @@ export function Home() {
 }
 
 export function Auth({ register, next }) {
-  const { state, auth, t, notify } = useApp();
+  const { auth, t, notify } = useApp();
   const [values, setValues] = useState({ name: '', email: '', password: '', confirm: '' });
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
-  const [demo, setDemo] = useState('alina');
   const target =
     next?.startsWith('/') && !next.startsWith('//') ? next : register ? '/profile' : '/people';
   const update = (e) => {
@@ -113,8 +110,9 @@ export function Auth({ register, next }) {
     if (busy) return;
     const email = values.email.trim().toLowerCase();
     const issues = {};
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      issues.email = t('Проверь адрес почты.', 'Enter a valid email address.');
+    if (register ? !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) : !email)
+      issues.email = register ? t('Проверь адрес почты.', 'Enter a valid email address.')
+        : t('Укажи почту или логин.', 'Enter your email or username.');
     if (values.password.length < 8 || values.password.length > 128)
       issues.password = t(
         'Пароль должен содержать от 8 до 128 символов.',
@@ -129,7 +127,7 @@ export function Auth({ register, next }) {
     setBusy(true);
     const code = register
       ? await auth('register', { name: values.name, email, password: values.password })
-      : await auth('login', { email, password: values.password });
+      : await auth('login', { identity: email, password: values.password });
     setBusy(false);
     if (code === 'EMAIL_TAKEN') {
       setErrors({
@@ -141,7 +139,7 @@ export function Auth({ register, next }) {
       return;
     }
     if (code === 'BAD_CREDENTIALS') {
-      setErrors({ general: t('Почта или пароль не подходят.', 'Email or password is incorrect.') });
+      setErrors({ general: t('Данные для входа не подходят.', 'Sign-in details are incorrect.') });
       return;
     }
     if (code) {
@@ -207,11 +205,11 @@ export function Auth({ register, next }) {
               />
             </Field>
           )}
-          <Field label={t('Почта', 'Email')} error={errors.email}>
+          <Field label={register ? t('Почта', 'Email') : t('Почта или логин', 'Email or username')} error={errors.email}>
             <input
               name="email"
-              type="email"
-              autoComplete="email"
+              type={register ? 'email' : 'text'}
+              autoComplete={register ? 'email' : 'username'}
               value={values.email}
               onChange={update}
               maxLength={254}
@@ -255,32 +253,6 @@ export function Auth({ register, next }) {
                 : t('Войти', 'Sign in')}
           </button>
         </form>
-        <div className="demo-access">
-          <p>
-            {t(
-              'Регистрация не обязательна: чтобы осмотреться, открой демоверсию с готовым профилем.',
-              'Registration is optional: open the demo to look around with a ready-made profile.',
-            )}
-          </p>
-          <Field label={t('Демо-пользователь', 'Demo user')}>
-            <select value={demo} onChange={(e) => setDemo(e.target.value)}>
-              {DEMO_USERS.map((id) => (
-                <option key={id} value={id}>
-                  {fullName(state.users.find((u) => u.id === id))}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <button
-            type="button"
-            className="button button-outline button-full"
-            onClick={async () => {
-              if (!(await auth('demo', { id: demo }))) go(target);
-            }}
-          >
-            {t('Открыть демоверсию', 'Open demo')}
-          </button>
-        </div>
         <p className="community-note">
           {t(
             'Местные студенты тоже могут присоединиться: помочь иностранным студентам освоиться и попрактиковать другой язык.',

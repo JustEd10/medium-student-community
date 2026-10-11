@@ -6,10 +6,15 @@ import { once } from 'node:events';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { createSeed } from '../src/data.js';
+import { passwordCredential } from '../src/domain.js';
+
+const fixturePassword = 'isolated-fixture-pass';
 const port = 3999;
 const base = `http://127.0.0.1:${port}`;
 const dataDir = mkdtempSync(join(tmpdir(), 'medium-'));
 let server;
+let startupError = '';
 
 async function call(path, { method = 'GET', body, token } = {}) {
   const res = await fetch(base + path, {
@@ -26,10 +31,17 @@ async function call(path, { method = 'GET', body, token } = {}) {
 const post = (path, body, token) => call(path, { method: 'POST', body, token });
 
 before(async () => {
+  const state = createSeed();
+  const credential = await passwordCredential(fixturePassword);
+  state.users = state.users.map(u => ({ ...u, credential }));
+  state.users.push({ ...state.users[0], id: 'legacy-unregistered', email: 'legacy@example.test', credential: null });
+  writeFileSync(join(dataDir, 'db.json'), JSON.stringify({ state, sessions: {} }));
+  writeFileSync(join(dataDir, 'admin-bootstrap.json'), JSON.stringify({ login: 'fixture-moderator', credential }));
   server = spawn(process.execPath, ['server/server.js'], {
     env: { ...process.env, PORT: port, DATA_DIR: dataDir },
-    stdio: 'ignore',
+    stdio: ['ignore', 'ignore', 'pipe'],
   });
+  server.stderr.on('data', chunk => { startupError += chunk; });
   // ждём, пока сервер поднимется (максимум ~6 секунд)
   for (let i = 0; i < 40; i++) {
     try {
@@ -39,13 +51,15 @@ before(async () => {
       await new Promise((r) => setTimeout(r, 150));
     }
   }
-  throw new Error('server did not start');
+  throw new Error(`server did not start: ${startupError}`);
 });
 
 after(async () => {
-  const exited = once(server, 'exit');
-  server.kill();
-  await exited;
+  if (server.exitCode === null && server.signalCode === null) {
+    const exited = once(server, 'exit');
+    server.kill();
+    await exited;
+  }
   rmSync(dataDir, { recursive: true, force: true });
 });
 
@@ -57,6 +71,14 @@ test('invalid JSON and non-object bodies get HTTP errors', async () => {
     assert.equal(res.status, expected);
     assert.equal(typeof (await res.json()).error, 'string');
   }
+});
+
+test('legacy demo profiles are hidden and cannot authenticate', async () => {
+  const state = (await call('/api/app/state')).data.state;
+  assert.ok(!state.users.some(u => u.id === 'legacy-unregistered'));
+  assert.equal((await post('/api/app/auth/login', {
+    email: 'legacy@example.test', password: fixturePassword,
+  })).status, 401);
 });
 
 test('Bearer header is required and logout revokes a token without a body', async () => {
@@ -82,7 +104,7 @@ test('parallel registration cannot create two users with the same email', async 
 });
 
 test('private chats are filtered and API responses cannot be cached', async () => {
-  const { data } = await post('/api/app/auth/demo', { id: 'alina' });
+  const { data } = await post('/api/app/auth/login', { email: createSeed().users.find(u => u.id === 'alina').email, password: fixturePassword });
   const res = await fetch(base + '/api/app/state', { headers: { Authorization: `Bearer ${data.token}` } });
   assert.equal(res.headers.get('cache-control'), 'no-store');
   assert.match(res.headers.get('vary'), /Authorization/);
@@ -96,7 +118,7 @@ test('private chats are filtered and API responses cannot be cached', async () =
 });
 
 test('wrong types and oversized text are rejected without changing server state', async () => {
-  const { data } = await post('/api/app/auth/demo', { id: 'alina' });
+  const { data } = await post('/api/app/auth/login', { email: createSeed().users.find(u => u.id === 'alina').email, password: fixturePassword });
   const beforeState = (await call('/api/app/state', { token: data.token })).data.state;
   const actions = [
     { type: 'addQuestion', args: { title: 'x'.repeat(181), body: '', category: 'Кампус' } },
@@ -110,8 +132,38 @@ test('wrong types and oversized text are rejected without changing server state'
   assert.deepEqual((await call('/api/app/state', { token: data.token })).data.state, beforeState);
 });
 
+test('message receipts: authenticated recipient, viewed boundary, sender refresh and retry deduplication', async () => {
+  const { data: sender } = await post('/api/app/auth/login', { email: createSeed().users.find(u => u.id === 'alina').email, password: fixturePassword });
+  const { data: recipient } = await post('/api/app/auth/login', { email: createSeed().users.find(u => u.id === 'wei').email, password: fixturePassword });
+  const { data: outsider } = await post('/api/app/auth/login', { email: createSeed().users.find(u => u.id === 'maria').email, password: fixturePassword });
+  const send = { type: 'sendMessage', args: { chatId: 'c1', body: 'Проверка галочек', clientId: 'api-retry', readAt: 1 } };
+  const sent = await post('/api/app/act', send, sender.token);
+  assert.equal(sent.status, 200);
+  const messages = sent.data.state.chats.find(c => c.id === 'c1').messages;
+  const message = messages.at(-1);
+  assert.equal(message.readAt, null); // клиент не может подделать прочтение при отправке
+  const retry = await post('/api/app/act', send, sender.token);
+  assert.equal(retry.data.state.chats.find(c => c.id === 'c1').messages.length, messages.length);
+  assert.equal((await post('/api/app/act', { ...send, args: { ...send.args, body: 'Подмена' } }, sender.token)).status, 400);
+  const later = await post('/api/app/act', { type: 'sendMessage', args: { chatId: 'c1', body: 'После просмотра' } }, sender.token);
+  const laterId = later.data.state.chats.find(c => c.id === 'c1').messages.at(-1).id;
+  const receipt = { type: 'markChatRead', args: { chatId: 'c1', throughId: message.id } };
+  assert.equal((await post('/api/app/act', receipt)).status, 401);
+  assert.equal((await post('/api/app/act', receipt, outsider.token)).status, 403);
+  assert.equal((await post('/api/app/act', { ...receipt, args: { chatId: 'c1', throughId: 'missing' } }, recipient.token)).status, 404);
+  assert.equal((await post('/api/app/act', receipt, recipient.token)).status, 200);
+  const refreshed = (await call('/api/app/state', { token: sender.token })).data.state.chats.find(c => c.id === 'c1');
+  const readAt = refreshed.messages.find(m => m.id === message.id).readAt;
+  assert.ok(Number.isFinite(readAt) && readAt >= message.createdAt);
+  assert.equal(refreshed.messages.find(m => m.id === laterId).readAt, null);
+  assert.equal(refreshed.messages.find(m => m.id === 'm1').readAt, undefined);
+  const repeated = await post('/api/app/act', receipt, recipient.token);
+  assert.equal(repeated.data.state.chats.find(c => c.id === 'c1').messages.find(m => m.id === message.id).readAt, readAt);
+  assert.equal((await call('/api/app/state')).data.state.chats.length, 0);
+});
+
 test('failed disk write returns 503 and keeps the previous state', async () => {
-  const { data } = await post('/api/app/auth/demo', { id: 'alina' });
+  const { data } = await post('/api/app/auth/login', { email: createSeed().users.find(u => u.id === 'alina').email, password: fixturePassword });
   const beforeState = (await call('/api/app/state', { token: data.token })).data.state;
   const backup = dataDir + '-backup';
   renameSync(dataDir, backup);
@@ -209,4 +261,98 @@ test('site api: register, ask a question, no password leaks', async () => {
   const state = await call('/api/app/state', { token: reg.data.token });
   assert.ok(!JSON.stringify(state.data).includes('credential'));
   assert.ok(state.data.state.questions.some((q) => q.id === act.data.id));
+});
+
+test('moderation boundaries, cascades, recovery and permanent session revocation', async () => {
+  const register = async name => (await post('/api/app/auth/register', { name: `${name} Тестовый`, email: `${name}@example.test`, password: fixturePassword, role: 'admin' })).data;
+  const owner = await register('owner');
+  const other = await register('other');
+  assert.equal(owner.state.users.find(u => u.id === owner.me).role, 'user');
+  const admin = (await post('/api/app/auth/login', { identity: 'fixture-moderator', password: fixturePassword })).data;
+  assert.ok(admin.token);
+  const act = (session, type, args) => post('/api/app/act', { type, args }, session.token);
+  const question = await act(owner, 'addQuestion', { title: 'Тестовый вопрос владельца', body: '', category: 'Кампус' });
+  const qid = question.data.id;
+  const answered = await act(other, 'addAnswer', { questionId: qid, body: 'Тестовый ответ' });
+  const aid = answered.data.state.answers.find(a => a.questionId === qid).id;
+  assert.equal((await act(owner, 'deleteContent', { kind: 'answer', id: aid })).status, 403);
+  assert.equal((await act(other, 'deleteContent', { kind: 'question', id: qid })).status, 403);
+  assert.equal((await act(other, 'deleteContent', { kind: 'answer', id: aid })).status, 200);
+  assert.equal((await act(owner, 'restoreContent', { kind: 'answer', id: aid })).status, 403);
+  assert.equal((await act(other, 'restoreContent', { kind: 'answer', id: aid })).status, 200);
+  const removed = await act(owner, 'deleteContent', { kind: 'question', id: qid });
+  assert.ok(!removed.data.state.answers.some(a => a.id === aid));
+  assert.equal((await act(other, 'addAnswer', { questionId: qid, body: 'Новый ответ' })).status, 404);
+  const restored = await act(owner, 'restoreContent', { kind: 'question', id: qid });
+  assert.ok(restored.data.state.answers.some(a => a.id === aid));
+  assert.equal((await act(other, 'deleteContent', { kind: 'user', id: owner.me })).status, 403);
+  const opened = await act(owner, 'openChat', { partner: other.me });
+  const cid = opened.data.id;
+  const sent = await act(owner, 'sendMessage', { chatId: cid, body: 'Приватный тестовый текст' });
+  const mid = sent.data.state.chats.find(c => c.id === cid).messages[0].id;
+  assert.equal((await act(other, 'deleteContent', { kind: 'message', id: mid })).status, 403);
+  assert.equal((await act(admin, 'deleteContent', { kind: 'message', id: mid })).status, 200);
+  const help = await act(owner, 'addHelp', { subject: 'Тест', body: 'Нужна тестовая помощь' });
+  const hid = help.data.state.helpRequests.find(h => h.authorId === owner.me).id;
+  assert.equal((await act(other, 'deleteContent', { kind: 'help', id: hid })).status, 403);
+  assert.equal((await act(admin, 'deleteContent', { kind: 'help', id: hid })).status, 200);
+  assert.equal((await act(admin, 'deleteContent', { kind: 'answer', id: aid })).status, 200);
+  assert.equal((await act(admin, 'deleteContent', { kind: 'question', id: qid })).status, 200);
+  assert.equal((await act(admin, 'restoreContent', { kind: 'question', id: qid })).status, 200);
+  assert.equal((await act(admin, 'deleteContent', { kind: 'user', id: owner.me })).status, 200);
+  assert.equal((await act(owner, 'addQuestion', {})).status, 401);
+  assert.equal((await post('/api/app/auth/login', { email: 'owner@example.test', password: fixturePassword })).status, 401);
+  const publicData = (await call('/api/app/state')).data.state;
+  assert.ok(!publicData.users.some(u => u.id === owner.me));
+  assert.ok(!publicData.questions.some(q => q.id === qid));
+  assert.deepEqual(publicData.trash, []);
+  assert.ok(publicData.users.every(u => !('login' in u) && !('credential' in u) && u.email === ''));
+  assert.equal((await act(admin, 'restoreContent', { kind: 'user', id: owner.me })).status, 200);
+  assert.equal((await act(owner, 'addQuestion', {})).status, 401);
+  assert.equal((await post('/api/app/auth/login', { email: 'owner@example.test', password: fixturePassword })).status, 200);
+  assert.equal((await post('/api/app/auth/demo', { id: 'alina' })).status, 404);
+});
+
+
+test('bans revoke sessions and allow amnesty with fresh login', async () => {
+  const account = { name: 'Ban Boundary', email: 'ban-boundary@example.test', password: fixturePassword };
+  const user = (await post('/api/app/auth/register', account)).data;
+  const admin = (await post('/api/app/auth/login', { identity: 'fixture-moderator', password: fixturePassword })).data;
+  const action = (session, type, args) => post('/api/app/act', { type, args }, session?.token);
+  const args = { id: user.me, banned: true };
+  assert.equal((await action(null, 'setUserBan', args)).status, 401);
+  assert.equal((await action(user, 'setUserBan', args)).status, 403);
+  assert.equal((await action(admin, 'setUserBan', { id: admin.me, banned: true })).status, 403);
+  const question = await action(user, 'addQuestion', { title: 'Preserved during account ban', body: '', category: 'Кампус' });
+  assert.equal((await action(admin, 'setUserBan', args)).status, 200);
+  assert.equal((await action(user, 'setStudyHelpVisibility', { visible: false })).status, 401);
+  assert.equal((await post('/api/app/auth/login', account)).status, 401);
+  assert.ok(!(await call('/api/app/state')).data.state.questions.some(q => q.id === question.data.id));
+  assert.equal((await action(admin, 'setUserBan', { ...args, banned: false })).status, 200);
+  assert.equal((await action(user, 'setStudyHelpVisibility', { visible: false })).status, 401);
+  const fresh = (await post('/api/app/auth/login', account)).data;
+  assert.ok(fresh.token);
+  assert.ok(fresh.state.questions.some(q => q.id === question.data.id));
+  assert.equal((await action(fresh, 'setStudyHelpVisibility', { visible: false })).status, 200);
+});
+
+
+test('assistant requires an active account, bounds requests and isolates unavailable provider', async () => {
+  assert.equal((await post('/api/app/assistant', { question: 'Где расписание?' })).status, 401);
+  const user = (await post('/api/app/auth/register', { email: 'ai-fixture@example.test', password: fixturePassword, name: 'AI Fixture' })).data;
+  assert.ok(user.token);
+  assert.equal((await post('/api/app/assistant', { question: 'x'.repeat(2201) }, user.token)).status, 400);
+  assert.equal((await post('/api/app/assistant', { question: 'Где найти расписание?' }, user.token)).data.error, 'AI_NOT_CONFIGURED');
+  const created = await post('/api/app/act', { type: 'addQuestion', args: { title: 'Где найти расписание РЭУ?', body: '', category: 'Учёба', autoAI: true } }, user.token);
+  assert.equal(created.status, 200);
+  let q;
+  for (let i = 0; i < 10; i++) {
+    q = (await call('/api/app/state', { token: user.token })).data.state.questions.find(x => x.id === created.data.id);
+    if (q.aiResponse?.status === 'error') break;
+    await new Promise(r => setTimeout(r, 10));
+  }
+  assert.equal(q.aiResponse.error, 'AI_NOT_CONFIGURED');
+  const admin = (await post('/api/app/auth/login', { email: 'fixture-moderator', password: fixturePassword })).data;
+  await post('/api/app/act', { type: 'setUserBan', args: { id: user.me, banned: true } }, admin.token);
+  assert.equal((await post('/api/app/assistant', { question: 'Где расписание?' }, user.token)).status, 401);
 });

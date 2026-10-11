@@ -1,15 +1,20 @@
 import crypto from 'crypto';
 import { Router } from 'express';
 import { db, commit } from '../store.js';
+import { startAutomaticAnswer } from '../assistant.js';
 import { getToken } from '../auth.js';
-import { CATEGORIES, DEMO_USERS, INTERESTS, LANGUAGES } from '../../src/data.js';
+import { CATEGORIES, INTERESTS, LANGUAGES } from '../../src/data.js';
+import { deleteContent, restoreContent, setUserBan } from '../../src/moderation.js';
 import {
   addAnswer,
+  withdrawHelp,
+  setStudyHelpVisibility,
   addHelp,
   addQuestion,
   completeHelp,
   offerHelp,
   openChat,
+  markChatRead,
   passwordCredential,
   rateAnswer,
   rateHelp,
@@ -38,20 +43,32 @@ function currentUserId(req) {
   const session = db.sessions[getToken(req)];
   if (!session || session.expiresAt <= Date.now()) return null;
   const id = session.userId;
-  return db.state.users.some((u) => u.id === id) ? id : null;
+  return db.state.users.some((u) => u.id === id && u.credential && u.deletedAt == null && u.bannedAt == null) ? id : null;
 }
 
 // пользователям отдаём всё, кроме паролей и чужих почт; чаты только свои
 function publicState(userId) {
   const s = db.state;
+  const administrator = s.users.some(u => u.id === userId && u.role === 'admin' && u.deletedAt == null && u.bannedAt == null);
+  // Старые демонстрационные анкеты без учётных данных не участвуют в рабочем сайте.
+  const alive = new Set(s.users.filter(u => u.deletedAt == null && u.credential && (administrator || u.bannedAt == null)).map(u => u.id));
+  const questions = s.questions.filter(q => q.deletedAt == null && alive.has(q.authorId));
+  const questionIds = new Set(questions.map(q => q.id));
   return {
-    users: s.users.map(({ credential, email, ...u }) =>
-      u.id === userId ? { ...u, email } : { ...u, email: '' },
+    users: s.users.filter(u => alive.has(u.id)).map(({ credential, login, email, role, ...u }) =>
+      u.id === userId ? { ...u, email, role: role || 'user' } : { ...u, email: '', ...(administrator ? { role: role || 'user' } : {}) },
     ),
-    questions: s.questions,
-    answers: s.answers,
-    helpRequests: s.helpRequests,
-    chats: s.chats.filter((c) => c.members.includes(userId)),
+    questions,
+    answers: s.answers.filter(a => a.deletedAt == null && alive.has(a.authorId) && questionIds.has(a.questionId)),
+    helpRequests: s.helpRequests.filter(h => h.deletedAt == null && alive.has(h.authorId)).map(h => {
+      const helperExists = !h.helperId || alive.has(h.helperId);
+      return { ...h, helpers: h.helpers.filter(id => alive.has(id)),
+        ...(!helperExists ? { helperId: null, status: 'open', rating: null } : {}) };
+    }),
+    chats: s.chats.filter(c => c.deletedAt == null && c.members.every(id => alive.has(id)) &&
+      (administrator || c.members.includes(userId))).map(c => ({ ...c,
+        messages: c.messages.filter(m => m.deletedAt == null && alive.has(m.senderId)) })),
+    trash: [],
   };
 }
 
@@ -90,12 +107,13 @@ router.post('/auth/register', asyncRoute(async (req, res) => {
     return res.status(400).json({ error: 'PASSWORD_LENGTH' });
   if (parts.length < 2 || parts[0].length > 60 || parts.slice(1).join(' ').length > 60 || trimmed(req.body.name).length > 120)
     return res.status(400).json({ error: 'NAME_REQUIRED' });
-  if (db.state.users.some((u) => u.email === email))
+  if (db.state.users.some((u) => (u.email.toLowerCase() === email || u.login?.toLowerCase() === email)))
     return res.status(409).json({ error: 'EMAIL_TAKEN' });
 
   const id = uid();
   const user = {
     id,
+    role: 'user',
     firstName: parts.shift(),
     lastName: parts.join(' '),
     email,
@@ -109,30 +127,25 @@ router.post('/auth/register', asyncRoute(async (req, res) => {
     color: db.state.users.length % 5,
   };
   // Пока вычислялся хэш, другой запрос мог зарегистрировать ту же почту.
-  if (db.state.users.some(u => u.email === email))
+  if (db.state.users.some(u => (u.email.toLowerCase() === email || u.login?.toLowerCase() === email)))
     return res.status(409).json({ error: 'EMAIL_TAKEN' });
   const state = { ...db.state, users: [...db.state.users, user] };
   res.status(201).json(sessionResponse(id, state));
 }));
 
 router.post('/auth/login', asyncRoute(async (req, res) => {
-  const email = trimmed(req.body.email).toLowerCase();
+  const identity = trimmed(req.body.identity ?? req.body.email).toLowerCase();
   const password = req.body.password;
   if (typeof password !== 'string' || password.length < 8 || password.length > 128)
     return res.status(401).json({ error: 'BAD_CREDENTIALS' });
-  const user = db.state.users.find((u) => u.email === email);
+  const user = db.state.users.find((u) => u.deletedAt == null && u.bannedAt == null &&
+    (u.email === identity || (u.role === 'admin' && u.login === identity)));
   if (!user || !user.credential) return res.status(401).json({ error: 'BAD_CREDENTIALS' });
   const check = await passwordCredential(password, user.credential.salt);
-  if (!samePassword(user.credential, check))
+  if (!samePassword(user.credential, check) || !db.state.users.some(u => u.id === user.id && u.deletedAt == null && u.bannedAt == null && u.credential === user.credential))
     return res.status(401).json({ error: 'BAD_CREDENTIALS' });
   res.json(sessionResponse(user.id));
 }));
-
-router.post('/auth/demo', (req, res) => {
-  const id = req.body.id;
-  if (!DEMO_USERS.includes(id)) return res.status(400).json({ error: 'NOT_FOUND' });
-  res.json(sessionResponse(id));
-});
 
 router.post('/auth/logout', (req, res) => {
   const sessions = { ...db.sessions };
@@ -144,6 +157,7 @@ router.post('/auth/logout', (req, res) => {
 // каждое действие вызывает те же правила, что и раньше жили в браузере
 const actions = {
   addQuestion: (s, me, a) => {
+    if (a.autoAI !== undefined && typeof a.autoAI !== 'boolean') throw new Error('INVALID_QUESTION');
     if (!CATEGORIES.includes(a.category)) throw new Error('INVALID_QUESTION');
     return addQuestion(s, me, {
       title: text(a.title, 180),
@@ -158,13 +172,22 @@ const actions = {
   offerHelp: (s, me, a) => {
     // повторное нажатие «Помогу» не считаем ошибкой
     const help = s.helpRequests.find((h) => h.id === a.helpId);
-    if (help && help.helpers.includes(me)) return s;
+    if (help && help.deletedAt == null && help.helpers.includes(me)) return s;
     return offerHelp(s, me, text(a.helpId, 100));
   },
   completeHelp: (s, me, a) => completeHelp(s, me, text(a.helpId, 100), text(a.helperId, 100)),
   rateHelp: (s, me, a) => rateHelp(s, me, text(a.helpId, 100), a.value),
   openChat: (s, me, a) => openChat(s, me, text(a.partner, 100)),
-  sendMessage: (s, me, a) => sendMessage(s, me, text(a.chatId, 100), text(a.body, 2000)),
+  sendMessage: (s, me, a) => sendMessage(
+    s, me, text(a.chatId, 100), text(a.body, 2000),
+    a.clientId === undefined ? undefined : text(a.clientId, 100),
+  ),
+  markChatRead: (s, me, a) => markChatRead(s, me, text(a.chatId, 100), text(a.throughId, 100)),
+  deleteContent: (s, me, a) => deleteContent(s, me, text(a.kind, 20), text(a.id, 100)),
+  setUserBan: (s, me, a) => setUserBan(s, me, text(a.id, 100), a.banned),
+  withdrawHelp: (s, me, a) => withdrawHelp(s, me, text(a.helpId, 100)),
+  setStudyHelpVisibility: (s, me, a) => setStudyHelpVisibility(s, me, a.visible),
+  restoreContent: (s, me, a) => restoreContent(s, me, text(a.kind, 20), text(a.id, 100)),
   saveProfile: (s, me, a) => {
     if (!['number', 'string'].includes(typeof a.course)) throw new Error('INVALID_PROFILE');
     return saveProfile(s, me, {
@@ -193,12 +216,18 @@ router.post('/act', (req, res) => {
     return res.status(400).json({ error: 'INVALID_DATA' });
 
   try {
+    const actionStartedAt = Date.now();
     const out = action(db.state, me, args);
     // часть функций возвращает { state, id }, остальные просто новый state
     const next = out.state || out;
     if (!validState(next)) return res.status(400).json({ error: 'INVALID_DATA' });
-    commit({ state: next, sessions: db.sessions });
-    res.json({ id: out.id, me, state: publicState(me) });
+    if (next !== db.state) {
+      const activeUsers = new Set(next.users.filter(u => u.deletedAt == null && u.bannedAt == null).map(u => u.id));
+      const sessions = Object.fromEntries(Object.entries(db.sessions).filter(([, session]) => activeUsers.has(session.userId)));
+      commit({ state: next, sessions });
+    }
+    if (req.body.type === 'addQuestion' && args.autoAI !== false) startAutomaticAnswer(out.id, me);
+    res.json({ id: out.id, me, state: publicState(me), ...(req.body.type === 'deleteContent' ? { undoExpiresAt: actionStartedAt + 5000 } : {}) });
   } catch (err) {
     if (err.code === 'STORAGE_UNAVAILABLE')
       return res.status(503).json({ error: 'STORAGE_UNAVAILABLE' });

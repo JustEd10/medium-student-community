@@ -6,6 +6,10 @@ import authRoutes from './routes/auth.js';
 import itemRoutes from './routes/items.js';
 import recordRoutes from './routes/records.js';
 import appRoutes from './routes/app.js';
+import { provisionAdministrator } from './admin.js';
+import { createAssistantRouter } from './assistant.js';
+
+provisionAdministrator();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -42,6 +46,7 @@ app.get('/api/demo', (req, res) => {
 app.use('/api', authRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api', recordRoutes);
+app.use('/api/app/assistant', createAssistantRouter());
 app.use('/api/app', appRoutes);
 
 app.use('/app', express.static(path.join(__dirname, 'public')));

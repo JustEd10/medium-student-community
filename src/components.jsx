@@ -329,6 +329,7 @@ export function MenuContent({ onClose = () => {} }) {
     ['/questions', t('Вопрос-ответ', 'Questions & answers')],
     ['/chats', t('Общение', 'Messages')],
     ['/profile', t('Профиль', 'Profile')],
+    ...(me?.role === 'admin' ? [['/moderation', t('Модерация', 'Moderation')]] : []),
   ];
   return (
     <div className="menu-content">

@@ -10,9 +10,15 @@ export const INTERESTS = [
   'Игры',
 ];
 export const CATEGORIES = ['Документы', 'Учёба', 'Кампус', 'Языки', 'События'];
-export const DEMO_USERS = ['alina', 'wei', 'maria'];
+export function createEmptyState() {
+  return { version: 1, locale: 'ru', session: null,
+    users: [], questions: [], answers: [], helpRequests: [], chats: [] };
+}
 
-export function createInitialState() {
+export const createInitialState = createEmptyState;
+
+// Вымышленные записи используются только в изолированных проверках.
+export function createSeed() {
   const students = [
     [
       'alina',

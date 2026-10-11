@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useApp, go } from './context';
 import { CATEGORIES } from './data';
+import UniversityAssistant from './UniversityAssistant';
 import { fullName, matches } from './domain';
+import { DeleteControl } from './AdminModeration';
 import {
   Avatar,
   Empty,
@@ -16,7 +18,7 @@ import {
 } from './components';
 
 export function QuestionCard({ question }) {
-  const { state, t } = useApp();
+  const { state, me, t } = useApp();
   const answers = state.answers.filter((a) => a.questionId === question.id);
   return (
     <article className="question-card panel">
@@ -31,6 +33,8 @@ export function QuestionCard({ question }) {
           {t('Ответов:', 'Answers:')} {answers.length}
         </Link>
         <span>{question.category}</span>
+        {(me?.id === question.authorId || me?.role === 'admin') &&
+          <DeleteControl kind="question" id={question.id} label={t('Удалить вопрос', 'Delete question')} />}
       </div>
     </article>
   );
@@ -40,6 +44,7 @@ export function Questions({ tab }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [category, setCategory] = useState('Документы');
+  const [autoAI, setAutoAI] = useState(true);
   const [errors, setErrors] = useState({});
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
@@ -74,7 +79,7 @@ export function Questions({ tab }) {
       });
       return;
     }
-    const result = await act('addQuestion', { title, body, category });
+    const result = await act('addQuestion', { title, body, category, autoAI });
     if (!result) return;
     setErrors({});
     notify(
@@ -113,6 +118,7 @@ export function Questions({ tab }) {
               className="question-main"
               aria-label={t('Вопросы сообщества', 'Community questions')}
             >
+              <UniversityAssistant />
               <form className="ask-form panel" onSubmit={publish} noValidate>
                 <FormErrors errors={errors} />
                 <Field label={t('Твой вопрос', 'Your question')} error={errors.title}>
@@ -148,6 +154,8 @@ export function Questions({ tab }) {
                     </select>
                   </Field>
                 </details>
+                <label className="ai-auto-toggle"><input type="checkbox" checked={autoAI} onChange={e => setAutoAI(e.target.checked)} />Получить ответ AI автоматически</label>
+                {autoAI && <p className="ai-privacy">Текст вопроса будет отправлен в GigaChat для поиска ответа по источникам РЭУ.</p>}
                 <button type="submit" className="button button-gradient">
                   {t('Спросить', 'Ask')}
                 </button>
@@ -310,8 +318,12 @@ export function Question({ id }) {
               <span>
                 {t('Ответов:', 'Answers:')} {answers.length}
               </span>
+              {(me?.id === question.authorId || me?.role === 'admin') &&
+                <DeleteControl kind="question" id={id} label={t('Удалить вопрос', 'Delete question')}
+                  onDeleted={() => go('/questions')} />}
             </div>
           </article>
+          <UniversityAssistant question={question} />
           <h2 className="answers-heading">
             {t('Ответы', 'Answers')} · {answers.length}
           </h2>
@@ -335,6 +347,8 @@ export function Question({ id }) {
                     <h3>{fullName(user)}</h3>
                   </Link>
                   <p className="answer-body">{a.body}</p>
+                  {(me?.id === a.authorId || me?.role === 'admin') &&
+                    <DeleteControl kind="answer" id={a.id} label={t('Удалить ответ', 'Delete answer')} />}
                   <Stars
                     value={a.rating}
                     disabled={!canRate}

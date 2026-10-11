@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useApp, go } from './context';
 import { INTERESTS, LANGUAGES } from './data';
 import { commonItems, fullName, matches, rankings } from './domain';
+import { DeleteControl } from './AdminModeration';
 import {
   Avatar,
   Empty,
@@ -348,7 +349,10 @@ export function Profile() {
               maxLength={600}
             />
           </Field>
-          <Field label={t('Могу помочь с (через запятую)', 'I can help with (comma separated)')}>
+          <button type="button" className="button button-outline" onClick={() => act('setStudyHelpVisibility', { visible: me.studyHelpVisible === false })}>
+            {me.studyHelpVisible === false ? t('Показывать предложение помощи', 'Show my study help offer') : t('Снять предложение помощи', 'Withdraw my study help offer')}
+          </button>
+          <Field label={t('Могу помочь с (через запятую)' , 'I can help with (comma separated)')}>
             <input
               name="skills"
               value={values.skills}
@@ -440,12 +444,15 @@ export function Person({ id }) {
               {t('Написать', 'Send a message')}
             </button>
           )}
+          {me?.role === 'admin' && me.id !== id &&
+            <DeleteControl kind="user" id={id} label={t('Удалить анкету', 'Delete profile')}
+              onDeleted={() => go('/moderation')} />}
         </section>
         <aside className="person-extra">
           <section className="panel can-help">
             <h2>{t('Может помочь', 'Can help with')}</h2>
-            <Tags values={user.skills} kind="interest" />
-            {!user.skills.length && <p>{t('Пока не указано', 'Not specified yet')}</p>}
+            <Tags values={user.studyHelpVisible === false ? [] : user.skills} kind="interest" />
+            {(user.studyHelpVisible === false || !user.skills.length) && <p>{t('Пока не указано', 'Not specified yet')}</p>}
           </section>
           <section className="panel personal-rating">
             <h2>{t('Рейтинг', 'Rating')}</h2>

@@ -6,6 +6,7 @@ import { People, Person, Profile } from './PeopleProfile';
 import { Question, Questions } from './Questions';
 import { Study } from './Study';
 import { Chats } from './Chats';
+import { Moderation } from './AdminModeration';
 
 export default function App() {
   const route = useRoute();
@@ -33,6 +34,7 @@ export default function App() {
       />
     );
   else if (route.path === '/profile') page = <Profile />;
+  else if (route.path === '/moderation') page = <Moderation />;
   else if (route.path === '/people') page = <People />;
   else if (parts[0] === 'people' && parts.length === 2) page = <Person id={parts[1]} />;
   else if (route.path === '/questions') page = <Questions tab={route.search.get('tab')} />;

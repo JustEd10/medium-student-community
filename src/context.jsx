@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
+import './moderation.css';
+
 const Context = createContext(null);
 const TOKEN_KEY = 'medium.token';
 const LOCALE_KEY = 'medium.locale';
-const empty = { users: [], questions: [], answers: [], helpRequests: [], chats: [] };
+const empty = { users: [], questions: [], answers: [], helpRequests: [], chats: [], trash: [] };
 
 export function go(path) {
   window.location.hash = path.startsWith('/') ? path : `/${path}`;
@@ -25,12 +27,12 @@ const write = (key, value) => {
   try { value ? localStorage.setItem(key, value) : localStorage.removeItem(key); } catch { /* работает до перезагрузки */ }
 };
 
-async function request(path, { method = 'GET', body, token, signal } = {}) {
+async function request(path, { method = 'GET', body, token, signal, timeout = 15000 } = {}) {
   const controller = new AbortController();
   const abort = () => controller.abort();
   if (signal?.aborted) abort();
   signal?.addEventListener('abort', abort, { once: true });
-  const timer = setTimeout(abort, 15000);
+  const timer = setTimeout(abort, timeout);
   try {
     const res = await fetch(`/api/app${path}`, {
       method, cache: 'no-store', signal: controller.signal,
@@ -53,6 +55,9 @@ export function AppProvider({ children }) {
   const [ready, setReady] = useState(false);
   const [offline, setOffline] = useState(false);
   const [notice, setNotice] = useState('');
+  const [undo, setUndo] = useState(null);
+  const [undoNow, setUndoNow] = useState(Date.now());
+  const [undoBusy, setUndoBusy] = useState(false);
   const token = useRef(read(TOKEN_KEY));
   const revision = useRef(0);
   const sessionGeneration = useRef(0);
@@ -77,12 +82,13 @@ export function AppProvider({ children }) {
     setReady(true);
   }, []);
   const clearSession = useCallback((persist = true) => {
+    setUndo(null);
     token.current = null;
     if (persist) write(TOKEN_KEY, null);
     sessionGeneration.current += 1;
     invalidate();
     // Личная переписка и почта исчезают сразу, даже если сервер недоступен.
-    setData(previous => ({ ...previous, me: null, chats: [], users: previous.users.map(user => ({ ...user, email: '' })) }));
+    setData(previous => ({ ...previous, me: null, chats: [], trash: [], users: previous.users.map(({ role, ...user }) => ({ ...user, email: '' })) }));
   }, [invalidate]);
   const refresh = useCallback(async () => {
     if (authBusy.current || mutations.current) return;
@@ -138,7 +144,17 @@ export function AppProvider({ children }) {
     return () => clearTimeout(id);
   }, [notice]);
 
-  function act(type, args = {}) {
+  useEffect(() => {
+    if (!undo) return;
+    const timer = setInterval(() => {
+      const now = Date.now();
+      setUndoNow(now);
+      if (now >= undo.expiresAt) setUndo(null);
+    }, 100);
+    return () => clearInterval(timer);
+  }, [undo]);
+
+  function act(type, args = {}, { silent = false } = {}) {
     const requestedToken = token.current;
     const generation = sessionGeneration.current;
     const key = JSON.stringify([generation, type, args]);
@@ -151,6 +167,10 @@ export function AppProvider({ children }) {
         const result = await request('/act', { method: 'POST', body: { type, args }, token: requestedToken });
         if (generation !== sessionGeneration.current || requestedToken !== token.current) return null;
         apply(result);
+        if (type === 'deleteContent') {
+          setUndoNow(Date.now());
+          setUndo({ ...args, expiresAt: result.undoExpiresAt });
+        }
         return { id: result.id };
       } catch (err) {
         if (generation !== sessionGeneration.current || requestedToken !== token.current) return null;
@@ -159,11 +179,11 @@ export function AppProvider({ children }) {
           setNotice(t('Сессия закончилась. Войди снова.', 'Your session has expired. Sign in again.'));
         } else if (!err.status) {
           setOffline(true);
-          setNotice(t('Нет связи с сервером. Попробуй ещё раз.', 'Cannot reach the server. Try again.'));
+          if (!silent) setNotice(t('Нет связи с сервером. Попробуй ещё раз.', 'Cannot reach the server. Try again.'));
         } else if (err.message === 'STORAGE_UNAVAILABLE') {
-          setNotice(t('Сервер не смог сохранить данные. Попробуй позже.', 'The server could not save your data. Try again later.'));
+          if (!silent) setNotice(t('Сервер не смог сохранить данные. Попробуй позже.', 'The server could not save your data. Try again later.'));
         } else {
-          setNotice(t('Не удалось сохранить. Проверь данные и попробуй снова.', 'Could not save. Check the data and try again.'));
+          if (!silent) setNotice(t('Не удалось сохранить. Проверь данные и попробуй снова.', 'Could not save. Check the data and try again.'));
         }
         return null;
       }
@@ -193,6 +213,13 @@ export function AppProvider({ children }) {
       authBusy.current = false;
     }
   }
+  async function askAI(body) {
+    const generation = sessionGeneration.current;
+    const result = await request('/assistant', { method: 'POST', body, token: token.current, timeout: 60000 });
+    if (generation !== sessionGeneration.current) throw new Error('AUTH_REQUIRED');
+    if (body.questionId) await refresh();
+    return result;
+  }
   async function logout() {
     if (authBusy.current) return;
     const previousToken = token.current;
@@ -213,6 +240,18 @@ export function AppProvider({ children }) {
     go(`/login?next=${encodeURIComponent(next)}`);
     return false;
   };
-  return <Context.Provider value={{ state, toggleLocale, me, locale, t, notify: setNotice, offline, ready, retry: refresh, notice, requireUser, act, auth, logout }}>{children}</Context.Provider>;
+  return <Context.Provider value={{ state, toggleLocale, me, locale, t, notify: setNotice, offline, ready, retry: refresh, notice, requireUser, act, auth, logout, askAI }}>{children}
+    {undo && <div className="deletion-undo" role="status" aria-live="polite">
+      <span>{t('Удалено.', 'Deleted.')} {Math.max(0, Math.ceil((undo.expiresAt - undoNow) / 1000))} {t('сек.', 'sec.')}</span>
+      <button type="button" className="button button-outline" disabled={undoBusy || undoNow >= undo.expiresAt}
+        onClick={async () => {
+          const pending = undo;
+          setUndoBusy(true);
+          await act('restoreContent', { kind: pending.kind, id: pending.id });
+          setUndo(current => current === pending ? null : current);
+          setUndoBusy(false);
+        }}>{t('Отменить удаление', 'Undo deletion')}</button>
+    </div>}
+  </Context.Provider>;
 }
 export const useApp = () => useContext(Context);
