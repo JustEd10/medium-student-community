@@ -53,7 +53,15 @@ async function accessToken(config) {
   })().finally(() => { tokenPending = null; });
   return tokenPending;
 }
+let providerActive = 0;
 export async function gigaChat(messages) {
+  if (providerActive >= 2) throw ragError('AI_BUSY', 429);
+  providerActive += 1;
+  try {
+    return await completeGigaChat(messages);
+  } finally { providerActive -= 1; }
+}
+async function completeGigaChat(messages) {
   const config = loadConfig();
   if (!config.authKey) throw ragError('AI_NOT_CONFIGURED');
   const token = await accessToken(config);

@@ -2590,9 +2590,25 @@ input[type='checkbox'] {
 }
 
 .university-assistant { margin-bottom: 24px; border-color: #d2c0ef; background: linear-gradient(135deg, #fff, #f7f2ff); }
+.question-detail + .university-assistant { margin-top: 24px; }
 .university-assistant h2 { margin: 0 0 12px; }
 .university-assistant form label { display: grid; gap: 10px; }
-.university-assistant textarea { width: 100%; }
+.university-assistant textarea {
+  display: block; width: 100%; min-height: 88px; padding: 14px 18px;
+  border: 1px solid #b8a5df; border-radius: 20px; background: #fff;
+  color: var(--ink); font: inherit; line-height: 1.5; resize: vertical;
+}
+.university-assistant textarea:focus {
+  outline: none; border-color: #8555c9;
+  box-shadow: 0 0 0 3px #8555c926;
+}
+.ai-error { margin: 14px 0 0; padding: 12px 16px; border: 1px solid #e3bcc6;
+  border-radius: 16px; background: #fff5f7; color: #8a2841; font-size: 14px; }
+.my-study-offer { margin-bottom: 24px; }
+.my-study-offer-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.my-study-offer-heading h3, .my-study-offer-heading p { margin: 0; }
+.my-study-offer .tags { margin: 14px 0; }
+.my-study-offer-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
 .ai-answer { padding: 8px 0 16px; }
 .ai-answer-heading { display: flex; align-items: center; gap: 10px; }
 .ai-badge { padding: 6px 10px; background: #8555c9; color: white; border-radius: 12px; font-weight: 700; }
@@ -2606,3 +2622,9 @@ input[type='checkbox'] {
 .ai-auto-toggle input { flex: 0 0 20px; width: 20px; height: 20px; }
 .ai-sources a { color: #68439e; text-decoration: underline; text-underline-offset: 3px; }
 .university-assistant .button { min-height: 44px; }
+
+.ai-review-list li { grid-template-columns: minmax(0, 1fr) auto auto; }
+@media (max-width: 600px) {
+  .ai-review-list li { grid-template-columns: minmax(0, 1fr); }
+  .ai-review-list .button { justify-self: start; }
+}

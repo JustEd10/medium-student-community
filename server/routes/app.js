@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import { Router } from 'express';
 import { db, commit } from '../store.js';
 import { startAutomaticAnswer } from '../assistant.js';
+import { prepareReviews, adminReviewAction } from '../ai-moderation.js';
+import { reviewWorker } from '../review-worker.js';
 import { getToken } from '../auth.js';
 import { CATEGORIES, INTERESTS, LANGUAGES } from '../../src/data.js';
 import { deleteContent, restoreContent, setUserBan } from '../../src/moderation.js';
@@ -69,6 +71,7 @@ function publicState(userId) {
       (administrator || c.members.includes(userId))).map(c => ({ ...c,
         messages: c.messages.filter(m => m.deletedAt == null && alive.has(m.senderId)) })),
     trash: [],
+    ...(administrator ? { aiReviews: s.aiReviews || {} } : {}),
   };
 }
 
@@ -129,8 +132,9 @@ router.post('/auth/register', asyncRoute(async (req, res) => {
   // Пока вычислялся хэш, другой запрос мог зарегистрировать ту же почту.
   if (db.state.users.some(u => (u.email.toLowerCase() === email || u.login?.toLowerCase() === email)))
     return res.status(409).json({ error: 'EMAIL_TAKEN' });
-  const state = { ...db.state, users: [...db.state.users, user] };
+  const state = prepareReviews(db.state, { ...db.state, users: [...db.state.users, user] });
   res.status(201).json(sessionResponse(id, state));
+  reviewWorker.start();
 }));
 
 router.post('/auth/login', asyncRoute(async (req, res) => {
@@ -156,6 +160,8 @@ router.post('/auth/logout', (req, res) => {
 
 // каждое действие вызывает те же правила, что и раньше жили в браузере
 const actions = {
+  dismissAIReview: (s, me, a) => adminReviewAction(s, me, a),
+  retryAIReview: (s, me, a) => adminReviewAction(s, me, a, true),
   addQuestion: (s, me, a) => {
     if (a.autoAI !== undefined && typeof a.autoAI !== 'boolean') throw new Error('INVALID_QUESTION');
     if (!CATEGORIES.includes(a.category)) throw new Error('INVALID_QUESTION');
@@ -224,7 +230,8 @@ router.post('/act', (req, res) => {
     if (next !== db.state) {
       const activeUsers = new Set(next.users.filter(u => u.deletedAt == null && u.bannedAt == null).map(u => u.id));
       const sessions = Object.fromEntries(Object.entries(db.sessions).filter(([, session]) => activeUsers.has(session.userId)));
-      commit({ state: next, sessions });
+      commit({ state: prepareReviews(db.state, next), sessions });
+      reviewWorker.start();
     }
     if (req.body.type === 'addQuestion' && args.autoAI !== false) startAutomaticAnswer(out.id, me);
     res.json({ id: out.id, me, state: publicState(me), ...(req.body.type === 'deleteContent' ? { undoExpiresAt: actionStartedAt + 5000 } : {}) });

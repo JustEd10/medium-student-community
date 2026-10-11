@@ -3,7 +3,7 @@ import { useApp } from './context';
 
 const errors = {
   AI_NOT_CONFIGURED: 'AI-помощник пока не подключён к GigaChat.',
-  AI_BUSY: 'Слишком много запросов. Попробуй через несколько минут.',
+  AI_BUSY: 'Лимит AI-запросов временно достигнут или помощник занят. Попробуй позже; вопрос можно опубликовать для студентов.',
   AI_INVALID_QUESTION: 'Напиши вопрос от 8 до 2200 символов.',
   AI_NOT_ALLOWED: 'Запросить ответ для публикации может её автор.',
   AUTH_REQUIRED: 'Войди, чтобы спросить AI.',
@@ -43,7 +43,7 @@ export default function UniversityAssistant({ question }) {
       {!question && <label>Твой вопрос<textarea value={text} onChange={e => setText(e.target.value)} maxLength={2200} rows={2} placeholder="Где найти расписание занятий?" /></label>}
       <p className="ai-privacy">Текст вопроса будет отправлен в GigaChat. Не добавляй пароли и личные документы.</p>
       <button className="button button-gradient" type="submit" disabled={busy || question?.aiResponse?.status === 'pending'}>{busy ? 'Ищу ответ…' : 'Спросить AI'}</button>
-      {error && <p role="alert">{error}</p>}
+      {error && <p className="ai-error" role="alert">{error}</p>}
     </form>}
   </section>;
 }

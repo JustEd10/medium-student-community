@@ -349,9 +349,6 @@ export function Profile() {
               maxLength={600}
             />
           </Field>
-          <button type="button" className="button button-outline" onClick={() => act('setStudyHelpVisibility', { visible: me.studyHelpVisible === false })}>
-            {me.studyHelpVisible === false ? t('Показывать предложение помощи', 'Show my study help offer') : t('Снять предложение помощи', 'Withdraw my study help offer')}
-          </button>
           <Field label={t('Могу помочь с (через запятую)' , 'I can help with (comma separated)')}>
             <input
               name="skills"
@@ -361,6 +358,7 @@ export function Profile() {
               placeholder={t('Например: Python, русский язык', 'For example: Python, Russian')}
             />
           </Field>
+          <p className="ai-privacy">{t('Публичные поля анкеты проверяет GigaChat. Решения о модерации принимает администратор.', 'GigaChat reviews public profile fields. Moderation decisions are made by an administrator.')}</p>
           <button type="submit" className="button profile-save-mobile">
             {t('Сохранить и найти людей', 'Save and find people')}
           </button>

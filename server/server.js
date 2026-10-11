@@ -8,8 +8,10 @@ import recordRoutes from './routes/records.js';
 import appRoutes from './routes/app.js';
 import { provisionAdministrator } from './admin.js';
 import { createAssistantRouter } from './assistant.js';
+import { recoverReviews } from './review-worker.js';
 
 provisionAdministrator();
+recoverReviews();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DeleteControl } from './AdminModeration';
 import { useApp, go } from './context';
 import { commonItems, fullName, matches } from './domain';
@@ -14,7 +14,54 @@ import {
   RatingPanel,
   SegmentedNav,
   Stars,
+  Tags,
 } from './components';
+
+function MyStudyOffer() {
+  const { me, act, t } = useApp();
+  const [busy, setBusy] = useState(false);
+  const [until, setUntil] = useState(0);
+  const [remaining, setRemaining] = useState(0);
+  useEffect(() => {
+    if (!until) return;
+    const tick = () => {
+      const seconds = Math.max(0, Math.ceil((until - Date.now()) / 1000));
+      setRemaining(seconds);
+      if (!seconds) setUntil(0);
+    };
+    tick();
+    const timer = setInterval(tick, 200);
+    return () => clearInterval(timer);
+  }, [until]);
+  if (!me) return null;
+  const visible = me.studyHelpVisible !== false && me.skills.length > 0;
+  async function changeVisibility(value) {
+    if (busy) return;
+    setBusy(true);
+    if (await act('setStudyHelpVisibility', { visible: value })) {
+      setUntil(value ? 0 : Date.now() + 5000);
+      setRemaining(value ? 0 : 5);
+    }
+    setBusy(false);
+  }
+  return <>
+    <section className="my-study-offer panel" aria-label={t('Моя анкета помощи', 'My study help profile')}>
+      <h2>{t('Моя анкета помощи', 'My study help profile')}</h2>
+      {visible ? <>
+        <div className="my-study-offer-heading"><Avatar user={me} /><div><h3>{fullName(me)}</h3><p className="muted">{me.direction}</p></div></div>
+        <p>{t('Могу помочь с', 'I can help with')}</p><Tags values={me.skills} kind="interest" />
+        {me.about && <p>{me.about}</p>}
+      </> : <p className="muted">{me.skills.length ? t('Анкета помощи убрана. Другие студенты не видят твои предметы для помощи.', 'Your study help profile is hidden from other students.') : t('Добавь предметы в профиле, чтобы предложить помощь.', 'Add subjects to your profile to offer help.')}</p>}
+      <div className="my-study-offer-actions">
+        <Link to="/profile" className="button button-outline">{t('Редактировать анкету', 'Edit profile')}</Link>
+        {!!me.skills.length && <button type="button" className="button button-outline" disabled={busy} onClick={() => changeVisibility(!visible)}>
+          {visible ? t('Убрать анкету', 'Remove study help profile') : t('Вернуть анкету', 'Restore study help profile')}
+        </button>}
+      </div>
+    </section>
+    {!!until && <div className="deletion-undo" role="status"><span>{t('Анкета помощи убрана', 'Study help profile removed')} · {remaining} {t('с', 's')}</span><button type="button" className="text-link" disabled={busy || Date.now() >= until} onClick={() => changeVisibility(true)}>{t('Отменить', 'Undo')}</button></div>}
+  </>;
+}
 
 function MyRequest({ request }) {
   const { state, me, act, t, notify } = useApp();
@@ -177,6 +224,7 @@ export function Study({ tab }) {
                       required
                     />
                   </Field>
+<p className="ai-privacy">{t('Публичный текст проверяет GigaChat. Подозрительные публикации передаются администратору без автоматического удаления.', 'GigaChat reviews public text and flags possible violations for an administrator without automatic deletion.')}</p>
                   <button type="submit" className="button button-green">
                     {t('Опубликовать', 'Publish')}
                   </button>
@@ -265,6 +313,7 @@ export function Study({ tab }) {
           )
         ) : (
           <>
+            <MyStudyOffer />
             <div className="search-box study-search">
               <Icon name="search" />
               <input

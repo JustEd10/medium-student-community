@@ -245,6 +245,7 @@ export function Auth({ register, next }) {
               />
             </Field>
           )}
+          {register && <p className="ai-privacy">{t('Имя и публичные поля анкеты проверяет GigaChat. Не указывай личные документы.', 'GigaChat reviews your name and public profile fields. Do not add personal documents.')}</p>}
           <button type="submit" className="button button-full" disabled={busy}>
             {busy
               ? t('Подожди…', 'Please wait…')

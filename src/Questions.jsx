@@ -156,6 +156,7 @@ export function Questions({ tab }) {
                 </details>
                 <label className="ai-auto-toggle"><input type="checkbox" checked={autoAI} onChange={e => setAutoAI(e.target.checked)} />Получить ответ AI автоматически</label>
                 {autoAI && <p className="ai-privacy">Текст вопроса будет отправлен в GigaChat для поиска ответа по источникам РЭУ.</p>}
+<p className="ai-privacy">{t('Публичный текст проверяет GigaChat. Подозрительные публикации передаются администратору без автоматического удаления.', 'GigaChat reviews public text and flags possible violations for an administrator without automatic deletion.')}</p>
                 <button type="submit" className="button button-gradient">
                   {t('Спросить', 'Ask')}
                 </button>
@@ -402,6 +403,7 @@ export function Question({ id }) {
                 required
               />
             </Field>
+<p className="ai-privacy">{t('Публичный текст проверяет GigaChat. Подозрительные публикации передаются администратору без автоматического удаления.', 'GigaChat reviews public text and flags possible violations for an administrator without automatic deletion.')}</p>
             <button type="submit" className="button button-blue">
               {t('Ответить', 'Answer')}
             </button>

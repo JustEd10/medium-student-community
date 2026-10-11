@@ -56,6 +56,23 @@ export function Moderation() {
     <PageTitle title={t('Модерация', 'Moderation')}
       description={t('Управляй публикациями и блокировками аккаунтов.', 'Manage content and account bans.')} />
     <section className="moderation-panel panel">
+      <h2>{t('Проверка AI', 'AI review')}</h2>
+      <p>{t('AI только отмечает контент. Решение принимает администратор; публикации остаются видимыми.', 'AI only flags content. An administrator decides; posts remain visible.')}</p>
+      <ul className="moderation-list ai-review-list">{Object.entries(state.aiReviews || {}).filter(([, r]) => ['flagged', 'error', 'pending'].includes(r.status)).map(([key, r]) => {
+        const item = r.kind === 'user' ? state.users.find(u => u.id === r.id) : r.kind === 'question' ? state.questions.find(q => q.id === r.id) : r.kind === 'answer' ? state.answers.find(a => a.id === r.id) : state.helpRequests.find(h => h.id === r.id);
+        const href = r.kind === 'user' ? `/people/${r.id}` : r.kind === 'question' ? `/questions/${r.id}` : r.kind === 'answer' ? `/questions/${item?.questionId}` : '/study';
+        return <li key={key}><div>
+          <small>{labels[r.kind]} · {r.status === 'flagged' ? t('Нужна проверка', 'Needs review') : r.status === 'pending' ? t('Проверяется', 'Pending') : t('Ошибка проверки', 'Review failed')}</small>
+          <p><Link to={href}>{item?.title || item?.subject || item?.body || (item ? fullName(item) : r.id)}</Link></p>
+          <p>{r.reason || t('Ожидает результата GigaChat', 'Waiting for GigaChat')}</p>
+        </div>
+          {r.status === 'error' && <button className="button button-outline" onClick={() => act('retryAIReview', { key })}>{t('Повторить', 'Retry')}</button>}
+          {r.status !== 'pending' && <button className="button button-outline" onClick={() => act('dismissAIReview', { key })}>{t('Снять отметку', 'Dismiss')}</button>}
+        </li>;
+      })}</ul>
+      {!Object.values(state.aiReviews || {}).some(r => ['flagged', 'error', 'pending'].includes(r.status)) && <p>{t('Нет отметок для проверки.', 'No items to review.')}</p>}
+    </section>
+    <section className="moderation-panel panel">
       <div className="moderation-filters">
         <Field label={t('Раздел', 'Section')}><select value={kind} onChange={e => setKind(e.target.value)}>
           {Object.entries(labels).map(([key, label]) => <option value={key} key={key}>{label}</option>)}

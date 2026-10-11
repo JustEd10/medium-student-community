@@ -356,3 +356,35 @@ test('assistant requires an active account, bounds requests and isolates unavail
   await post('/api/app/act', { type: 'setUserBan', args: { id: user.me, banned: true } }, admin.token);
   assert.equal((await post('/api/app/assistant', { question: 'Где расписание?' }, user.token)).status, 401);
 });
+
+test('AI review queue stays admin-only and does not hide publications', async () => {
+  const user = (await post('/api/app/auth/register', { email: 'review-public@example.test', password: fixturePassword, name: 'Review Fixture' })).data;
+  const admin = (await post('/api/app/auth/login', { identity: 'fixture-moderator', password: fixturePassword })).data;
+  const action = (session, type, args) => post('/api/app/act', { type, args }, session.token);
+  const created = await action(user, 'addQuestion', { title: 'Как найти библиотеку?', body: '', category: 'Кампус' });
+  assert.equal(created.status, 200);
+  const key = `question:${created.data.id}`;
+  const waitForError = async () => {
+    let state;
+    for (let i = 0; i < 30; i++) {
+      state = (await call('/api/app/state', { token: admin.token })).data.state;
+      if (state.aiReviews?.[key]?.status === 'error') return state;
+      await new Promise(r => setTimeout(r, 10));
+    }
+    assert.fail('Review worker did not report unavailable provider');
+  };
+  await waitForError();
+  for (const token of [undefined, user.token]) {
+    const state = (await call('/api/app/state', { token })).data.state;
+    assert.ok(!('aiReviews' in state));
+    assert.ok(state.questions.some(q => q.id === created.data.id));
+  }
+  assert.equal((await action(user, 'dismissAIReview', { key })).status, 403);
+  assert.equal((await action(user, 'retryAIReview', { key })).status, 403);
+  assert.equal((await action(admin, 'retryAIReview', { key })).status, 200);
+  await waitForError();
+  const dismissed = await action(admin, 'dismissAIReview', { key });
+  assert.equal(dismissed.status, 200);
+  assert.equal(dismissed.data.state.aiReviews[key].status, 'dismissed');
+  assert.ok(dismissed.data.state.questions.some(q => q.id === created.data.id));
+});
