@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useApp, go } from './context';
 import { CATEGORIES } from './data';
 import UniversityAssistant from './UniversityAssistant';
@@ -43,8 +43,10 @@ export function Questions({ tab }) {
   const { state, me, requireUser, act, t, notify } = useApp();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
-  const [category, setCategory] = useState('Документы');
-  const [autoAI, setAutoAI] = useState(true);
+  const [category, setCategory] = useState('Кампус');
+  const [autoAI, setAutoAI] = useState(false);
+  const [askMode, setAskMode] = useState('students');
+  const studentQuestion = useRef(null);
   const [errors, setErrors] = useState({});
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
@@ -79,6 +81,7 @@ export function Questions({ tab }) {
       });
       return;
     }
+    if (body.length > 2000) { setErrors({ body: t('Сократи подробности до 2000 символов.', 'Shorten details to 2000 characters.') }); return; }
     const result = await act('addQuestion', { title, body, category, autoAI });
     if (!result) return;
     setErrors({});
@@ -118,12 +121,29 @@ export function Questions({ tab }) {
               className="question-main"
               aria-label={t('Вопросы сообщества', 'Community questions')}
             >
-              <UniversityAssistant />
-              <form className="ask-form panel" onSubmit={publish} noValidate>
+              <div className="question-choice" role="group" aria-label={t('Кому задать вопрос', 'Who should answer?')}>
+                <button type="button" aria-pressed={askMode === 'students'} onClick={() => setAskMode('students')}>
+                  <strong>{t('Спросить студентов', 'Ask students')}</strong>
+                  <span>{t('Советы, кафе, общение и жизнь в кампусе. Вопрос увидят другие студенты.', 'Advice, cafés and campus life. Other students will see your question.')}</span>
+                </button>
+                <button type="button" aria-pressed={askMode === 'ai'} onClick={() => setAskMode('ai')}>
+                  <strong>{t('Спросить AI', 'Ask AI')}</strong>
+                  <span>{t('Справочник РЭУ: кабинеты, документы и сервисы. Вопрос не публикуется.', 'REU directory: offices, documents and services. Your question is not published.')}</span>
+                </button>
+              </div>
+              <div hidden={askMode !== 'ai'}><UniversityAssistant onAskStudents={text => {
+                setTitle(text.slice(0, 180)); setBody(text.slice(180)); setAutoAI(false);
+                setErrors(text.length > 2180 ? { body: t('Сократи подробности до 2000 символов.', 'Shorten details to 2000 characters.') } : {}); setAskMode('students');
+                requestAnimationFrame(() => studentQuestion.current?.focus());
+              }} /></div>
+              <form className="ask-form panel" onSubmit={publish} noValidate hidden={askMode !== 'students'}>
+                <h2>{t('Задать вопрос студентам', 'Ask the student community')}</h2>
+                <p>{t('Опубликуй вопрос — другие студенты смогут поделиться опытом и ответить.', 'Publish a question so other students can share their experience and reply.')}</p>
                 <FormErrors errors={errors} />
                 <Field label={t('Твой вопрос', 'Your question')} error={errors.title}>
                   <textarea
                     className="question-title-input"
+                    ref={studentQuestion}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     rows={3}
@@ -131,14 +151,14 @@ export function Questions({ tab }) {
                     maxLength={180}
                     required
                     placeholder={t(
-                      'Когда получу студенческий билет?',
-                      'When can I collect my student card?',
+                      'Где рядом с РЭУ вкусная шаурма?',
+                      'Where can I get good food near REU?',
                     )}
                   />
                 </Field>
-                <details className="question-details">
+                <details className="question-details" open={body.length > 0 || undefined}>
                   <summary>{t('Добавить подробности', 'Add details')}</summary>
-                  <Field label={t('Подробности', 'Details')}>
+                  <Field label={t('Подробности', 'Details')} error={errors.body}>
                     <textarea
                       value={body}
                       onChange={(e) => setBody(e.target.value)}
@@ -154,13 +174,14 @@ export function Questions({ tab }) {
                     </select>
                   </Field>
                 </details>
-                <label className="ai-auto-toggle"><input type="checkbox" checked={autoAI} onChange={e => setAutoAI(e.target.checked)} />Получить ответ AI автоматически</label>
+                <label className="ai-auto-toggle"><input type="checkbox" checked={autoAI} onChange={e => setAutoAI(e.target.checked)} />{t('Дополнительно спросить AI по справочнику РЭУ', 'Also ask AI using the REU directory')}</label>
                 {autoAI && <p className="ai-privacy">Текст вопроса будет отправлен в GigaChat для поиска ответа по источникам РЭУ.</p>}
 <p className="ai-privacy">{t('Публичный текст проверяет GigaChat. Подозрительные публикации передаются администратору без автоматического удаления.', 'GigaChat reviews public text and flags possible violations for an administrator without automatic deletion.')}</p>
                 <button type="submit" className="button button-gradient">
-                  {t('Спросить', 'Ask')}
+                  {t('Опубликовать для студентов', 'Publish for students')}
                 </button>
               </form>
+              <h2 className="community-heading">{t('Вопросы студентов', 'Community questions')}</h2>
               <details className="filters">
                 <summary>
                   <Icon name="filter" />

@@ -2,7 +2,7 @@
 
 Сайт для иностранных студентов и студентов-мигрантов: знакомства по языкам и интересам, вопросы об университете, помощь с учёбой и личные сообщения. Интерфейс доступен на русском и английском.
 
-[Открыть сайт](https://medium-bob01.amvera.io/) · [Макет в Figma](https://www.figma.com/design/78urA9a9EggvJYdgLotj5L/Untitled?node-id=0-1&t=x3YhCRRbUUCU5oZ9-1)
+[Открыть сайт](https://medium-warsaw-bob01.waw0.amvera.tech/) · [Макет в Figma](https://www.figma.com/design/78urA9a9EggvJYdgLotj5L/Untitled?node-id=0-1&t=x3YhCRRbUUCU5oZ9-1)
 
 Фронтенд: React и Vite. Бэкенд: Node.js и Express.
 
@@ -50,5 +50,5 @@ curl http://localhost:3000/api/app/state
 Основной сайт сохраняет данные в JSON-файле. Для Docker и Amvera нужен постоянный каталог `/data` и одна реплика приложения. [Инструкция размещения](deploy/amvera/README.md).
 
 - [Скриншоты сайта и работы API](docs/screenshots/README.md).
-- [Сверка с «Отработкой 3»](docs/REVIEW-2026-10-10.md).
+- [Сверка с «Отработками 2 и 3»](docs/ASSIGNMENTS.md).
 - [Отчёт проекта](docs/REPORT.md).

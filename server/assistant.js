@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db, commit } from './store.js';
 import { getToken } from './auth.js';
-import { generateUniversityAnswer, providerConfigured, ragError } from './rag.js';
+import { generateUniversityAnswer, providerConfigured, ragError, answerKnowledgeVersion } from './rag.js';
 
 export function assistantUser(req) {
   const session = db.sessions[getToken(req)];
@@ -30,7 +30,7 @@ export function answerPublishedQuestion(questionId, userId) {
   if (!question) return Promise.reject(ragError('NOT_FOUND', 404));
   const user = db.state.users.find(u => u.id === userId && u.credential && u.deletedAt == null && u.bannedAt == null);
   if (!user || (question.authorId !== userId && user.role !== 'admin')) return Promise.reject(ragError('AI_NOT_ALLOWED', 403));
-  if (question.aiResponse?.status === 'ready') return Promise.resolve(question.aiResponse);
+  if (question.aiResponse?.status === 'ready' && question.aiResponse.knowledgeVersion === answerKnowledgeVersion) return Promise.resolve(question.aiResponse);
   try { consume(userId); } catch (err) { return Promise.reject(err); }
   const job = (async () => {
     try {
@@ -40,7 +40,7 @@ export function answerPublishedQuestion(questionId, userId) {
         db.state.questions.some(q => q.id === questionId && q.deletedAt == null && q.title === question.title && q.body === question.body) &&
         db.state.users.some(u => u.id === userId && u.credential && u.deletedAt == null && u.bannedAt == null) &&
         db.state.users.some(u => u.id === question.authorId && u.deletedAt == null && u.bannedAt == null)
-      }), status: 'ready' };
+      }), status: 'ready', knowledgeVersion: answerKnowledgeVersion };
       saveResponse(questionId, response);
       return response;
     } catch (err) {

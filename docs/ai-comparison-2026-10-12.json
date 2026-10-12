@@ -1,0 +1,667 @@
+{
+  "date": "2026-10-12",
+  "knowledgeVersion": "reu-3-grounding-2",
+  "providerCalls": 12,
+  "rows": [
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Какой кабинет вуса?",
+      "generated": false,
+      "milliseconds": 1,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "ВУС (военно-учётный стол): кабинет 100 — по уточнению для Медиума от 12.10.2026. Корпус пока не уточнён. На официальной странице номер кабинета не опубликован; перед визитом можно уточнить место приёма по vus@rea.ru. [1]",
+        "sources": [
+          {
+            "id": "military-registration",
+            "title": "ВУС — военно-учётный стол: контакты",
+            "url": "https://www.rea.ru/structure/departments/otdel-mobilizatsionnoy-podgotovki/kontaktyi-i-grafik-rabotyi",
+            "checkedAt": "2026-10-12",
+            "sourceNote": "Кабинет 100 указан владельцем проекта 12.10.2026; официальный источник подтверждает контакты, но не номер кабинета."
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837095703
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Какой кабинет ВУЦ?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "ВУЦ — Военный учебный центр, отдельное подразделение от ВУС. Проверенного номера кабинета ВУЦ в справочнике пока нет. Контакт: VUC@rea.ru. [1]",
+        "sources": [
+          {
+            "id": "military-training",
+            "title": "ВУЦ — Военный учебный центр",
+            "url": "https://www.rea.ru/structure/departments/vuts",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837095703
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Где сектор записи читателей?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Сектор записи читателей НИБЦ: ул. Зацепа, д. 43, шестой корпус, кабинет 301. Для записи студенту нужны электронный пропуск и студенческий билет. [1]",
+        "sources": [
+          {
+            "id": "library-registration",
+            "title": "Запись в библиотеку — сектор записи читателей",
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837095703
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Какой кабинет отдела социальной работы?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Отдел социальной работы: третий корпус, третий этаж, кабинет 343. Номер указан в официальной странице отдела; перед визитом проверь актуальность контактов. [1]",
+        "sources": [
+          {
+            "id": "social",
+            "title": "Социальная и материальная поддержка",
+            "url": "https://www.rea.ru/structure/departments/upravlenie-po-sotsialno-vospitatelnoy-rabote/otdel-po-sotsialnoy-rabote",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837095703
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Где кабинет отдела стран Европы?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Отдел стран Европы, Америки, Африки и Ближнего Востока: Стремянный пер., 36, третий корпус, кабинет 649; interprojects@rea.ru. [1]",
+        "sources": [
+          {
+            "id": "international-europe",
+            "title": "Отдел стран Европы, Америки, Африки и Ближнего Востока",
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/otdel-stran-evropyi-ameriki-afriki-i-blijnego-vostoka",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837095703
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Где кабинет деканата?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Уточни название подразделения и корпус РЭУ. В проверенном справочнике нет однозначного номера кабинета для этого вопроса.",
+        "sources": [],
+        "grounded": false,
+        "createdAt": 1791837095704
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Как найти расписание занятий?",
+      "generated": true,
+      "milliseconds": 251,
+      "usage": {
+        "model": "GigaChat-3-Lightning:32.4.16.3",
+        "totalTokens": 277
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Расписание занятий можно найти в разделе «Студенту» на официальном сайте РЭУ: rasp.rea.ru и student.rea.ru. [1]",
+        "sources": [
+          {
+            "id": "schedule",
+            "title": "Расписание и личный кабинет",
+            "url": "https://www.rea.ru/studentu",
+            "checkedAt": "2026-10-11"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837095955
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Не приходит письмо с логином и паролем",
+      "generated": true,
+      "milliseconds": 225,
+      "usage": {
+        "model": "GigaChat-3-Lightning:32.4.16.3",
+        "totalTokens": 216
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Проверьте папку «Спам» на личной почте. Если письма нет, обратитесь в службу поддержки по адресу lks@rea.ru [1].",
+        "sources": [
+          {
+            "id": "account",
+            "title": "Учётная запись РЭУ",
+            "url": "https://www.rea.ru/tech/edu_services",
+            "checkedAt": "2026-10-11"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837096180
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Сколько дней ждать студенческий билет?",
+      "generated": true,
+      "milliseconds": 156,
+      "usage": {
+        "model": "GigaChat-3-Lightning:32.4.16.3",
+        "totalTokens": 201
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Срок ожидания студенческого билета не указан.",
+        "sources": [
+          {
+            "id": "library-registration",
+            "title": "Запись в библиотеку — сектор записи читателей",
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837096336
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Какой кабинет вуса?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "ВУС (военно-учётный стол): кабинет 100 — по уточнению для Медиума от 12.10.2026. Корпус пока не уточнён. На официальной странице номер кабинета не опубликован; перед визитом можно уточнить место приёма по vus@rea.ru. [1]",
+        "sources": [
+          {
+            "id": "military-registration",
+            "title": "ВУС — военно-учётный стол: контакты",
+            "url": "https://www.rea.ru/structure/departments/otdel-mobilizatsionnoy-podgotovki/kontaktyi-i-grafik-rabotyi",
+            "checkedAt": "2026-10-12",
+            "sourceNote": "Кабинет 100 указан владельцем проекта 12.10.2026; официальный источник подтверждает контакты, но не номер кабинета."
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837096336
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Какой кабинет ВУЦ?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "ВУЦ — Военный учебный центр, отдельное подразделение от ВУС. Проверенного номера кабинета ВУЦ в справочнике пока нет. Контакт: VUC@rea.ru. [1]",
+        "sources": [
+          {
+            "id": "military-training",
+            "title": "ВУЦ — Военный учебный центр",
+            "url": "https://www.rea.ru/structure/departments/vuts",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837096336
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Где сектор записи читателей?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Сектор записи читателей НИБЦ: ул. Зацепа, д. 43, шестой корпус, кабинет 301. Для записи студенту нужны электронный пропуск и студенческий билет. [1]",
+        "sources": [
+          {
+            "id": "library-registration",
+            "title": "Запись в библиотеку — сектор записи читателей",
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837096336
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Какой кабинет отдела социальной работы?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Отдел социальной работы: третий корпус, третий этаж, кабинет 343. Номер указан в официальной странице отдела; перед визитом проверь актуальность контактов. [1]",
+        "sources": [
+          {
+            "id": "social",
+            "title": "Социальная и материальная поддержка",
+            "url": "https://www.rea.ru/structure/departments/upravlenie-po-sotsialno-vospitatelnoy-rabote/otdel-po-sotsialnoy-rabote",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837096336
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Где кабинет отдела стран Европы?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Отдел стран Европы, Америки, Африки и Ближнего Востока: Стремянный пер., 36, третий корпус, кабинет 649; interprojects@rea.ru. [1]",
+        "sources": [
+          {
+            "id": "international-europe",
+            "title": "Отдел стран Европы, Америки, Африки и Ближнего Востока",
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/otdel-stran-evropyi-ameriki-afriki-i-blijnego-vostoka",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837096336
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Где кабинет деканата?",
+      "generated": false,
+      "milliseconds": 0,
+      "usage": null,
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Уточни название подразделения и корпус РЭУ. В проверенном справочнике нет однозначного номера кабинета для этого вопроса.",
+        "sources": [],
+        "grounded": false,
+        "createdAt": 1791837096336
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Как найти расписание занятий?",
+      "generated": true,
+      "milliseconds": 925,
+      "usage": {
+        "model": "GigaChat-2-Pro:2.0.30.01",
+        "totalTokens": 294
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Для того чтобы найти расписание занятий РЭУ им. Г.В. Плеханова, перейдите на сайт rasp.rea.ru или воспользуйтесь личным кабинетом на student.rea.ru [1].",
+        "sources": [
+          {
+            "id": "schedule",
+            "title": "Расписание и личный кабинет",
+            "url": "https://www.rea.ru/studentu",
+            "checkedAt": "2026-10-11"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837097261
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Не приходит письмо с логином и паролем",
+      "generated": true,
+      "milliseconds": 867,
+      "usage": {
+        "model": "GigaChat-2-Pro:2.0.30.01",
+        "totalTokens": 318
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Если вы не получили письмо с логином и паролем от РЭУ, проверьте папку «Спам» в вашей личной почте. При отсутствии письма в этой папке обратитесь на адрес lks@rea.ru [1].",
+        "sources": [
+          {
+            "id": "account",
+            "title": "Учётная запись РЭУ",
+            "url": "https://www.rea.ru/tech/edu_services",
+            "checkedAt": "2026-10-11"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837098128
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Сколько дней ждать студенческий билет?",
+      "generated": true,
+      "milliseconds": 1126,
+      "usage": {
+        "model": "GigaChat-2-Pro:2.0.30.01",
+        "totalTokens": 184
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Нет информации о сроках ожидания студенческого билета в предоставленных источниках [1].",
+        "sources": [
+          {
+            "id": "library-registration",
+            "title": "Запись в библиотеку — сектор записи читателей",
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837099253
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Какие документы нужны для записи в библиотеку?",
+      "generated": true,
+      "milliseconds": 288,
+      "usage": {
+        "model": "GigaChat-3-Lightning:32.4.16.3",
+        "totalTokens": 211
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Для записи в библиотеку нужны электронный пропуск и студенческий билет. [1]",
+        "sources": [
+          {
+            "id": "library-registration",
+            "title": "Запись в библиотеку — сектор записи читателей",
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837156701
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Сколько стоит общежитие и гарантировано ли свободное место?",
+      "generated": true,
+      "milliseconds": 359,
+      "usage": {
+        "model": "GigaChat-3-Lightning:32.4.16.3",
+        "totalTokens": 385
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Стоимость общежития не указана. Свободное место для конкретного человека не гарантировано — уточнять наличие следует по спискам и порядку заселения [1].",
+        "sources": [
+          {
+            "id": "dormitory",
+            "title": "Общежития РЭУ",
+            "url": "https://www.rea.ru/structure/departments/edinaya-direktsiya-obschejitiy",
+            "checkedAt": "2026-10-11"
+          },
+          {
+            "id": "international",
+            "title": "Иностранным студентам",
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam",
+            "checkedAt": "2026-10-11"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837157060
+      }
+    },
+    {
+      "model": "GigaChat-3-Lightning",
+      "question": "Как иностранному студенту оформить приглашение?",
+      "generated": true,
+      "milliseconds": 332,
+      "usage": {
+        "model": "GigaChat-3-Lightning:32.4.16.3",
+        "totalTokens": 223
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Иностранному студенту следует обратиться на официальную страницу для иностранных абитуриентов и студентов, где есть разделы по оформлению приглашений. Конкретные сроки и перечни документов не указаны в данной выдержке [1].",
+        "sources": [
+          {
+            "id": "international",
+            "title": "Иностранным студентам",
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam",
+            "checkedAt": "2026-10-11"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837157392
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Какие документы нужны для записи в библиотеку?",
+      "generated": true,
+      "milliseconds": 890,
+      "usage": {
+        "model": "GigaChat-2-Pro:2.0.30.01",
+        "totalTokens": 200
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Для записи в библиотеку РЭУ им. Г.В. Плеханова студент должен предоставить электронный пропуск и студенческий билет [1].",
+        "sources": [
+          {
+            "id": "library-registration",
+            "title": "Запись в библиотеку — сектор записи читателей",
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
+            "checkedAt": "2026-10-12"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837158281
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Сколько стоит общежитие и гарантировано ли свободное место?",
+      "generated": true,
+      "milliseconds": 1195,
+      "usage": {
+        "model": "GigaChat-2-Pro:2.0.30.01",
+        "totalTokens": 356
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Стоимость проживания в общежитиях РЭУ и гарантия наличия свободных мест не указаны в предоставленных источниках [1], [2].",
+        "sources": [
+          {
+            "id": "dormitory",
+            "title": "Общежития РЭУ",
+            "url": "https://www.rea.ru/structure/departments/edinaya-direktsiya-obschejitiy",
+            "checkedAt": "2026-10-11"
+          },
+          {
+            "id": "international",
+            "title": "Иностранным студентам",
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam",
+            "checkedAt": "2026-10-11"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837159476
+      }
+    },
+    {
+      "model": "GigaChat-2-Pro",
+      "question": "Как иностранному студенту оформить приглашение?",
+      "generated": true,
+      "milliseconds": 1244,
+      "usage": {
+        "model": "GigaChat-2-Pro:2.0.30.01",
+        "totalTokens": 203
+      },
+      "checks": {
+        "source": true,
+        "includes": true,
+        "excludes": true,
+        "grounded": true
+      },
+      "answer": {
+        "body": "Для оформления приглашения иностранным студентам рекомендуется обратиться к разделу на официальном сайте РЭУ им. Г.В. Плеханова, посвященному оформлению приглашений для иностранных граждан. Конкретные требования и сроки там уточняются отдельно [1].",
+        "sources": [
+          {
+            "id": "international",
+            "title": "Иностранным студентам",
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam",
+            "checkedAt": "2026-10-11"
+          }
+        ],
+        "grounded": true,
+        "createdAt": 1791837160720
+      }
+    }
+  ]
+}
