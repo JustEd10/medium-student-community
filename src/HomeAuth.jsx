@@ -8,28 +8,28 @@ export function Home() {
     [
       '/people',
       'violet',
-      t('Знакомства', 'Meet people'),
+      t('Найти знакомых', 'Meet people'),
       t(
-        'Выбери язык общения, затем найди студентов с близкими интересами.',
-        'Choose a language to talk in, then find students with shared interests.',
+        'Выбери язык и интересы. Например: найди компанию для прогулки или практики русского.',
+        'Choose a language and interests. Find company for a walk or to practise Russian.',
       ),
     ],
     [
       '/questions',
       'sky',
-      t('Вопрос-ответ', 'Questions & answers'),
+      t('Задать вопрос студентам', 'Ask students'),
       t(
-        'Спроси о студенческом билете, расписании или жизни в кампусе.',
-        'Ask about your student card, timetable or life on campus.',
+        'Ответят другие студенты. Например: «Где поесть рядом с университетом?»',
+        'Other students answer. For example: “Where can I eat near campus?”',
       ),
     ],
     [
       '/study',
       'mint',
-      t('Помощь с учёбой', 'Study help'),
+      t('Получить помощь с учёбой', 'Get study help'),
       t(
-        'Попроси объяснить сложную тему на языке, который ты понимаешь.',
-        'Ask someone to explain a difficult topic in a language you understand.',
+        'Опубликуй заявку. Например: «Помогите разобраться с матрицами на английском».',
+        'Post a request. For example: “Help me understand matrices in English”.',
       ),
     ],
   ];
@@ -78,7 +78,7 @@ export function Home() {
             <article key={url} className={`destination-card ${color}`}>
               <h3>{title}</h3>
               <p>{body}</p>
-              <Link to={url}>{t('Перейти', 'Explore')}</Link>
+              <Link to={url}>{title}<span aria-hidden="true"> →</span></Link>
             </article>
           ))}
         </div>
@@ -193,6 +193,7 @@ export function Auth({ register, next }) {
         </nav>
         <form onSubmit={submit} noValidate>
           <FormErrors errors={errors} />
+        {!register && <p><Link to="/appeal">{t('Аккаунт заблокирован? Обжаловать решение', 'Account banned? Submit an appeal')}</Link></p>}
           {register && (
             <Field label={t('Имя Фамилия', 'Full name')} error={errors.name}>
               <input

@@ -1,3 +1,6 @@
+import { createCommunityRouter } from './community.js';
+import { db, startBackupSchedule } from './store.js';
+import { setKnowledgeSource } from './rag.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -12,6 +15,8 @@ import { recoverReviews } from './review-worker.js';
 
 provisionAdministrator();
 recoverReviews();
+startBackupSchedule();
+setKnowledgeSource(() => db.state);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -48,6 +53,7 @@ app.get('/api/demo', (req, res) => {
 app.use('/api', authRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api', recordRoutes);
+app.use('/api/app/community', createCommunityRouter());
 app.use('/api/app/assistant', createAssistantRouter());
 app.use('/api/app', appRoutes);
 

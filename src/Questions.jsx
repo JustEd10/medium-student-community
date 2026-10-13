@@ -1,3 +1,4 @@
+import { ReportControl } from './Community';
 import React, { useRef, useState } from 'react';
 import { useApp, go } from './context';
 import { CATEGORIES } from './data';
@@ -33,6 +34,7 @@ export function QuestionCard({ question }) {
           {t('Ответов:', 'Answers:')} {answers.length}
         </Link>
         <span>{question.category}</span>
+              {me && <ReportControl kind="question" id={id} />}
         {(me?.id === question.authorId || me?.role === 'admin') &&
           <DeleteControl kind="question" id={question.id} label={t('Удалить вопрос', 'Delete question')} />}
       </div>
@@ -337,6 +339,7 @@ export function Question({ id }) {
                 {fullName(author)}
               </Link>
               <span>{question.category}</span>
+              {me && <ReportControl kind="question" id={id} />}
               <span>
                 {t('Ответов:', 'Answers:')} {answers.length}
               </span>
@@ -369,6 +372,7 @@ export function Question({ id }) {
                     <h3>{fullName(user)}</h3>
                   </Link>
                   <p className="answer-body">{a.body}</p>
+                  {me && <ReportControl kind="answer" id={a.id} />}
                   {(me?.id === a.authorId || me?.role === 'admin') &&
                     <DeleteControl kind="answer" id={a.id} label={t('Удалить ответ', 'Delete answer')} />}
                   <Stars

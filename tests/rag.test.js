@@ -81,3 +81,16 @@ test('directory distinguishes library registration, specific international offic
     if (id === 'military-training') assert.ok(!a.body.includes('100'));
   }
 });
+
+test('admin directory updates affect deterministic answers and invalidate cached versions', async () => {
+  const { setKnowledgeSource, currentKnowledgeVersion } = await import('../server/rag.js');
+  const before = currentKnowledgeVersion();
+  const state = { knowledgeOverrides: { 'military-registration': { office: '100', building: 'Корпус уточнён в тесте', hours: '10:00–16:00', contact: 'vus@rea.ru', checkedAt: '2026-01-01', source: 'https://www.rea.ru/' } } };
+  try {
+    setKnowledgeSource(() => state);
+    assert.notEqual(currentKnowledgeVersion(), before);
+    const result = await generateUniversityAnswer('Какой кабинет вуса?', () => assert.fail('do not call provider'));
+    assert.match(result.body, /100/); assert.match(result.body, /Корпус уточнён/); assert.match(result.body, /10:00–16:00/);
+    assert.doesNotMatch(result.sources[0].sourceNote, /владельцем проекта/);
+  } finally { setKnowledgeSource(() => ({})); }
+});

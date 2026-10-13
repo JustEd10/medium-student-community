@@ -88,7 +88,7 @@ export function AppProvider({ children }) {
     sessionGeneration.current += 1;
     invalidate();
     // Личная переписка и почта исчезают сразу, даже если сервер недоступен.
-    setData(previous => ({ ...previous, me: null, chats: [], trash: [], users: previous.users.map(({ role, ...user }) => ({ ...user, email: '' })) }));
+    setData({ ...empty, me: null, notifications: [] });
   }, [invalidate]);
   const refresh = useCallback(async () => {
     if (authBusy.current || mutations.current) return;
@@ -220,6 +220,18 @@ export function AppProvider({ children }) {
     if (body.questionId) await refresh();
     return result;
   }
+  const communityRequest = useCallback(async (path, options = {}) => {
+    const generation = sessionGeneration.current;
+    const changing = options.method && options.method !== 'GET';
+    if (changing) { mutations.current += 1; invalidate(); }
+    try {
+      const result = await request(`/community${path}`, { ...options, token: token.current });
+      if (generation !== sessionGeneration.current) throw new Error('AUTH_REQUIRED');
+      return result;
+    } finally {
+      if (changing) { mutations.current -= 1; await refresh(); }
+    }
+  }, [refresh, invalidate]);
   async function logout() {
     if (authBusy.current) return;
     const previousToken = token.current;
@@ -240,7 +252,7 @@ export function AppProvider({ children }) {
     go(`/login?next=${encodeURIComponent(next)}`);
     return false;
   };
-  return <Context.Provider value={{ state, toggleLocale, me, locale, t, notify: setNotice, offline, ready, retry: refresh, notice, requireUser, act, auth, logout, askAI }}>{children}
+  return <Context.Provider value={{ state, toggleLocale, me, locale, t, notify: setNotice, offline, ready, retry: refresh, notice, requireUser, act, auth, logout, askAI, communityRequest }}>{children}
     {undo && <div className="deletion-undo" role="status" aria-live="polite">
       <span>{t('Удалено.', 'Deleted.')} {Math.max(0, Math.ceil((undo.expiresAt - undoNow) / 1000))} {t('сек.', 'sec.')}</span>
       <button type="button" className="button button-outline" disabled={undoBusy || undoNow >= undo.expiresAt}

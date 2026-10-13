@@ -1,3 +1,5 @@
+import { appendModerationLog } from '../community.js';
+import { notificationsFor, markNotificationsRead } from '../../src/notifications.js';
 import crypto from 'crypto';
 import { Router } from 'express';
 import { db, commit } from '../store.js';
@@ -15,6 +17,8 @@ import {
   addHelp,
   addQuestion,
   completeHelp,
+  selectHelp,
+  reopenHelp,
   offerHelp,
   openChat,
   markChatRead,
@@ -74,6 +78,7 @@ function publicState(userId) {
       (administrator || c.members.includes(userId))).map(c => ({ ...c,
         messages: c.messages.filter(m => m.deletedAt == null && alive.has(m.senderId)) })),
     trash: [],
+    notifications: notificationsFor(s, userId),
     ...(administrator ? { aiReviews: s.aiReviews || {} } : {}),
   };
 }
@@ -184,6 +189,9 @@ const actions = {
     if (help && help.deletedAt == null && help.helpers.includes(me)) return s;
     return offerHelp(s, me, text(a.helpId, 100));
   },
+  markNotificationsRead: (s, me, a) => markNotificationsRead(s, me, a.ids),
+  selectHelp: (s, me, a) => selectHelp(s, me, text(a.helpId, 100), text(a.helperId, 100)),
+  reopenHelp: (s, me, a) => reopenHelp(s, me, text(a.helpId, 100)),
   completeHelp: (s, me, a) => completeHelp(s, me, text(a.helpId, 100), text(a.helperId, 100)),
   rateHelp: (s, me, a) => rateHelp(s, me, text(a.helpId, 100), a.value),
   openChat: (s, me, a) => openChat(s, me, text(a.partner, 100)),
@@ -229,7 +237,20 @@ router.post('/act', (req, res) => {
     const actionStartedAt = Date.now();
     const out = action(db.state, me, args);
     // часть функций возвращает { state, id }, остальные просто новый state
-    const next = out.state || out;
+    let next = out.state || out;
+    const admin = db.state.users.find(u => u.id === me && u.role === 'admin');
+    if (admin && ['setUserBan', 'deleteContent', 'restoreContent', 'dismissAIReview', 'retryAIReview'].includes(req.body.type)) {
+      const reason = req.body.type === 'setUserBan' ? (args.reason === undefined ? 'Решение администратора' : text(args.reason, 2000).trim()) : args.reason === undefined ? '' : text(args.reason, 2000).trim();
+      if (req.body.type === 'setUserBan' && reason.length < 5) throw new Error('REASON_REQUIRED');
+      if (req.body.type === 'setUserBan') next = { ...next, users: next.users.map(u => u.id === args.id && args.banned ? { ...u, banReason: reason } : u) };
+      next = appendModerationLog(next, me, req.body.type === 'setUserBan' ? (args.banned ? 'user.banned' : 'user.unbanned') : req.body.type, args.key || `${args.kind || 'user'}:${args.id}`, reason);
+    }
+    // A removed/banned selected helper must not leave the owner with a hidden, unusable assignment.
+    if (next.helpRequests.some(h => h.status === 'assigned' && !next.users.some(u => u.id === h.helperId && u.deletedAt == null && u.bannedAt == null))) next = { ...next, helpRequests: next.helpRequests.map(h => {
+      if (h.status !== 'assigned' || next.users.some(u => u.id === h.helperId && u.deletedAt == null && u.bannedAt == null)) return h;
+      const { assignedAt, ...rest } = h;
+      return { ...rest, helperId: null, status: 'open', rating: null };
+    }) };
     if (!validState(next)) return res.status(400).json({ error: 'INVALID_DATA' });
     if (next !== db.state) {
       const activeUsers = new Set(next.users.filter(u => u.deletedAt == null && u.bannedAt == null).map(u => u.id));

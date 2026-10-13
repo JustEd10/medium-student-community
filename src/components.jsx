@@ -201,7 +201,7 @@ export function SegmentedNav({ items, activeIndex, label, className = '' }) {
     <nav
       className={`segmented motion-segmented ${className}`}
       aria-label={label}
-      style={{ '--active-index': activeIndex }}
+      style={{ '--active-index': activeIndex, '--segment-count': items.length }}
     >
       <span className="segment-indicator" aria-hidden="true" />
       {items.map(([to, text], index) => (
@@ -218,7 +218,8 @@ export function SegmentedNav({ items, activeIndex, label, className = '' }) {
   );
 }
 export function Header({ path, onMenu }) {
-  const { me, t, locale, toggleLocale } = useApp();
+  const { me, state, t, locale, toggleLocale } = useApp();
+  const unreadCount = (state.notifications || []).filter(n => !n.read).length;
   const links = [
     ['/', t('Главная', 'Home')],
     ['/people', t('Знакомства', 'Meet people')],
@@ -257,6 +258,7 @@ export function Header({ path, onMenu }) {
           ))}
         </nav>
         <div className="header-actions">
+          {me && <Link to="/notifications" className="notification-button" aria-label={t(`Уведомления: ${unreadCount} непрочитанных`, `Notifications: ${unreadCount} unread`)}><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg>{unreadCount > 0 && <span className="notification-count">{Math.min(unreadCount, 99)}</span>}</Link>}
           {me ? (
             <Link
               to="/profile"
@@ -328,6 +330,7 @@ export function MenuContent({ onClose = () => {} }) {
     ['/study', t('Помощь с учёбой', 'Study help')],
     ['/questions', t('Вопрос-ответ', 'Questions & answers')],
     ['/chats', t('Общение', 'Messages')],
+    ...(me ? [['/notifications', t('Уведомления', 'Notifications')]] : []),
     ['/profile', t('Профиль', 'Profile')],
     ...(me?.role === 'admin' ? [['/moderation', t('Модерация', 'Moderation')]] : []),
   ];

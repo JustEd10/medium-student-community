@@ -7,7 +7,7 @@ import { join } from 'node:path';
 
 function inStore(dir, code) {
   return spawnSync(process.execPath, ['--input-type=module', '-e', code], {
-    env: { ...process.env, DATA_DIR: dir }, encoding: 'utf8', timeout: 5000,
+    env: { ...process.env, DATA_DIR: dir, BACKUP_DIR: join(dir, 'backups'), BACKUP_RETENTION: '14' }, encoding: 'utf8', timeout: 5000,
   });
 }
 
@@ -32,7 +32,7 @@ test('state survives a new process; expired and legacy sessions do not', () => {
       }});
     `);
     assert.equal(created.status, 0, created.stderr);
-    assert.deepEqual(readdirSync(dir), ['db.json']);
+    assert.deepEqual(readdirSync(dir).sort(), ['backups', 'db.json']);
     const reopened = inStore(dir, `
       import { db } from './server/store.js';
       const message = db.state.chats[0].messages.at(-1);
@@ -117,4 +117,42 @@ test('bans and interrupted AI requests survive restart safely', () => {
     assert.equal(reopened.status, 0, reopened.stderr);
     assert.deepEqual(JSON.parse(reopened.stdout), { banned: true, sessions: 0, ai: 'error', preserved: true });
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('failed due backup blocks mutation and keeps memory and disk aligned', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'medium-backup-failure-'));
+  try {
+    const result = inStore(dir, `
+      import fs from 'node:fs';
+      import { db, commit, getBackupStatus } from './server/store.js';
+      import { createSeed } from './src/data.js';
+      fs.writeFileSync(process.env.BACKUP_DIR, 'blocked destination');
+      commit({state:createSeed(),sessions:{}});
+      const before = fs.readFileSync(process.env.DATA_DIR+'/db.json','utf8');
+      const next = structuredClone(db); next.state.users[0].about = 'must not persist';
+      let code; try { commit(next); } catch (error) { code = error.code; }
+      console.log(JSON.stringify({ code, sameDisk: before === fs.readFileSync(process.env.DATA_DIR+'/db.json','utf8'),
+        sameMemory: db.state.users[0].about !== 'must not persist', backupError:getBackupStatus().error }));
+    `);
+    assert.equal(result.status, 0, result.stderr);
+    assert.deepEqual(JSON.parse(result.stdout), {code:'STORAGE_UNAVAILABLE',sameDisk:true,sameMemory:true,backupError:'BACKUP_UNAVAILABLE'});
+  } finally { rmSync(dir,{recursive:true,force:true}); }
+});
+
+test('rename failure leaves memory unchanged and cleans temporary writes', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'medium-rename-failure-'));
+  try {
+    const result = inStore(dir, `
+      import fs from 'node:fs';
+      import { db, commit } from './server/store.js';
+      import { createSeed } from './src/data.js';
+      commit({state:createSeed(),sessions:{}});
+      fs.unlinkSync(process.env.DATA_DIR+'/db.json'); fs.mkdirSync(process.env.DATA_DIR+'/db.json');
+      const next = structuredClone(db); next.state.users[0].about = 'must not persist';
+      let code; try { commit(next); } catch(error) { code=error.code; }
+      console.log(JSON.stringify({code,unchanged:db.state.users[0].about !== 'must not persist',temp:fs.readdirSync(process.env.DATA_DIR).some(n=>n.endsWith('.tmp'))}));
+    `);
+    assert.equal(result.status,0,result.stderr);
+    assert.deepEqual(JSON.parse(result.stdout),{code:'STORAGE_UNAVAILABLE',unchanged:true,temp:false});
+  } finally { rmSync(dir,{recursive:true,force:true}); }
 });

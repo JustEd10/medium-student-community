@@ -1,3 +1,4 @@
+import { loadKnowledge } from './knowledge-store.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import https from 'node:https';
@@ -7,6 +8,10 @@ import { createAIQueue } from './ai-queue.js';
 
 const knowledge = JSON.parse(fs.readFileSync(new URL('./knowledge/reu.json', import.meta.url), 'utf8'));
 export const answerKnowledgeVersion = `reu-${knowledge.version}-grounding-2`;
+let knowledgeSource = () => ({});
+export function setKnowledgeSource(provider) { knowledgeSource = provider; }
+const chunksNow = () => loadKnowledge(knowledge.chunks, knowledgeSource());
+export function currentKnowledgeVersion() { return `${answerKnowledgeVersion}-${crypto.createHash('sha256').update(JSON.stringify(chunksNow())).digest('hex').slice(0, 16)}`; }
 const stopWords = new Set('как где когда что это мне мой моя для или еще тоже можно нужно хочу реу плеханова университет студент студенты вопрос найти получить please where what how the and find get can' .split(' '));
 const normalize = text => String(text).toLowerCase().replace(/ё/g, 'е')
   .replace(/(?<![а-я])вус(?:а|у|ом|е)?(?![а-я])/gu, 'военно учетный стол');
@@ -18,15 +23,16 @@ function locationQuestion(question) {
 }
 function departmentFor(question) {
   const text = normalize(question);
-  const matches = knowledge.chunks.filter(chunk => chunk.office &&
+  const matches = chunksNow().filter(chunk => chunk.office &&
     chunk.office.aliases.some(alias => text.includes(alias)));
   return matches.length === 1 ? matches[0] : null;
 }
 export function retrieve(question, limit = 3) {
   const terms = [...new Set(tokenize(question))];
-  return knowledge.chunks.map(chunk => {
+  const chunks = chunksNow();
+  return chunks.map(chunk => {
     const words = tokenize(`${chunk.title} ${chunk.keywords} ${chunk.text}`);
-    const score = terms.reduce((sum, term) => sum + (words.includes(term) ? Math.log(1 + knowledge.chunks.length / (1 + knowledge.chunks.filter(c => tokenize(`${c.title} ${c.keywords} ${c.text}`).includes(term)).length)) : 0), 0);
+    const score = terms.reduce((sum, term) => sum + (words.includes(term) ? Math.log(1 + chunks.length / (1 + chunks.filter(c => tokenize(`${c.title} ${c.keywords} ${c.text}`).includes(term)).length)) : 0), 0);
     return { ...chunk, score };
   }).filter(c => c.score > 0).sort((a, b) => b.score - a.score).filter((c, index, all) => c.score >= all[0].score * 0.55).slice(0, limit);
 }

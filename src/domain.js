@@ -1,3 +1,5 @@
+import { validCommunityState } from './community-schema.js';
+import { validNotificationReads } from './notifications.js';
 export const STORAGE_KEY = 'medium.frontend.v1';
 
 export const fullName = (user) => (user ? `${user.firstName} ${user.lastName}`.trim() : 'Медиум');
@@ -100,7 +102,7 @@ export function offerHelp(state, actor, helpId) {
   return {
     ...state,
     helpRequests: state.helpRequests.map((h) =>
-      h.id === helpId ? { ...h, helpers: [...new Set([...h.helpers, actor])] } : h,
+      h.id === helpId ? { ...h, helpers: [...new Set([...h.helpers, actor])], helperOfferedAt: { ...h.helperOfferedAt, [actor]: h.helperOfferedAt?.[actor] || Date.now() } } : h,
     ),
   };
 }
@@ -110,13 +112,13 @@ export function completeHelp(state, actor, helpId, helperId) {
   requireMember(state, helperId);
   const help = state.helpRequests.find((h) => h.id === helpId && h.deletedAt == null);
   if (!help) fail('NOT_FOUND');
-  if (help.authorId !== actor || help.status !== 'open') fail('HELP_NOT_ALLOWED');
+  if (help.authorId !== actor || !['open', 'assigned'].includes(help.status)) fail('HELP_NOT_ALLOWED');
   // выбрать можно только того, кто сам откликнулся
-  if (helperId === actor || !help.helpers.includes(helperId)) fail('HELP_NOT_ALLOWED');
+  if (helperId === actor || !help.helpers.includes(helperId) || (help.status === 'assigned' && help.helperId !== helperId)) fail('HELP_NOT_ALLOWED');
   return {
     ...state,
     helpRequests: state.helpRequests.map((h) =>
-      h.id === helpId ? { ...h, helperId, status: 'completed' } : h,
+      h.id === helpId ? { ...h, helperId, status: 'completed', completedAt: Date.now() } : h,
     ),
   };
 }
@@ -334,9 +336,13 @@ export function validState(value) {
     if (!isTextList(h.helpers)) return false;
     if (!h.helpers.every((id) => isUser(id) && id !== h.authorId)) return false;
     if (!Number.isFinite(h.createdAt)) return false;
+    if (h.assignedAt !== undefined && !Number.isFinite(h.assignedAt)) return false;
+    if (h.completedAt !== undefined && !Number.isFinite(h.completedAt)) return false;
+    if (h.helperOfferedAt !== undefined && (!h.helperOfferedAt || typeof h.helperOfferedAt !== 'object' || Array.isArray(h.helperOfferedAt) || !Object.entries(h.helperOfferedAt).every(([id, at]) => isUser(id) && Number.isFinite(at)))) return false;
     // пока заявка открыта, помощник не выбран и оценки нет
     if (h.status === 'open') return h.helperId === null && h.rating === null;
-    if (h.status !== 'completed') return false;
+    if (!['assigned', 'completed'].includes(h.status)) return false;
+    if (h.status === 'assigned' && h.rating !== null) return false;
     return h.helpers.includes(h.helperId) && h.helperId !== h.authorId && isRating(h.rating);
   };
 
@@ -352,6 +358,8 @@ export function validState(value) {
   };
 
   return (
+    validNotificationReads(value.notificationReads, userIds) &&
+    validCommunityState(value, userIds) &&
     value.users.every(userOk) &&
     value.questions.every(questionOk) &&
     value.answers.every(answerOk) &&
@@ -366,7 +374,7 @@ export function withdrawHelp(state, actor, helpId) {
   if (!help) fail('NOT_FOUND');
   if (help.status !== 'open' || !help.helpers.includes(actor)) fail('HELP_NOT_ALLOWED');
   return { ...state, helpRequests: state.helpRequests.map(h => h.id === helpId
-    ? { ...h, helpers: h.helpers.filter(id => id !== actor) } : h) };
+    ? { ...h, helpers: h.helpers.filter(id => id !== actor), helperOfferedAt: Object.fromEntries(Object.entries(h.helperOfferedAt || {}).filter(([id]) => id !== actor)) } : h) };
 }
 export function setStudyHelpVisibility(state, actor, visible) {
   requireMember(state, actor);
@@ -377,4 +385,23 @@ export function setPeopleVisibility(state, actor, visible) {
   requireMember(state, actor);
   if (typeof visible !== 'boolean') fail('INVALID_DATA');
   return { ...state, users: state.users.map(u => u.id === actor ? { ...u, peopleVisible: visible } : u) };
+}
+
+export function selectHelp(state, actor, helpId, helperId) {
+  requireMember(state, actor); requireMember(state, helperId);
+  const help = state.helpRequests.find(h => h.id === helpId && h.deletedAt == null);
+  if (!help) fail('NOT_FOUND');
+  if (help.authorId !== actor || help.status !== 'open' || helperId === actor || !help.helpers.includes(helperId)) fail('HELP_NOT_ALLOWED');
+  return { ...state, helpRequests: state.helpRequests.map(h => h.id === helpId ? { ...h, helperId, status: 'assigned', assignedAt: Date.now() } : h) };
+}
+export function reopenHelp(state, actor, helpId) {
+  requireMember(state, actor);
+  const help = state.helpRequests.find(h => h.id === helpId && h.deletedAt == null);
+  if (!help) fail('NOT_FOUND');
+  if (help.authorId !== actor || help.status !== 'assigned') fail('HELP_NOT_ALLOWED');
+  return { ...state, helpRequests: state.helpRequests.map(h => {
+    if (h.id !== helpId) return h;
+    const { assignedAt, ...rest } = h;
+    return { ...rest, helperId: null, status: 'open', rating: null };
+  }) };
 }

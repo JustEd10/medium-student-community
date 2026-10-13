@@ -93,7 +93,7 @@ export function setUserBan(state, actor, id, banned) {
   if (typeof banned !== 'boolean') fail('INVALID_DATA');
   return { ...state, users: state.users.map(u => {
     if (u.id !== id) return u;
-    const { bannedAt, bannedBy, ...rest } = u;
+    const { bannedAt, bannedBy, banReason, ...rest } = u;
     return banned ? { ...rest, bannedAt: Date.now(), bannedBy: actor } : rest;
   }) };
 }

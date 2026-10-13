@@ -1,3 +1,4 @@
+import { ReportControl } from './Community';
 import React, { useEffect, useState } from 'react';
 import { useApp, go } from './context';
 import { INTERESTS, LANGUAGES } from './data';
@@ -460,6 +461,7 @@ export function Person({ id }) {
               {t('Написать', 'Send a message')}
             </button>
           )}
+          {me && me.id !== id && <ReportControl kind="user" id={id} />}
           {me?.role === 'admin' && me.id !== id &&
             <DeleteControl kind="user" id={id} label={t('Удалить анкету', 'Delete profile')}
               onDeleted={() => go('/moderation')} />}

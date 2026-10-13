@@ -1,16 +1,18 @@
+import { CommunityAdmin } from './Community';
 import React, { useState } from 'react';
 import { useApp } from './context';
 import { fullName } from './domain';
 import { Avatar, Dialog, Empty, Field, Icon, Link, LoginGate, PageTitle } from './components';
 
 export function DeleteControl({ kind, id, label, onDeleted }) {
-  const { act, t } = useApp();
+  const { act, me, t } = useApp();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [reason, setReason] = useState('');
   async function remove() {
     if (busy) return;
     setBusy(true);
-    if (await act('deleteContent', { kind, id })) {
+    if (await act('deleteContent', { kind, id, ...(me?.role === 'admin' ? { reason } : {}) })) {
       setOpen(false);
       onDeleted?.();
     }
@@ -21,16 +23,30 @@ export function DeleteControl({ kind, id, label, onDeleted }) {
       onClick={() => setOpen(true)}><Icon name="trash" /></button>
     <Dialog open={open} onClose={() => !busy && setOpen(false)} title={label}>
       <p>{t('После удаления у тебя будет 5 секунд, чтобы отменить действие.', 'You will have 5 seconds to undo deletion.')}</p>
+      <>{me?.role === 'admin' && <Field label={t('Причина удаления', 'Reason for deletion')}><textarea value={reason} onChange={e => setReason(e.target.value)} minLength={5} maxLength={2000} /></Field>}</>
       <div className="moderation-actions">
         <button type="button" className="button button-outline" disabled={busy} onClick={() => setOpen(false)}>
           {t('Отмена', 'Cancel')}
         </button>
-        <button type="button" className="button button-danger" disabled={busy} onClick={remove}>
+        <button type="button" className="button button-danger" disabled={busy || (me?.role === 'admin' && reason.trim().length < 5)} onClick={remove}>
           {busy ? t('Удаление…', 'Deleting…') : t('Удалить', 'Delete')}
         </button>
       </div>
     </Dialog>
   </>;
+}
+function BanControl({ user }) {
+  const { act, t } = useApp();
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+  const banned = user.bannedAt != null;
+  const title = banned ? t('Разблокировать аккаунт', 'Unban account') : t('Заблокировать аккаунт', 'Ban account');
+  return <><button type="button" className="button button-outline" onClick={() => setOpen(true)}>{banned ? t('Разблокировать', 'Unban') : t('Заблокировать', 'Ban')}</button>
+    <Dialog open={open} onClose={() => !busy && setOpen(false)} title={title}><p>{fullName(user)}</p><p>{t('Решение и причина сохранятся в истории модерации.', 'The decision and reason will be saved in the moderation history.')}</p>
+      <Field label={t('Причина решения', 'Reason for decision')}><textarea value={reason} onChange={e => setReason(e.target.value)} minLength={5} maxLength={2000} /></Field>
+      <div className="request-actions"><button type="button" className="button button-outline" disabled={busy} onClick={() => setOpen(false)}>{t('Отмена', 'Cancel')}</button><button type="button" className="button" disabled={busy || reason.trim().length < 5} onClick={async () => { setBusy(true); if (await act('setUserBan', {id:user.id,banned:!banned,reason})) { setOpen(false); setReason(''); } setBusy(false); }}>{title}</button></div>
+    </Dialog></>;
 }
 export function Moderation() {
   const { state, me, t, act } = useApp();
@@ -55,6 +71,7 @@ export function Moderation() {
   return <>
     <PageTitle title={t('Модерация', 'Moderation')}
       description={t('Управляй публикациями и блокировками аккаунтов.', 'Manage content and account bans.')} />
+    <CommunityAdmin />
     <section className="moderation-panel panel">
       <h2>{t('Проверка AI', 'AI review')}</h2>
       <p>{t('AI только отмечает контент. Решение принимает администратор; публикации остаются видимыми.', 'AI only flags content. An administrator decides; posts remain visible.')}</p>
@@ -85,10 +102,7 @@ export function Moderation() {
         <div><small>{fullName(item.user)}</small><p>{item.href
           ? <Link to={item.href}>{item.title}</Link> : item.title}</p></div>
         {(kind !== 'user' || item.role !== 'admin') && <>
-          {kind === 'user' && <button type="button" className="button button-outline"
-            onClick={() => act('setUserBan', { id: item.id, banned: item.bannedAt == null })}>
-            {item.bannedAt != null ? t('Разблокировать', 'Unban') : t('Заблокировать', 'Ban')}
-          </button>}
+          {kind === 'user' && <BanControl user={item} />}
           {item.bannedAt != null && <span>{t('Заблокирован', 'Banned')}</span>}
           <DeleteControl kind={kind} id={item.id} label={t('Удалить', 'Delete')} />
         </>}

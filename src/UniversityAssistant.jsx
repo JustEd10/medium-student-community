@@ -1,3 +1,4 @@
+import { AIFeedbackControl } from './Community';
 import React, { useState } from 'react';
 import { useApp } from './context';
 
@@ -10,7 +11,8 @@ const errors = {
   AI_NOT_ALLOWED: 'Запросить ответ для публикации может её автор.',
   AUTH_REQUIRED: 'Войди, чтобы спросить AI.',
 };
-export function AIAnswer({ answer }) {
+export function AIAnswer({ answer, question, questionId }) {
+  const { me } = useApp();
   if (!answer) return null;
   return <div className="ai-answer" aria-live="polite">
     <div className="ai-answer-heading"><span className="ai-badge">AI</span><strong>Помощник РЭУ</strong></div>
@@ -20,6 +22,7 @@ export function AIAnswer({ answer }) {
         {!!answer.sources?.length && <div className="ai-sources"><strong>Источники</strong><ol>{answer.sources.map(s =>
           <li key={s.id}><a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a><small>Проверено {s.checkedAt}{s.sourceNote && ` · ${s.sourceNote}`}</small></li>)}</ol></div>}
         <small>Ответ по базе знаний Медиума. Источники и уточнения указаны выше; важные сведения уточняй в РЭУ.</small>
+        {me && question && <AIFeedbackControl questionId={questionId} question={question} answer={answer} />}
       </>}
   </div>;
 }
@@ -41,7 +44,7 @@ export default function UniversityAssistant({ question, onAskStudents }) {
   }
   return <section className="university-assistant panel">
     {!question && <><h2>{t('Спросить AI по справочнику РЭУ', 'Ask AI about REU')}</h2><p>{t('Отвечает по базе знаний об университете. Советы о кафе, местах и личном опыте лучше спросить у студентов.', 'Uses the university knowledge base. Ask students for cafés, local tips and personal experience.')}</p></>}
-    <AIAnswer answer={answer || question?.aiResponse} />
+    <AIAnswer answer={answer || question?.aiResponse} question={question ? `${question.title}\n${question.body}` : askedText} questionId={question?.id} />
     {onAskStudents && answer?.grounded === false && <p className="ai-community-hint">{t('В справочнике нет точного ответа. Студенты могут знать — перенеси вопрос в сообщество.', 'The directory has no precise answer. Students may know — ask the community.')}</p>}
     {canRequest && <form onSubmit={ask}>
       {!question && <label>Твой вопрос<textarea value={text} onChange={e => { setText(e.target.value); setAnswer(null); }} maxLength={2200} rows={2} placeholder="Где найти расписание занятий?" /></label>}

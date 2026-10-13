@@ -1,3 +1,5 @@
+import { BanAppeal } from './Community';
+import Notifications from './Notifications.jsx';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useApp, useRoute } from './context';
 import { BottomNav, Dialog, Empty, Header, Link, MenuContent, PageTitle } from './components';
@@ -33,6 +35,8 @@ export default function App() {
         next={route.search.get('next')}
       />
     );
+  else if (route.path === '/appeal') page = <><PageTitle title={t('Апелляция', 'Appeal')} /><BanAppeal /></>;
+  else if (route.path === '/notifications') page = <Notifications />;
   else if (route.path === '/profile') page = <Profile />;
   else if (route.path === '/moderation') page = <Moderation />;
   else if (route.path === '/people') page = <People />;
@@ -96,7 +100,7 @@ export default function App() {
             </button>
           </p>
         )}
-        {ready || ['/', '/login', '/register'].includes(route.path) ? (
+        {ready || ['/', '/login', '/register', '/appeal'].includes(route.path) ? (
           page
         ) : (
           <p className="loading" role="status">

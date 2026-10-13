@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { DeleteControl } from './AdminModeration';
+import { ReportControl } from './Community';
 import { useApp, go } from './context';
 import { commonItems, fullName, matches } from './domain';
 import {
@@ -63,64 +64,39 @@ function MyStudyOffer() {
   </>;
 }
 
+function RequestStatus({ request }) {
+  const { t } = useApp();
+  return <span className={`request-status status-${request.status}`}>{request.status === 'completed' ? t('Решено', 'Completed') : request.status === 'assigned' ? t('Помощник найден', 'Helper found') : t('Ищу помощь', 'Looking for help')}</span>;
+}
 function MyRequest({ request }) {
-  const { state, me, act, t, notify } = useApp();
+  const { state, act, t } = useApp();
   const [helper, setHelper] = useState(request.helpers[0] || '');
-  return (
-    <article className="my-request panel">
-      <h3>{request.subject}</h3>
-      <DeleteControl kind="help" id={request.id} label={t('Снять запрос', 'Withdraw request')} />
-      <p>{request.body}</p>
-      {request.status === 'completed' ? (
-        <p className="completed-badge">
-          {t('Помощь получена', 'Help received')} ·{' '}
-          {fullName(state.users.find((u) => u.id === request.helperId))}
-        </p>
-      ) : request.helpers.length ? (
-        <>
-          <Field label={t('Кто помог?', 'Who helped you?')}>
-            <select
-              value={helper || request.helpers[0]}
-              onChange={(e) => setHelper(e.target.value)}
-            >
-              {request.helpers.map((id) => (
-                <option key={id} value={id}>
-                  {fullName(state.users.find((u) => u.id === id))}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <button
-            type="button"
-            className="button button-green"
-            onClick={async () => {
-              if (
-                await act('completeHelp', {
-                  helpId: request.id,
-                  helperId: helper || request.helpers[0],
-                })
-              )
-                notify(
-                  t(
-                    'Помощь завершена. Теперь её можно оценить.',
-                    'Help completed. You can now rate it.',
-                  ),
-                );
-            }}
-          >
-            {t('Помощь получена', 'Help received')}
-          </button>
-        </>
-      ) : (
-        <p className="muted">
-          {t(
-            'Откликов пока нет. Запрос виден в разделе «Могу помочь».',
-            'Waiting for offers. Your request is visible in “I can help”.',
-          )}
-        </p>
-      )}
-    </article>
-  );
+  const selectedHelper = request.helpers.includes(helper) ? helper : request.helpers[0];
+  return <article className="my-request panel">
+    <div className="request-heading"><h3>{request.subject}</h3><RequestStatus request={request} /></div>
+    <p>{request.body}</p>
+    <DeleteControl kind="help" id={request.id} label={t('Снять запрос', 'Withdraw request')} />
+    {request.status === 'completed' ? <p className="completed-badge">{t('Помощь получена от', 'Help received from')} {fullName(state.users.find(u => u.id === request.helperId))}</p>
+      : request.status === 'assigned' ? <>
+        <p>{t('Помощник:', 'Helper:')} {fullName(state.users.find(u => u.id === request.helperId))}</p>
+        <div className="request-actions"><button type="button" className="button button-green" onClick={() => act('completeHelp', { helpId: request.id, helperId: request.helperId })}>{t('Задача решена', 'Mark as completed')}</button>
+        <button type="button" className="button button-outline" onClick={() => act('reopenHelp', { helpId: request.id })}>{t('Снова искать помощника', 'Find another helper')}</button></div>
+      </> : request.helpers.length ? <>
+        <Field label={t('Выбери помощника', 'Choose a helper')}><select value={selectedHelper} onChange={e => setHelper(e.target.value)}>{request.helpers.map(id => <option key={id} value={id}>{fullName(state.users.find(u => u.id === id))}</option>)}</select></Field>
+        <button type="button" className="button button-green" onClick={() => act('selectHelp', { helpId: request.id, helperId: selectedHelper })}>{t('Выбрать помощника', 'Choose helper')}</button>
+      </> : <p className="muted">{t('Откликов пока нет. Запрос виден в разделе «Могу помочь».', 'Waiting for offers. Your request is visible in “I can help”.')}</p>}
+  </article>;
+}
+function MyStudyActivity() {
+  const { state, me, t, act } = useApp();
+  if (!me) return <LoginGate next="/study?tab=my" />;
+  const own = state.helpRequests.filter(h => h.authorId === me.id);
+  const offered = state.helpRequests.filter(h => h.authorId !== me.id && h.helpers.includes(me.id));
+  return <div className="my-study-activity">
+    <MyStudyOffer />
+    <section className="my-requests"><h2>{t('Мои заявки', 'My requests')}</h2>{own.length ? own.map(h => <MyRequest key={h.id} request={h} />) : <Empty title={t('У тебя пока нет заявок', 'No requests yet')}><Link to="/study?tab=need" className="button button-blue">{t('Попросить помощь', 'Ask for help')}</Link></Empty>}</section>
+    <section className="my-requests"><h2>{t('Мои отклики', 'My offers')}</h2>{offered.length ? offered.map(h => <article className="panel my-request" key={h.id}><div className="request-heading"><h3>{h.subject}</h3><RequestStatus request={h} /></div><p>{fullName(state.users.find(u => u.id === h.authorId))}</p><p>{h.body}</p>{h.status === 'assigned' && <p>{h.helperId === me.id ? t('Автор выбрал тебя помощником.', 'You were chosen as the helper.') : t('Автор выбрал другого помощника.', 'Another helper was chosen.')}</p>}<div className="request-actions"><button className="button button-outline" onClick={async () => { const chat = await act('openChat', { partner: h.authorId }); if (chat) go(`/chats/${chat.id}`); }}>{t('Открыть диалог', 'Open conversation')}</button>{h.status === 'open' && <button className="text-link" onClick={() => act('withdrawHelp', { helpId: h.id })}>{t('Отозвать отклик', 'Withdraw offer')}</button>}</div></article>) : <Empty title={t('Ты пока не предлагал помощь', 'No offers yet')}><Link to="/study" className="button button-outline">{t('Посмотреть заявки студентов', 'Browse student requests')}</Link></Empty>}</section>
+  </div>;
 }
 export function Study({ tab }) {
   const { state, me, act, t, notify, requireUser } = useApp();
@@ -131,6 +107,7 @@ export function Study({ tab }) {
   const [limit, setLimit] = useState(3);
   const [evaluation, setEvaluation] = useState('');
   const need = tab === 'need';
+  const mine = tab === 'my';
   const own = state.helpRequests.filter((h) => h.authorId === me?.id);
   const completed = own.filter((h) => h.status === 'completed' && h.helperId);
   const selected = completed.find((h) => h.id === evaluation) || completed[0];
@@ -191,14 +168,15 @@ export function Study({ tab }) {
       <SegmentedNav
         className="study-tabs"
         label={t('Тип помощи', 'Study help options')}
-        activeIndex={need ? 1 : 0}
+        activeIndex={mine ? 2 : need ? 1 : 0}
         items={[
           ['/study', t('Могу помочь', 'I can help')],
           ['/study?tab=need', t('Нужна помощь', 'I need help')],
+          ['/study?tab=my', t('Мои заявки и отклики', 'My requests & offers')],
         ]}
       />
-      <div key={need ? 'need' : 'list'} className="tab-content">
-        {need ? (
+      <div key={mine ? 'my' : need ? 'need' : 'list'} className="tab-content">
+        {mine ? <MyStudyActivity /> : need ? (
           !me ? (
             <LoginGate next="/study?tab=need" />
           ) : (
@@ -351,7 +329,9 @@ export function Study({ tab }) {
                       </p>
                       <p className="muted">{t('Нужна помощь с', 'Needs help with')}</p>
                       <span className="subject-tag">{request.subject}</span>
+                      <RequestStatus request={request} />
                       <p className="help-body">{request.body}</p>
+                      {me && <ReportControl kind="help" id={request.id} />}
                       <button
                         type="button"
                         className={`button ${offered ? 'button-outline' : 'button-blue'}`}

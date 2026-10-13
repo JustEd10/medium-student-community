@@ -2663,3 +2663,23 @@ input[type='checkbox'] {
 .university-assistant form > label, .university-assistant form > p, .university-assistant form > small { flex-basis: 100%; }
 @media (max-width: 600px) { .question-choice { grid-template-columns: 1fr; gap: 12px; }
   .question-choice button { padding: 18px; } .university-assistant form .button { width: 100%; } }
+
+.notification-button { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 42px; min-height: 42px; color: #51408a; background: #eee7ff; border: 1px solid #b089ff; border-radius: 50%; }
+.notification-count { position: absolute; top: -4px; right: -4px; background: #7150bc; color: #fff; border-radius: 999px; padding: 2px 5px; min-width: 18px; text-align: center; font-size: 11px; line-height: 1.2; }
+.notification-list { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 12px; }
+.notification-list li { border: 1px solid #d4cbe8; border-radius: 18px; }
+.notification-list li.unread { background: #f1ebff; border-color: #ab8dd9; }
+.notification-list a { display: grid; gap: 8px; padding: 18px; color: inherit; text-decoration: none; }
+.notification-list time { font-size: .8em; color: #68667b; }
+.request-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.request-status { display: inline-block; border-radius: 999px; padding: 6px 12px; font-size: .8em; border: 1px solid #b9add5; background: #f0eafa; }
+.status-assigned { background: #e5efff; border-color: #a2bbe0; }
+.status-completed { background: #ddf5e8; border-color: #97c1aa; }
+.request-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 20px; }
+.my-study-activity { display: grid; gap: 28px; }
+.my-requests { display: grid; gap: 20px; }
+.study-tabs { width: 100%; max-width: 1100px; }
+.study-tabs a { flex: 1; min-width: 0; text-align: center; }
+@media (max-width: 640px) { .study-tabs { display: flex; flex-wrap: wrap; gap: 8px; } .study-tabs a { font-size: 14px; padding: 10px; flex-basis: 40%; } .study-tabs a:last-child { flex-basis: 100%; } .header-actions { gap: 8px; } }
+
+@media (max-width: 640px) { .study-tabs .segment-indicator { display: none; } .motion-segmented.study-tabs a.active { background: #e1d7fc; border: 2px solid #9774d2; } }
