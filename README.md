@@ -50,5 +50,4 @@ curl http://localhost:3000/api/app/state
 Основной сайт сохраняет данные в JSON-файле. Для Docker и Amvera нужен постоянный каталог `/data` и одна реплика приложения. [Инструкция размещения](deploy/amvera/README.md).
 
 - [Скриншоты сайта и работы API](docs/screenshots/README.md).
-- [Сверка с «Отработками 2 и 3»](docs/ASSIGNMENTS.md).
 - [Отчёт проекта](docs/REPORT.md).
