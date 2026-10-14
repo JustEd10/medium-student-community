@@ -7,6 +7,7 @@
   --muted: #626579;
   --purple: #724cff;
   --purple-ink: #4f319c;
+  --nav-purple: #8555c9;
   --header: #f3e9ff;
   --blue: #2470ac;
   --blue-ink: #195d8e;
@@ -311,7 +312,7 @@ main:focus {
   height: 24px;
   transform: translateY(-50%);
   border-radius: 11px;
-  background: #b089ff;
+  background: var(--nav-purple);
   pointer-events: none;
 }
 .desktop-nav a.active {
@@ -319,7 +320,7 @@ main:focus {
 }
 .desktop-nav a.active::before {
   background: #dfeaff;
-  box-shadow: inset 0 0 0 1px #b089ff;
+  box-shadow: inset 0 0 0 1px var(--nav-purple);
 }
 .desktop-nav a:hover {
   text-decoration: none;

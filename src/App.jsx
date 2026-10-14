@@ -81,7 +81,9 @@ export default function App() {
       </a>
       <Header
         path={route.path}
-        onMenu={() => {
+        onMenu={(event) => {
+          // Safari does not focus buttons clicked with the mouse by default.
+          event.currentTarget.focus();
           menuRoute.current = window.location.hash;
           setMenu(true);
         }}

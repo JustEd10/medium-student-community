@@ -34,7 +34,7 @@ export function QuestionCard({ question }) {
           {t('Ответов:', 'Answers:')} {answers.length}
         </Link>
         <span>{question.category}</span>
-              {me && <ReportControl kind="question" id={id} />}
+              {me && <ReportControl kind="question" id={question.id} />}
         {(me?.id === question.authorId || me?.role === 'admin') &&
           <DeleteControl kind="question" id={question.id} label={t('Удалить вопрос', 'Delete question')} />}
       </div>

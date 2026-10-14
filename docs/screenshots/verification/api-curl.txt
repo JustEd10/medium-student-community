@@ -1,0 +1,193 @@
+Реальные запросы curl
+Локальный учебный сервер, отдельные вымышленные данные. Токен, пароль и часть технических значений скрыты.
+
+$ curl -X GET http://127.0.0.1:4221/hello
+HTTP 200
+Привет, это сервер моего сайта
+
+$ curl -X GET http://127.0.0.1:4221/time
+HTTP 200
+{
+  "time": "[скрыто]"
+}
+
+$ curl -X GET http://127.0.0.1:4221/random
+HTTP 200
+{
+  "random": 68
+}
+
+$ curl -X GET http://127.0.0.1:4221/api/demo
+HTTP 200
+[
+  {
+    "id": 1,
+    "title": "Первый элемент",
+    "price": 250
+  },
+  {
+    "id": 2,
+    "title": "Второй элемент",
+    "price": 280
+  },
+  {
+    "id": 3,
+    "title": "Третий элемент",
+    "price": 180
+  }
+]
+
+$ curl -X GET http://127.0.0.1:4221/api/items
+HTTP 200
+[
+  {
+    "id": 1,
+    "title": "Когда можно получить студенческий билет?",
+    "body": "Подала документы и уже хожу на занятия. Где узнать о готовности билета?",
+    "category": "Документы",
+    "author": "alina",
+    "createdAt": "[скрыто]",
+    "answersCount": 2,
+    "bodyLength": 71
+  },
+  {
+    "id": 2,
+    "title": "Где найти расписание занятий?",
+    "body": "На сайте много разделов на русском, не могу найти расписание своей группы.",
+    "category": "Учёба",
+    "author": "user",
+    "createdAt": "[скрыто]",
+    "answersCount": 1,
+    "bodyLength": 74
+  },
+  {
+    "id": 3,
+    "title": "Кто хочет практиковать русский и английский?",
+    "body": "Предлагаю встречаться после занятий и общаться на двух языках.",
+    "category": "Языки",
+    "author": "wei",
+    "createdAt": "[скрыто]",
+    "answersCount": 1,
+    "bodyLength": 62
+  }
+]
+
+$ curl -X GET http://127.0.0.1:4221/api/items/1
+HTTP 200
+{
+  "id": 1,
+  "title": "Когда можно получить студенческий билет?",
+  "body": "Подала документы и уже хожу на занятия. Где узнать о готовности билета?",
+  "category": "Документы",
+  "author": "alina",
+  "createdAt": "[скрыто]",
+  "answersCount": 2,
+  "bodyLength": 71,
+  "answers": [
+    {
+      "id": 1,
+      "item_id": 1,
+      "author": "wei",
+      "body": "Наша группа узнавала через куратора, напиши ему или старосте.",
+      "rating": null,
+      "createdAt": "[скрыто]"
+    },
+    {
+      "id": 4,
+      "item_id": 1,
+      "author": "user",
+      "body": "Проверка Chromium: узнай готовность билета в деканате.",
+      "rating": null,
+      "createdAt": "[скрыто]"
+    }
+  ]
+}
+
+$ curl -X POST http://127.0.0.1:4221/api/items -H 'Content-Type: application/json' --data '{"title":"Проверка без токена","category":"Учёба"}'
+HTTP 401
+{
+  "error": "Нужен токен, сначала войди через POST /api/login"
+}
+
+$ curl -X POST http://127.0.0.1:4221/api/login -H 'Content-Type: application/json' --data '{"login":"user","password":"[скрыт]"}'
+HTTP 200
+{
+  "token": "[скрыт]",
+  "login": "user",
+  "role": "user"
+}
+
+$ curl -X POST http://127.0.0.1:4221/api/items -H 'Content-Type: application/json' --data '{"title":"Проверка curl: связанный вопрос","body":"Временный учебный пример.","category":"Учёба"}' -H 'Authorization: Bearer [скрыт]'
+HTTP 201
+{
+  "id": 5,
+  "title": "Проверка curl: связанный вопрос",
+  "body": "Временный учебный пример.",
+  "category": "Учёба",
+  "author": "user",
+  "createdAt": "[скрыто]",
+  "answersCount": 0,
+  "bodyLength": 25
+}
+
+$ curl -X POST http://127.0.0.1:4221/api/records -H 'Content-Type: application/json' --data '{"item_id":5,"body":"Ответ создан реальным запросом curl."}' -H 'Authorization: Bearer [скрыт]'
+HTTP 201
+{
+  "id": 6,
+  "item_id": 5,
+  "author": "user",
+  "body": "Ответ создан реальным запросом curl.",
+  "rating": null,
+  "createdAt": "[скрыто]",
+  "item_title": "Проверка curl: связанный вопрос"
+}
+
+$ curl -X GET http://127.0.0.1:4221/api/records/my -H 'Authorization: Bearer [скрыт]'
+HTTP 200
+[
+  {
+    "id": 3,
+    "item_id": 3,
+    "author": "user",
+    "body": "Проверка Safari: разговорный клуб после занятий.",
+    "rating": null,
+    "createdAt": "[скрыто]",
+    "item_title": "Кто хочет практиковать русский и английский?"
+  },
+  {
+    "id": 4,
+    "item_id": 1,
+    "author": "user",
+    "body": "Проверка Chromium: узнай готовность билета в деканате.",
+    "rating": null,
+    "createdAt": "[скрыто]",
+    "item_title": "Когда можно получить студенческий билет?"
+  },
+  {
+    "id": 6,
+    "item_id": 5,
+    "author": "user",
+    "body": "Ответ создан реальным запросом curl.",
+    "rating": null,
+    "createdAt": "[скрыто]",
+    "item_title": "Проверка curl: связанный вопрос"
+  }
+]
+
+$ curl -X DELETE http://127.0.0.1:4221/api/items/5
+HTTP 401
+{
+  "error": "Нужен токен, сначала войди через POST /api/login"
+}
+
+$ curl -X DELETE http://127.0.0.1:4221/api/items/5 -H 'Authorization: Bearer [скрыт]'
+HTTP 200
+{
+  "ok": true
+}
+
+$ curl -X GET http://127.0.0.1:4221/api/items/5
+HTTP 404
+{
+  "error": "Вопрос не найден"
+}

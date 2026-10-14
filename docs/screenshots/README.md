@@ -1,40 +1,12 @@
-# Скриншоты для сдачи (10.10.2026)
+# Скриншоты проекта
 
-Сняты с исправленной локальной версии `http://127.0.0.1:4183/`. Использованы вымышленные демо-профили и отдельный каталог данных. Для основного сайта задан экран ПК 1440 × 900 и телефона 390 × 844; часть снимков показывает всю страницу. Размер изображения может отличаться от размера окна из-за полосы прокрутки и полного захвата страницы.
+Материалы для сдачи. Снимки выполнены на локальной сборке с вымышленными данными. Рабочая база не затрагивалась.
 
-[Галерея всех снимков](current/index.html) · [Вывод реальных запросов curl](current/api-curl.txt)
+- [Новый комплект: ПК, телефон, планшет и Safari](verification/README.md).
+- [Галерея актуальных снимков](verification/index.html).
+- [Команды и ответы реальных curl-запросов](verification/api-curl.txt).
+- [Протокол проверки двух браузеров и клавиатуры](../BROWSER-CHECK.md).
 
-## Сайт и учебная страница
+## История
 
-| Страница | ПК | Телефон |
-| --- | --- | --- |
-| Главная | [Открыть](current/desktop-home.jpg) | [Открыть](current/mobile-home.jpg) |
-| Вход | [Открыть](current/desktop-login.jpg) | [Открыть](current/mobile-login.jpg) |
-| Знакомства | [Открыть](current/desktop-people.jpg) | [Открыть](current/mobile-people.jpg) |
-| Карточка студента | [Открыть](current/desktop-person.jpg) | [Открыть](current/mobile-person.jpg) |
-| Редактирование профиля | [Открыть](current/desktop-profile.jpg) | [Открыть](current/mobile-profile.jpg) |
-| Вопросы | [Открыть](current/desktop-questions.jpg) | [Открыть](current/mobile-questions.jpg) |
-| Ответы и пять звёзд | [Открыть](current/desktop-question.jpg) | [Открыть](current/mobile-question.jpg) |
-| Рейтинг | [Открыть](current/desktop-rating.jpg) | [Открыть](current/mobile-rating.jpg) |
-| Помощь с учёбой | [Открыть](current/desktop-study.jpg) | [Открыть](current/mobile-study.jpg) |
-| Публикация запроса | [Открыть](current/desktop-study-form.jpg) | [Открыть](current/mobile-study-form.jpg) |
-| Переписка | [Открыть](current/desktop-chats.jpg) | [Открыть](current/mobile-chat.jpg) |
-| Учебная страница: список с сервера | [Открыть](current/lesson-desktop-list.jpg) | [Открыть](current/lesson-mobile-list.jpg) |
-| Учебная страница: «Мои записи» | [Открыть](current/lesson-desktop-my-records.jpg) | [Открыть](current/lesson-mobile-my-records.jpg) |
-| Учебная страница: демо-массив | [Открыть](current/lesson-desktop-demo.jpg) | [Открыть](current/lesson-mobile-demo.jpg) |
-
-Дополнительно: [учебная страница после входа](current/lesson-desktop-login.jpg), [список мобильных диалогов](current/mobile-chats-list.jpg), [поле сообщения при шести строках](current/mobile-chat-draft.jpg).
-
-## API через curl
-
-Это снимки страницы с сохранённым выводом реально выполненных команд curl. Полный текст команд и ответов лежит в `api-curl.txt`; случайные токены скрыты.
-
-- [Приветствие, время, случайное число и массив](current/api-curl-1-server.jpg).
-- [Список вопросов и один вопрос](current/api-curl-2-items.jpg).
-- [Вход и создание вопроса](current/api-curl-3-login.jpg).
-- [Связь ответа с вопросом и «Мои записи»](current/api-curl-4-records.jpg).
-- [Удаление вопроса](current/api-curl-5-delete.jpg).
-
-Сценарий интерфейса: открыть `/app/`, войти как `user / qwerty`, ответить на вопрос о разговорном клубе. После отправки ответ виден в общем списке и в разделе «Мои записи». Пример создан только в локальной учебной версии. Данные этого API сбрасываются при перезапуске.
-
-Это комплект от 10.10.2026, а не подтверждение текущего интерфейса. Более поздние проверки функций находятся в [снимках от 11.10.2026](2026-10-11/README.md). Промежуточные HTML-файлы оформления вывода curl удалены; текст запросов и снимки сохранены.
+[Архив снимков](archive/index.html) и [дополнительные функции](features/README.md) сохранены как исторические материалы. Для сдачи используйте комплект verification.

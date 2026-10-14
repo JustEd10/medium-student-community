@@ -40,6 +40,7 @@ function showUser() {
   if (!token) return;
   box.append(el('span', currentUser + ' (' + role + ') '));
   const btn = el('button', 'Выйти', 'small');
+  btn.type = 'button';
   btn.onclick = logout;
   box.append(btn);
 }
@@ -152,10 +153,15 @@ async function drawItem(item) {
 
   if (token) {
     const form = el('form', undefined, 'answer-form');
+    const label = el('label', 'Ваш ответ', 'sr-only');
     const input = el('input');
-    input.placeholder = 'Ваш ответ';
+    input.id = `answer-${item.id}`;
+    input.name = 'body';
+    input.required = true;
+    label.htmlFor = input.id;
     const send = el('button', 'Ответить', 'small');
-    form.append(input, send);
+    send.type = 'submit';
+    form.append(label, input, send);
     form.onsubmit = async (e) => {
       e.preventDefault();
       if (send.disabled) return;
@@ -174,6 +180,7 @@ async function drawItem(item) {
 
     if (item.author === currentUser || role === 'admin') {
       const del = el('button', 'Удалить вопрос', 'small danger');
+      del.type = 'button';
       del.style.marginTop = '8px';
       del.onclick = async () => {
         if (!confirm('Удалить вопрос?')) return;

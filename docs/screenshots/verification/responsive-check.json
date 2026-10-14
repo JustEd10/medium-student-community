@@ -1,0 +1,191 @@
+[
+  {
+    "requestedWidth": 390,
+    "page": "home",
+    "h1": "Привет!Это Медиум",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "requestedWidth": 390,
+    "page": "people",
+    "h1": "Знакомства",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "requestedWidth": 390,
+    "page": "person",
+    "h1": "Профиль Вэй Линь",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "requestedWidth": 390,
+    "page": "questions",
+    "h1": "Вопрос-ответ",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "requestedWidth": 390,
+    "page": "question",
+    "h1": "Когда можно получить студенческий билет?",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "requestedWidth": 390,
+    "page": "rating",
+    "h1": "Вопрос-ответ",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "requestedWidth": 390,
+    "page": "study",
+    "h1": "Помощь с учёбой",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "requestedWidth": 390,
+    "page": "profile",
+    "h1": "Твой профиль",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "requestedWidth": 390,
+    "page": "chats",
+    "h1": "Общение",
+    "pageWidth": 375,
+    "viewport": 375
+  },
+  {
+    "requestedWidth": 768,
+    "page": "home",
+    "h1": "Привет!Это Медиум",
+    "pageWidth": 753,
+    "viewport": 753
+  },
+  {
+    "requestedWidth": 768,
+    "page": "people",
+    "h1": "Знакомства",
+    "pageWidth": 753,
+    "viewport": 753
+  },
+  {
+    "requestedWidth": 768,
+    "page": "person",
+    "h1": "Профиль Вэй Линь",
+    "pageWidth": 768,
+    "viewport": 768
+  },
+  {
+    "requestedWidth": 768,
+    "page": "questions",
+    "h1": "Вопрос-ответ",
+    "pageWidth": 753,
+    "viewport": 753
+  },
+  {
+    "requestedWidth": 768,
+    "page": "question",
+    "h1": "Когда можно получить студенческий билет?",
+    "pageWidth": 753,
+    "viewport": 753
+  },
+  {
+    "requestedWidth": 768,
+    "page": "rating",
+    "h1": "Вопрос-ответ",
+    "pageWidth": 753,
+    "viewport": 753
+  },
+  {
+    "requestedWidth": 768,
+    "page": "study",
+    "h1": "Помощь с учёбой",
+    "pageWidth": 753,
+    "viewport": 753
+  },
+  {
+    "requestedWidth": 768,
+    "page": "profile",
+    "h1": "Твой профиль",
+    "pageWidth": 753,
+    "viewport": 753
+  },
+  {
+    "requestedWidth": 768,
+    "page": "chats",
+    "h1": "Общение",
+    "pageWidth": 753,
+    "viewport": 753
+  },
+  {
+    "requestedWidth": 1440,
+    "page": "home",
+    "h1": "Привет!Это Медиум",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "requestedWidth": 1440,
+    "page": "people",
+    "h1": "Знакомства",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "requestedWidth": 1440,
+    "page": "person",
+    "h1": "Профиль Вэй Линь",
+    "pageWidth": 1440,
+    "viewport": 1440
+  },
+  {
+    "requestedWidth": 1440,
+    "page": "questions",
+    "h1": "Вопрос-ответ",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "requestedWidth": 1440,
+    "page": "question",
+    "h1": "Когда можно получить студенческий билет?",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "requestedWidth": 1440,
+    "page": "rating",
+    "h1": "Вопрос-ответ",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "requestedWidth": 1440,
+    "page": "study",
+    "h1": "Помощь с учёбой",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "requestedWidth": 1440,
+    "page": "profile",
+    "h1": "Твой профиль",
+    "pageWidth": 1425,
+    "viewport": 1425
+  },
+  {
+    "requestedWidth": 1440,
+    "page": "chats",
+    "h1": "Общение",
+    "pageWidth": 1425,
+    "viewport": 1425
+  }
+]

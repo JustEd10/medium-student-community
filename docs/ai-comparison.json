@@ -1,5 +1,4 @@
 {
-  "date": "2026-10-12",
   "knowledgeVersion": "reu-3-grounding-2",
   "providerCalls": 12,
   "rows": [
@@ -16,18 +15,16 @@
         "grounded": true
       },
       "answer": {
-        "body": "ВУС (военно-учётный стол): кабинет 100 — по уточнению для Медиума от 12.10.2026. Корпус пока не уточнён. На официальной странице номер кабинета не опубликован; перед визитом можно уточнить место приёма по vus@rea.ru. [1]",
+        "body": "ВУС (военно-учётный стол): кабинет 100 — по уточнению для Медиума. Корпус пока не уточнён. На официальной странице номер кабинета не опубликован; перед визитом можно уточнить место приёма по vus@rea.ru. [1]",
         "sources": [
           {
             "id": "military-registration",
             "title": "ВУС — военно-учётный стол: контакты",
             "url": "https://www.rea.ru/structure/departments/otdel-mobilizatsionnoy-podgotovki/kontaktyi-i-grafik-rabotyi",
-            "checkedAt": "2026-10-12",
-            "sourceNote": "Кабинет 100 указан владельцем проекта 12.10.2026; официальный источник подтверждает контакты, но не номер кабинета."
+            "sourceNote": "Кабинет 100 указан владельцем проекта; официальный источник подтверждает контакты, но не номер кабинета."
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837095703
+        "grounded": true
       }
     },
     {
@@ -48,12 +45,10 @@
           {
             "id": "military-training",
             "title": "ВУЦ — Военный учебный центр",
-            "url": "https://www.rea.ru/structure/departments/vuts",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/structure/departments/vuts"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837095703
+        "grounded": true
       }
     },
     {
@@ -74,12 +69,10 @@
           {
             "id": "library-registration",
             "title": "Запись в библиотеку — сектор записи читателей",
-            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837095703
+        "grounded": true
       }
     },
     {
@@ -100,12 +93,10 @@
           {
             "id": "social",
             "title": "Социальная и материальная поддержка",
-            "url": "https://www.rea.ru/structure/departments/upravlenie-po-sotsialno-vospitatelnoy-rabote/otdel-po-sotsialnoy-rabote",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/structure/departments/upravlenie-po-sotsialno-vospitatelnoy-rabote/otdel-po-sotsialnoy-rabote"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837095703
+        "grounded": true
       }
     },
     {
@@ -126,12 +117,10 @@
           {
             "id": "international-europe",
             "title": "Отдел стран Европы, Америки, Африки и Ближнего Востока",
-            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/otdel-stran-evropyi-ameriki-afriki-i-blijnego-vostoka",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/otdel-stran-evropyi-ameriki-afriki-i-blijnego-vostoka"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837095703
+        "grounded": true
       }
     },
     {
@@ -149,8 +138,7 @@
       "answer": {
         "body": "Уточни название подразделения и корпус РЭУ. В проверенном справочнике нет однозначного номера кабинета для этого вопроса.",
         "sources": [],
-        "grounded": false,
-        "createdAt": 1791837095704
+        "grounded": false
       }
     },
     {
@@ -174,12 +162,10 @@
           {
             "id": "schedule",
             "title": "Расписание и личный кабинет",
-            "url": "https://www.rea.ru/studentu",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/studentu"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837095955
+        "grounded": true
       }
     },
     {
@@ -203,12 +189,10 @@
           {
             "id": "account",
             "title": "Учётная запись РЭУ",
-            "url": "https://www.rea.ru/tech/edu_services",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/tech/edu_services"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837096180
+        "grounded": true
       }
     },
     {
@@ -232,12 +216,10 @@
           {
             "id": "library-registration",
             "title": "Запись в библиотеку — сектор записи читателей",
-            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837096336
+        "grounded": true
       }
     },
     {
@@ -253,18 +235,16 @@
         "grounded": true
       },
       "answer": {
-        "body": "ВУС (военно-учётный стол): кабинет 100 — по уточнению для Медиума от 12.10.2026. Корпус пока не уточнён. На официальной странице номер кабинета не опубликован; перед визитом можно уточнить место приёма по vus@rea.ru. [1]",
+        "body": "ВУС (военно-учётный стол): кабинет 100 — по уточнению для Медиума. Корпус пока не уточнён. На официальной странице номер кабинета не опубликован; перед визитом можно уточнить место приёма по vus@rea.ru. [1]",
         "sources": [
           {
             "id": "military-registration",
             "title": "ВУС — военно-учётный стол: контакты",
             "url": "https://www.rea.ru/structure/departments/otdel-mobilizatsionnoy-podgotovki/kontaktyi-i-grafik-rabotyi",
-            "checkedAt": "2026-10-12",
-            "sourceNote": "Кабинет 100 указан владельцем проекта 12.10.2026; официальный источник подтверждает контакты, но не номер кабинета."
+            "sourceNote": "Кабинет 100 указан владельцем проекта; официальный источник подтверждает контакты, но не номер кабинета."
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837096336
+        "grounded": true
       }
     },
     {
@@ -285,12 +265,10 @@
           {
             "id": "military-training",
             "title": "ВУЦ — Военный учебный центр",
-            "url": "https://www.rea.ru/structure/departments/vuts",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/structure/departments/vuts"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837096336
+        "grounded": true
       }
     },
     {
@@ -311,12 +289,10 @@
           {
             "id": "library-registration",
             "title": "Запись в библиотеку — сектор записи читателей",
-            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837096336
+        "grounded": true
       }
     },
     {
@@ -337,12 +313,10 @@
           {
             "id": "social",
             "title": "Социальная и материальная поддержка",
-            "url": "https://www.rea.ru/structure/departments/upravlenie-po-sotsialno-vospitatelnoy-rabote/otdel-po-sotsialnoy-rabote",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/structure/departments/upravlenie-po-sotsialno-vospitatelnoy-rabote/otdel-po-sotsialnoy-rabote"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837096336
+        "grounded": true
       }
     },
     {
@@ -363,12 +337,10 @@
           {
             "id": "international-europe",
             "title": "Отдел стран Европы, Америки, Африки и Ближнего Востока",
-            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/otdel-stran-evropyi-ameriki-afriki-i-blijnego-vostoka",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/otdel-stran-evropyi-ameriki-afriki-i-blijnego-vostoka"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837096336
+        "grounded": true
       }
     },
     {
@@ -386,8 +358,7 @@
       "answer": {
         "body": "Уточни название подразделения и корпус РЭУ. В проверенном справочнике нет однозначного номера кабинета для этого вопроса.",
         "sources": [],
-        "grounded": false,
-        "createdAt": 1791837096336
+        "grounded": false
       }
     },
     {
@@ -411,12 +382,10 @@
           {
             "id": "schedule",
             "title": "Расписание и личный кабинет",
-            "url": "https://www.rea.ru/studentu",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/studentu"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837097261
+        "grounded": true
       }
     },
     {
@@ -440,12 +409,10 @@
           {
             "id": "account",
             "title": "Учётная запись РЭУ",
-            "url": "https://www.rea.ru/tech/edu_services",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/tech/edu_services"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837098128
+        "grounded": true
       }
     },
     {
@@ -469,12 +436,10 @@
           {
             "id": "library-registration",
             "title": "Запись в библиотеку — сектор записи читателей",
-            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837099253
+        "grounded": true
       }
     },
     {
@@ -498,12 +463,10 @@
           {
             "id": "library-registration",
             "title": "Запись в библиотеку — сектор записи читателей",
-            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837156701
+        "grounded": true
       }
     },
     {
@@ -527,18 +490,15 @@
           {
             "id": "dormitory",
             "title": "Общежития РЭУ",
-            "url": "https://www.rea.ru/structure/departments/edinaya-direktsiya-obschejitiy",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/structure/departments/edinaya-direktsiya-obschejitiy"
           },
           {
             "id": "international",
             "title": "Иностранным студентам",
-            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837157060
+        "grounded": true
       }
     },
     {
@@ -562,12 +522,10 @@
           {
             "id": "international",
             "title": "Иностранным студентам",
-            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837157392
+        "grounded": true
       }
     },
     {
@@ -591,12 +549,10 @@
           {
             "id": "library-registration",
             "title": "Запись в библиотеку — сектор записи читателей",
-            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley",
-            "checkedAt": "2026-10-12"
+            "url": "https://www.rea.ru/science/biblcentr/struktura/sektor-zapisi-chitateley"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837158281
+        "grounded": true
       }
     },
     {
@@ -620,18 +576,15 @@
           {
             "id": "dormitory",
             "title": "Общежития РЭУ",
-            "url": "https://www.rea.ru/structure/departments/edinaya-direktsiya-obschejitiy",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/structure/departments/edinaya-direktsiya-obschejitiy"
           },
           {
             "id": "international",
             "title": "Иностранным студентам",
-            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837159476
+        "grounded": true
       }
     },
     {
@@ -655,13 +608,12 @@
           {
             "id": "international",
             "title": "Иностранным студентам",
-            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam",
-            "checkedAt": "2026-10-11"
+            "url": "https://www.rea.ru/mejdunarodnaya-deyatelnost/inostrannyim-abiturientam-i-studentam"
           }
         ],
-        "grounded": true,
-        "createdAt": 1791837160720
+        "grounded": true
       }
     }
-  ]
+  ],
+  "metadataOmitted": true
 }

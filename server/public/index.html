@@ -16,22 +16,26 @@
       <section id="loginBox" class="card">
         <h2>Вход</h2>
         <form id="loginForm">
-          <input name="login" placeholder="Логин" required />
-          <input name="password" type="password" placeholder="Пароль" required />
-          <button>Войти</button>
+          <label for="loginInput">Логин</label>
+          <input id="loginInput" name="login" autocomplete="username" required />
+          <label for="passwordInput">Пароль</label>
+          <input id="passwordInput" name="password" type="password" autocomplete="current-password" required />
+          <button type="submit">Войти</button>
         </form>
-        <p class="hint">Для проверки: user / qwerty или admin / 12345</p>
-        <p id="loginError" class="error"></p>
+        <p id="loginError" class="error" role="alert" aria-live="polite"></p>
       </section>
 
       <section class="card">
         <h2>Вопросы</h2>
         <div class="row">
-          <button id="loadBtn">Загрузить список</button>
+          <button id="loadBtn" type="button">Загрузить список</button>
+          <label class="sr-only" for="categoryFilter">Категория</label>
           <select id="categoryFilter">
             <option value="">Все категории</option>
           </select>
-          <input id="searchInput" placeholder="Поиск" />
+          <label class="sr-only" for="searchInput">Поиск</label>
+          <input id="searchInput" type="search" />
+          <label class="sr-only" for="sortSelect">Сортировка</label>
           <select id="sortSelect">
             <option value="new">Сначала новые</option>
             <option value="answers">По числу ответов</option>
@@ -43,12 +47,15 @@
       <section id="addBox" class="card hidden">
         <h2>Задать вопрос</h2>
         <form id="itemForm">
-          <input name="title" placeholder="Заголовок (от 8 символов)" required />
-          <textarea name="body" placeholder="Текст вопроса"></textarea>
-          <select name="category"></select>
-          <button>Опубликовать</button>
+          <label for="itemTitle">Заголовок (от 8 символов)</label>
+          <input id="itemTitle" name="title" required />
+          <label for="itemBody">Текст вопроса</label>
+          <textarea id="itemBody" name="body"></textarea>
+          <label for="itemCategory">Категория</label>
+          <select id="itemCategory" name="category"></select>
+          <button type="submit">Опубликовать</button>
         </form>
-        <p id="itemError" class="error"></p>
+        <p id="itemError" class="error" role="alert" aria-live="polite"></p>
       </section>
 
       <section id="myBox" class="card hidden">
@@ -58,7 +65,7 @@
 
       <section class="card">
         <h2>Проверка связи с сервером</h2>
-        <button id="demoBtn">Загрузить демо-список</button>
+        <button id="demoBtn" type="button">Загрузить демо-список</button>
         <p class="hint">Тестовый массив с /api/demo, он прописан прямо в коде сервера</p>
         <div id="demoList"></div>
       </section>
