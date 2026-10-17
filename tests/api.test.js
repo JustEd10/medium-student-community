@@ -1,7 +1,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdtempSync, rmSync, renameSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, renameSync, writeFileSync } from 'node:fs';
 import { once } from 'node:events';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -28,7 +28,12 @@ async function call(path, { method = 'GET', body, token } = {}) {
   return { status: res.status, data: await res.json().catch(() => null) };
 }
 
-const post = (path, body, token) => call(path, { method: 'POST', body, token });
+const post = async (path, body, token) => {
+  const result = await call(path, { method: 'POST', body: path === '/api/app/auth/register' ? { aiConsent: true, ...body } : body, token });
+  if (path !== '/api/app/auth/register' || result.status !== 202) return result;
+  const preview = JSON.parse(readFileSync(join(dataDir, 'mail-preview.json')));
+  return call('/api/app/auth/register/verify', { method: 'POST', body: { challengeId: result.data.challengeId, code: preview.code } });
+};
 
 before(async () => {
   const state = createSeed();
@@ -39,7 +44,7 @@ before(async () => {
   writeFileSync(join(dataDir, 'admin-bootstrap.json'), JSON.stringify({ login: 'fixture-moderator', credential }));
   writeFileSync(join(dataDir, 'chat-bots.json'), JSON.stringify({ enabled: true, provider: 'gemini', apiKey: '' }));
   server = spawn(process.execPath, ['server/server.js'], {
-    env: { ...process.env, PORT: port, DATA_DIR: dataDir, CHAT_BOTS_ENABLED: '1', CHAT_BOT_PROVIDER: 'gemini', GEMINI_CHAT_API_KEY: '', GROQ_API_KEY: '' },
+    env: { ...process.env, PORT: port, DATA_DIR: dataDir, NODE_ENV: 'test', HOST: '127.0.0.1', REGISTRATION_MAIL_MODE: 'local', CHAT_BOTS_ENABLED: '1', CHAT_BOT_PROVIDER: 'gemini', GEMINI_CHAT_API_KEY: '', GROQ_API_KEY: '' },
     stdio: ['ignore', 'ignore', 'pipe'],
   });
   server.stderr.on('data', chunk => { startupError += chunk; });
@@ -120,7 +125,7 @@ test('Bearer header is required and logout revokes a token without a body', asyn
 test('parallel registration cannot create two users with the same email', async () => {
   const input = { name: 'Анна Тестовая', email: 'parallel@example.com', password: 'longpassword123' };
   const results = await Promise.all([post('/api/app/auth/register', input), post('/api/app/auth/register', input)]);
-  assert.deepEqual(results.map(r => r.status).sort(), [201, 409]);
+  assert.deepEqual(results.map(r => r.status).sort(), [201, 429]);
   const created = results.find(r => r.status === 201);
   assert.equal(created.data.state.users.filter(u => u.email === input.email).length, 1);
   assert.ok(created.data.me && created.data.token);
@@ -198,11 +203,12 @@ test('failed disk write returns 503 and keeps the previous state', async () => {
     }, data.token);
     assert.equal(result.status, 503);
     assert.equal(result.data.error, 'STORAGE_UNAVAILABLE');
-    assert.deepEqual((await call('/api/app/state', { token: data.token })).data.state, beforeState);
+    assert.equal((await call('/api/app/state', { token: data.token })).status, 503);
   } finally {
     rmSync(dataDir);
     renameSync(backup, dataDir);
   }
+  assert.deepEqual((await call('/api/app/state', { token: data.token })).data.state, beforeState);
   assert.equal((await post('/api/app/act', {
     type: 'addQuestion', args: { title: 'Запись после восстановления диска', body: '', category: 'Кампус' },
   }, data.token)).status, 200);
@@ -480,4 +486,15 @@ test('integrated community and notification APIs isolate recipients and audit ad
   assert.equal(overview.status,200);
   assert.ok(overview.data.moderationLog.some(l => l.action === 'user.banned' && l.reason === 'Проверка границ модерации'));
   assert.equal(typeof overview.data.backups.lastSuccessAt,'number');
+});
+
+
+test('public administrator marker hides admin from any visitor leaderboard without leaking login', async () => {
+  const state = (await call('/api/app/state')).data.state;
+  const administrator = state.users.find(u => u.isAdministrator);
+  assert.ok(administrator);
+  assert.equal(administrator.login,undefined);
+  assert.equal(administrator.credential,undefined);
+  const {rankings} = await import('../src/domain.js');
+  assert.equal(rankings(state).some(r=>r.user.id===administrator.id),false);
 });

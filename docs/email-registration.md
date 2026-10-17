@@ -1,0 +1,29 @@
+# Подтверждение почты при регистрации
+
+Регистрация, шестизначный код и анимации реализованы локально. Реальная отправка пока **не подключена**: отдельного отправителя и закрытой конфигурации нет. Личная почта пользователя не используется. Без настроенного сервиса сервер возвращает `MAIL_NOT_CONFIGURED` и не создаёт аккаунт.
+
+Собственный домен для обычного SMTP-ящика не обязателен. Нужен отдельный ящик проекта у сервиса, разрешающего SMTP, и его пароль приложения. Адрес отправителя будет виден получателям. Для Resend нужен проверенный собственный домен. Пароль или ключ следует вводить только в закрытый файл, а не в чат, исходники или Git.
+
+В интерфейсе отправка и проверка показываются внутри кнопки, цифры появляются в шести ячейках, неверный код подсвечивается, успешное подтверждение отмечается галочкой. Референс движения — [micro progress button от withAnimationUI](https://x.com/withAnimationUI/status/2107359197511692380); реализация собственная, на React и CSS. Настройка уменьшения движения учитывается.
+
+Согласие на общение с AI запрашивается при регистрации и доступно для отзыва в профиле. Большой блок согласия из чата убран. Для старых аккаунтов без согласия в чате остаётся ссылка на профиль. Аккаунты администратора исключаются из общего рейтинга по серверному публичному признаку, без раскрытия логина и служебных данных.
+
+## Backend contract
+
+Mount `createRegistrationRouter({ sql, getData, onVerified })` at `/auth` before legacy auth handlers. Remove the old immediate account-creation endpoint. `getData()` returns `{ state }`. `onVerified(user, { beforeCommit })` must synchronously create the user and session in the ordinary application state transaction, call `beforeCommit(sql)` inside that transaction, and return the public `{ token, me, state }` response. It must roll back on callback failure. The callback consumes the challenge only if its digest, expiry, delivery status and attempt allowance still match. The parent creates a cryptographically random 48-hex-character session token and queues profile moderation after persistence.
+
+The router initializes `003-registration.sql` without changing the application schema version. Challenges contain salted password credentials, a separately salted scrypt code digest, timestamps and registration profile data. They must stay out of logical backups and public state exports. Expired challenges and rate-limit rows are removed on registration, resend and verification requests. Limits use request `ip`; configure Express proxy trust only for the actual trusted proxy to avoid spoofed forwarded addresses. Global quotas still apply independently of IP.
+
+`POST /register` requires `name`, `email`, `password`, and boolean `aiConsent: true`. It returns 202 with `challengeId`, masked `email`, numeric `expiresAt` and `resendAt`. No account or session exists yet. Consent records the server timestamp, version 1, provider `gemini`, and `adultConfirmed: true`. Duplicate existing email/login returns 409. An active pending email returns 429 without replacing its credential, code or attempt budget.
+
+`POST /register/verify` accepts `challengeId` and a six-digit string `code`, returning 201 only after atomic account/session creation. Codes expire after ten minutes, with five incorrect attempts total per challenge; malformed codes count too. `POST /register/resend` accepts `challengeId`, rotates the code after a 60-second cooldown, and retains the original expiry and attempt count. Delivery must finish before verification. Failed delivery returns generic 503 `MAIL_DELIVERY_FAILED` plus challenge metadata so the client can retry after cooldown. Process interruption during sending leaves the challenge unavailable until expiry. Unconfigured mail returns 503 `MAIL_NOT_CONFIGURED`.
+
+Persisted one-hour limits allow five sends per address, twenty per IP, and 200 globally. Verification has separate limits of 100 per IP and 1,000 globally. Send capacity is reserved before asynchronous password hashing or delivery, including failed delivery. At most 1,000 unexpired challenges can exist. `GET /registration-status` returns only `{ emailVerification: true, mailReady }`; readiness confirms valid local configuration, not provider reachability.
+
+Place private configuration at `DATA_DIR/email-config.json`, outside the repository, with exact mode 0600. SMTP fields: `provider: "smtp"`, `host`, numeric `port`, boolean `secure`, `user`, `password`, `from`. Supported combinations are port 465 with `secure: true`, or port 587 with `secure: false` and mandatory STARTTLS. Certificate validation and TLS 1.2 minimum are enforced. SMTP uses dynamically imported `nodemailer`, which the application must install. Connections and sockets time out after ten seconds. Provider failures are never exposed in API responses or logged by these modules.
+
+Alternatively configure `provider: "resend"`, `apiKey`, and `from`; mail is sent only to the fixed HTTPS Resend endpoint, with redirect refusal and a fifteen-second timeout. No provider requests run during tests.
+
+For explicitly local manual testing only, set `REGISTRATION_MAIL_MODE=local`, `HOST=127.0.0.1`, and a non-production `NODE_ENV`. The actual application server must bind to that HOST. This writes the most recent code to an isolated `DATA_DIR/mail-preview.json` with mode 0600; never include this file in backups or publication. The local mode refuses production or wildcard binding settings. Production has no fake-delivery fallback.
+
+Tests inject `sendMail`, `mailReady`, and a clock, and call the actual route handlers against an in-memory SQLite database. Run `node --test tests/registration.test.js`. Parent transaction rollback and one-time consumption are covered by `tests/database-integration.test.js`. Real SMTP delivery, production configuration and trusted reverse-proxy behavior remain unverified. No real provider requests are used in the test suite.

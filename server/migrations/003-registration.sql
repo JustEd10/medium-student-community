@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS registration_challenges (
+ id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, user_json TEXT NOT NULL,
+ digest TEXT NOT NULL, salt TEXT NOT NULL, expires_at INTEGER NOT NULL,
+ resend_at INTEGER NOT NULL, attempts INTEGER NOT NULL DEFAULT 0,
+ sending INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS registration_limits (
+ key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires_at INTEGER NOT NULL
+);

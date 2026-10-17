@@ -5,6 +5,9 @@ dist/
 .env.*
 !.env.example
 server/storage/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
 test-results/
 playwright-report/
 work/

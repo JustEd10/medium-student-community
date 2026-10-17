@@ -1,5 +1,5 @@
 import { createCommunityRouter } from './community.js';
-import { db, startBackupSchedule } from './store.js';
+import { db, startBackupSchedule, refreshFromDatabase } from './store.js';
 import { setKnowledgeSource } from './rag.js';
 import fs from 'fs';
 import path from 'path';
@@ -28,6 +28,7 @@ const HELLO = 'Привет, это сервер моего сайта';
 const app = express();
 app.use(express.json({ limit: '100kb' }));
 app.use('/api', (req, res, next) => {
+  refreshFromDatabase();
   res.set('Cache-Control', 'no-store');
   res.vary('Authorization');
   if (req.method === 'POST' && req.path.endsWith('/logout') && req.body == null) {
@@ -80,4 +81,5 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Ошибка сервера' });
 });
 
-app.listen(PORT, () => console.log(`Сервер запущен: http://localhost:${PORT}`));
+const listener = app.listen(PORT, process.env.HOST || '0.0.0.0', () =>
+  console.log(`Сервер запущен: http://localhost:${listener.address().port}`));

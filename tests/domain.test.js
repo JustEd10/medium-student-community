@@ -200,3 +200,11 @@ test('undo deadline, protected roots, bans and study withdrawal', async () => {
   assert.equal(state.users.find(u => u.id === 'alina').studyHelpVisible, false);
   assert.throws(() => setStudyHelpVisibility(state, 'unknown', false), /AUTH_REQUIRED/);
 });
+
+test('administrators are absent from rankings even when public roles are hidden', () => {
+  const state = createSeed();
+  const admin = state.users[0].id;
+  const marked = { ...state, users: state.users.map(u => u.id === admin ? { ...u, isAdministrator: true } : u) };
+  assert.ok(!rankings(marked).some(row => row.user.id === admin));
+  assert.ok(rankings(state).some(row => row.user.id === admin));
+});

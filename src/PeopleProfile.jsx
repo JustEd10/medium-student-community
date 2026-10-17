@@ -1,3 +1,5 @@
+import AIConsent from './AIConsent';
+import { hasAIConsent } from './ai-consent';
 import { ReportControl } from './Community';
 import React, { useEffect, useState } from 'react';
 import { useApp, go } from './context';
@@ -250,6 +252,11 @@ export function Profile() {
           'Tell us which languages you understand and what interests you to find someone to talk to at your new university.',
         )}
       />
+      <section className="panel profile-ai-consent" aria-labelledby="ai-consent-heading">
+        <h2 id="ai-consent-heading">{t('Общение с AI', 'AI conversations')}</h2>
+        <AIConsent checked={hasAIConsent(me, state.chatAI?.provider)}
+          onChange={consent => act('setAIConsent', { consent })} />
+      </section>
       <div className="profile-layout">
         <form className="profile-form panel" onSubmit={submit} noValidate>
           <FormErrors errors={errors} />
@@ -472,7 +479,7 @@ export function Person({ id }) {
             <Tags values={user.studyHelpVisible === false ? [] : user.skills} kind="interest" />
             {(user.studyHelpVisible === false || !user.skills.length) && <p>{t('Пока не указано', 'Not specified yet')}</p>}
           </section>
-          <section className="panel personal-rating">
+          {rank >= 0 && <section className="panel personal-rating">
             <h2>{t('Рейтинг', 'Rating')}</h2>
             <p>
               <strong>{score?.total || 0} ★</strong>
@@ -483,7 +490,7 @@ export function Person({ id }) {
             <Link to="/questions?tab=rating" className="text-link">
               {t('Посмотреть рейтинг', 'View leaderboard')}
             </Link>
-          </section>
+          </section>}
         </aside>
       </div>
     </>

@@ -1,8 +1,10 @@
+import { createRegistrationRouter } from '../registration.js';
+import { AI_CONSENT_VERSION } from '../../src/ai-consent.js';
 import { appendModerationLog } from '../community.js';
 import { notificationsFor, markNotificationsRead } from '../../src/notifications.js';
 import crypto from 'crypto';
 import { Router } from 'express';
-import { db, commit } from '../store.js';
+import { db, commit, joinedQuestionAnswers, sql } from '../store.js';
 import { startAutomaticAnswer } from '../assistant.js';
 import { prepareReviews, adminReviewAction } from '../ai-moderation.js';
 import { reviewWorker } from '../review-worker.js';
@@ -35,7 +37,6 @@ import {
 } from '../../src/domain.js';
 
 const router = Router();
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SESSION_TTL = 7 * 24 * 60 * 60 * 1000;
 const asyncRoute = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
@@ -67,7 +68,7 @@ function publicState(userId) {
   const questionIds = new Set(questions.map(q => q.id));
   return {
     users: s.users.filter(u => alive.has(u.id)).map(({ credential, login, email, role, ...u }) =>
-      u.id === userId ? { ...u, email, role: role || 'user' } : { ...u,
+      u.id === userId ? { ...u, email, role: role || 'user', isAdministrator: role === 'admin' } : { ...u, isAdministrator: role === 'admin', aiConsent: undefined,
         ...(!administrator && u.peopleVisible === false ? { about: '', interests: [] } : {}),
         email: '', ...(administrator ? { role: role || 'user' } : {}) },
     ),
@@ -112,42 +113,28 @@ router.get('/state', (req, res) => {
   res.json({ me, state: publicState(me) });
 });
 
-router.post('/auth/register', asyncRoute(async (req, res) => {
-  const email = trimmed(req.body.email).toLowerCase();
-  const password = typeof req.body.password === 'string' ? req.body.password : '';
-  const parts = trimmed(req.body.name).split(/\s+/).filter(Boolean);
+// The forum can request display-ready answer data with a real SQL JOIN.
+router.get('/questions/:id/answers', (req, res) => {
+  const me = currentUserId(req);
+  const visible = publicState(me);
+  if (!visible.questions.some(q => q.id === req.params.id)) return res.status(404).json({ error: 'NOT_FOUND' });
+  const visibleAnswers = new Set(visible.answers.map(a => a.id));
+  res.json(joinedQuestionAnswers(req.params.id).filter(a => visibleAnswers.has(a.id)));
+});
 
-  if (!EMAIL_RE.test(email) || email.length > 254)
-    return res.status(400).json({ error: 'EMAIL_INVALID' });
-  if (password.length < 8 || password.length > 128)
-    return res.status(400).json({ error: 'PASSWORD_LENGTH' });
-  if (parts.length < 2 || parts[0].length > 60 || parts.slice(1).join(' ').length > 60 || trimmed(req.body.name).length > 120)
-    return res.status(400).json({ error: 'NAME_REQUIRED' });
-  if (db.state.users.some((u) => (u.email.toLowerCase() === email || u.login?.toLowerCase() === email)))
-    return res.status(409).json({ error: 'EMAIL_TAKEN' });
-
-  const id = uid();
-  const user = {
-    id,
-    role: 'user',
-    firstName: parts.shift(),
-    lastName: parts.join(' '),
-    email,
-    credential: await passwordCredential(password),
-    direction: '',
-    course: 1,
-    languages: [],
-    interests: [],
-    skills: [],
-    about: '',
-    color: db.state.users.length % 5,
-  };
-  // Пока вычислялся хэш, другой запрос мог зарегистрировать ту же почту.
-  if (db.state.users.some(u => (u.email.toLowerCase() === email || u.login?.toLowerCase() === email)))
-    return res.status(409).json({ error: 'EMAIL_TAKEN' });
-  const state = prepareReviews(db.state, { ...db.state, users: [...db.state.users, user] });
-  res.status(201).json(sessionResponse(id, state));
-  reviewWorker.start();
+router.use('/auth', createRegistrationRouter({
+  sql, getData: () => db,
+  onVerified(user, { beforeCommit }) {
+    if (db.state.users.some(u => u.email.toLowerCase() === user.email || u.login?.toLowerCase() === user.email))
+      throw Object.assign(new Error('EMAIL_TAKEN'), {status:409,code:'EMAIL_TAKEN'});
+    const state = prepareReviews(db.state, { ...db.state, users: [...db.state.users, user] });
+    const token = crypto.randomBytes(24).toString('hex');
+    const sessions = Object.fromEntries(Object.entries(db.sessions).filter(([, s]) => s.expiresAt > Date.now()));
+    sessions[token] = { userId: user.id, expiresAt: Date.now() + SESSION_TTL };
+    commit({ state, sessions }, { beforeCommit });
+    reviewWorker.start();
+    return { token, me: user.id, state: publicState(user.id) };
+  },
 }));
 
 router.post('/auth/login', asyncRoute(async (req, res) => {
@@ -204,6 +191,12 @@ const actions = {
     s, me, text(a.chatId, 100), text(a.body, 2000),
     a.clientId === undefined ? undefined : text(a.clientId, 100),
   ),
+  setAIConsent: (s, me, a) => {
+    if (typeof a.consent !== 'boolean') throw new Error('INVALID_DATA');
+    const provider = loadChatBotConfig().provider;
+    return { ...s, users: s.users.map(u => u.id !== me ? u : { ...u, aiConsent: a.consent ? { version: AI_CONSENT_VERSION, provider, acceptedAt: Date.now(), adultConfirmed: true } : { version: AI_CONSENT_VERSION, provider, acceptedAt: null, adultConfirmed: false } }),
+      chats: s.chats.map(c => !c.members.includes(me) || a.consent || c.botJob?.status !== 'pending' ? c : { ...c, botJob: { ...c.botJob, status: 'error', error: 'BOT_CONSENT_REQUIRED' } }) };
+  },
   setBotConsent: (s, me, a) => setBotConsent(s, me, text(a.chatId, 100), a.consent),
   retryBotReply: (s, me, a) => retryBotReply(s, me, text(a.chatId, 100)),
   markChatRead: (s, me, a) => markChatRead(s, me, text(a.chatId, 100), text(a.throughId, 100)),

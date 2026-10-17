@@ -8,16 +8,16 @@ import { passwordCredential } from '../src/domain.js';
 import { loadKnowledge, validateKnowledgeOverride } from '../server/knowledge-store.js';
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'medium-community-'));
 process.env.DATA_DIR = dir;
-const { db, commit } = await import('../server/store.js');
+const { db, commit, sql } = await import('../server/store.js');
 const { createCommunityRouter } = await import('../server/community.js');
 test('community boundaries, decisions, appeal identity and persisted directory', async () => {
   const credential = await passwordCredential('Test-only-Password-123');
   const users = ['user', 'other', 'admin', 'banned'].map(id => ({ id, firstName: 'Тест', lastName: 'Тестов', direction: '', about: '', course: 1, languages: [], interests: [], skills: [], login: id, email: `${id}@example.test`, credential, role: id === 'admin' ? 'admin' : 'user', ...(id === 'banned' ? { bannedAt: 123, bannedBy: 'admin' } : {}) }));
-  commit({ state: { ...db.state, users, questions: [{ id: 'q', authorId: 'other', title: 'Вопрос', body: '', category: 'Учёба', createdAt: 1 }, { id: 'hidden', authorId: 'banned', title: 'Вопрос', body: '', category: 'Учёба', createdAt: 1 }], answers: [], helpRequests: [] }, sessions: Object.fromEntries(users.map(u => [u.id, { userId: u.id, expiresAt: Date.now() + 60000 }])) });
+  commit({ state: { ...db.state, users, questions: [{ id: 'q', authorId: 'other', title: 'Вопрос', body: '', category: 'Учёба', createdAt: 1 }, { id: 'hidden', authorId: 'banned', title: 'Вопрос', body: '', category: 'Учёба', createdAt: 1 }], answers: [], helpRequests: [] }, sessions: Object.fromEntries(users.map((u,i) => [(i+1).toString(16).repeat(48), { userId: u.id, expiresAt: Date.now() + 60000 }])) });
   const app = express(); app.use(express.json()); app.use('/community', createCommunityRouter());
   const server = app.listen(0, '127.0.0.1'); await new Promise(resolve => server.once('listening', resolve));
   const base = `http://127.0.0.1:${server.address().port}/community`;
-  async function request(url, token, method = 'GET', body) { const res = await fetch(base + url, { method, headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) }); return { status: res.status, data: await res.json() }; }
+  async function request(url, token, method = 'GET', body) { const res = await fetch(base + url, { method, headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${(['user','other','admin','banned'].indexOf(token)+1).toString(16).repeat(48)}` } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) }); return { status: res.status, data: await res.json() }; }
   try {
     assert.equal((await request('/admin')).status, 401);
     assert.equal((await request('/admin', 'user')).status, 403);
@@ -41,10 +41,10 @@ test('community boundaries, decisions, appeal identity and persisted directory',
     assert.equal((await request('/admin/directory/schedule', 'user', 'PUT', entry)).status, 403);
     assert.equal((await request('/admin/directory/schedule', 'admin', 'PUT', { ...entry, source: 'javascript:alert(1)' })).status, 400);
     assert.equal((await request('/admin/directory/schedule', 'admin', 'PUT', entry)).status, 200);
-    const persisted = JSON.parse(fs.readFileSync(path.join(dir, 'db.json'))).state;
-    assert.equal(persisted.knowledgeOverrides.schedule.office, '100'); assert.equal(persisted.reports[0].status, 'resolved'); assert.equal(persisted.appeals.length, 1);
+    const persisted = (await import('../server/sqlite-store.js')).openSqliteStore({file:path.join(dir,'medium.sqlite')}); const saved = persisted.read().state; persisted.close();
+    assert.equal(saved.knowledgeOverrides.schedule.office, '100'); assert.equal(saved.reports[0].status, 'resolved'); assert.equal(saved.appeals.length, 1);
     const view = await request('/admin', 'admin'); assert.equal(view.status, 200); assert.equal(view.data.directory.find(x => x.id === 'schedule').directory.office, '100');
-  } finally { await new Promise(resolve => server.close(resolve)); fs.rmSync(dir, { recursive: true, force: true }); }
+  } finally { await new Promise(resolve => server.close(resolve)); sql.close(); fs.rmSync(dir, { recursive: true, force: true }); }
 });
 test('knowledge override keeps stable identity and replaces stale location', () => {
   const entry = { office: '42', building: '', hours: '', contact: '', checkedAt: '2026-01-01', source: 'https://www.rea.ru/' };

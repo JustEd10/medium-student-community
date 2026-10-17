@@ -1,4 +1,4 @@
-import { tokens, users } from './data.js';
+import { lesson } from './store.js';
 
 export function getToken(req) {
   const header = req.headers.authorization || '';
@@ -6,10 +6,9 @@ export function getToken(req) {
 }
 
 export function checkToken(req, res, next) {
-  const login = tokens.get(getToken(req));
-  if (!login)
+  const user = lesson.userForToken(getToken(req));
+  if (!user)
     return res.status(401).json({ error: 'Нужен токен, сначала войди через POST /api/login' });
-  req.user = users.find((u) => u.login === login);
-  if (!req.user) return res.status(401).json({ error: 'Пользователь не найден' });
+  req.user = user;
   next();
 }

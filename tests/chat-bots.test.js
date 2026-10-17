@@ -149,3 +149,16 @@ test('Groq alternate uses its fixed endpoint and no silent switch from Gemini', 
   assert.equal(reply, 'Hello!');
   await assert.rejects(generateChatReply({ provider: 'gemini' }, { config: groq }), /BOT_UNAVAILABLE/);
 });
+
+test('registration consent enables all bot chats and profile revocation supersedes legacy chat consent', async () => {
+  const { state, chatId } = fixture();
+  let next = { ...state, users: state.users.map(u => u.id !== 'alina' ? u : { ...u, aiConsent: { version: 1, provider: 'gemini', acceptedAt: now, adultConfirmed: true } }),
+    chats: state.chats.map(c => c.id !== chatId ? c : { ...c, botConsentAt: null, botConsentProvider: null }) };
+  assert.equal(validState(next),true);
+  assert.equal(sendBotMessage(next,'alina',chatId,'Привет!','consent-global',config,now).chats.find(c=>c.id===chatId).botJob.status,'pending');
+  next = { ...next, users: next.users.map(u => u.id !== 'alina' ? u : { ...u, aiConsent: { version: 1, provider: 'gemini', acceptedAt: null, adultConfirmed: false } }),
+    chats: next.chats.map(c => c.id !== chatId ? c : { ...c, botConsentAt: now, botConsentProvider:'gemini' }) };
+  assert.equal(validState(next),true);
+  assert.throws(()=>sendBotMessage(next,'alina',chatId,'Привет!','revoked-global',config,now),/BOT_CONSENT_REQUIRED/);
+  assert.equal(validState({ ...next, users: next.users.map(u => u.id !== 'alina' ? u : { ...u, aiConsent: { version:1,provider:'gemini',acceptedAt:now,adultConfirmed:false } }) }),false);
+});

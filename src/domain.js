@@ -1,4 +1,5 @@
 import { validCommunityState } from './community-schema.js';
+import { validAIConsent } from './ai-consent.js';
 import { validNotificationReads } from './notifications.js';
 import { isBotUser, BOT_ERROR_TEXT } from './bot-personas.js';
 export const STORAGE_KEY = 'medium.frontend.v1';
@@ -139,7 +140,7 @@ export function rateHelp(state, actor, helpId, value) {
 
 // в рейтинг идут оценки и за ответы, и за помощь с учёбой
 export function rankings(state) {
-  const rows = state.users.filter(user => user.deletedAt == null && user.role !== 'admin').map((user) => {
+  const rows = state.users.filter(user => user.deletedAt == null && user.role !== 'admin' && !user.isAdministrator).map((user) => {
     const answerRatings = state.answers
       .filter((a) => a.authorId === user.id && a.rating != null && a.deletedAt == null &&
         state.questions.some(q => q.id === a.questionId && q.deletedAt == null))
@@ -313,6 +314,7 @@ export function validState(value) {
     u.course <= 6 &&
     [u.languages, u.interests, u.skills].every(isTextList) &&
     validCredential(u.credential) &&
+    validAIConsent(u.aiConsent) &&
     (u.botPersona === undefined || (isBotUser(u) && u.credential === null && u.role === 'user')) &&
     (u.bannedAt == null || (Number.isFinite(u.bannedAt) && isUser(u.bannedBy))) &&
     (u.studyHelpVisible === undefined || typeof u.studyHelpVisible === 'boolean') &&

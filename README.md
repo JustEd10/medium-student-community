@@ -45,9 +45,20 @@ curl http://localhost:3000/api/app/state
 
 [Полный список методов и примеры запросов](docs/API.md). Учебное задание можно показать на странице `/app/`; она использует отдельные данные и сессии.
 
+## База данных
+
+[Схема, связи, транзакции, индексы, перенос данных и восстановление](docs/database/README.md).
+
+```sh
+npm run db:verify
+npm run db:benchmark
+```
+
+[Коллекция Postman для локальной проверки](docs/database/Medium-SQLite.postman_collection.json).
+
 ## Размещение и материалы
 
-Основной сайт сохраняет данные в JSON-файле. Для Docker и Amvera нужен постоянный каталог `/data` и одна реплика приложения. [Инструкция размещения](deploy/amvera/README.md).
+Основной сайт и учебное API сохраняют данные в SQLite (`DATA_DIR/medium.sqlite`). При первом запуске существующий `db.json` переносится автоматически и остаётся неизменным. Для Docker и Amvera нужен постоянный каталог `/data` и одна реплика приложения. [Инструкция размещения](deploy/amvera/README.md).
 
 - [Скриншоты сайта и работы API](docs/screenshots/README.md).
 - [Отчёт проекта](docs/REPORT.md).

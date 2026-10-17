@@ -1,5 +1,6 @@
 import { BOT_PERSONAS, BOT_ERROR_TEXT, isBotUser, botSystemInstruction } from '../src/bot-personas.js';
 import { sendMessage } from '../src/domain.js';
+import { hasChatConsent } from '../src/ai-consent.js';
 import { generateChatReply, chatBotReady, loadChatBotConfig } from './chat-provider.js';
 
 export function provisionChatBots(state) {
@@ -22,7 +23,7 @@ function conversation(state, actor, chatId) {
   const chat = state.chats.find(c => c.id === chatId && c.deletedAt == null && c.members.includes(actor));
   const bot = chat && state.users.find(u => cPartner(chat, actor) === u.id && isBotUser(u) && u.deletedAt == null && u.bannedAt == null);
   if (!human || !bot) throw new Error('CHAT_NOT_ALLOWED');
-  return { chat, bot };
+  return { chat, bot, human };
 }
 const cPartner = (chat, actor) => chat.members.find(id => id !== actor);
 
@@ -37,7 +38,7 @@ export function setBotConsent(state, actor, chatId, consent, now = Date.now(), c
 
 function reserve(state, actor, chat, config, now) {
   if (!chatBotReady(config)) throw new Error('BOT_UNAVAILABLE');
-  if (!chat.botConsentAt || chat.botConsentProvider !== config.provider) throw new Error('BOT_CONSENT_REQUIRED');
+  if (!hasChatConsent(state.users.find(u => u.id === actor), chat, config.provider)) throw new Error('BOT_CONSENT_REQUIRED');
   if (chat.botJob?.status === 'pending') throw new Error('BOT_BUSY');
   const day = new Date(now).toISOString().slice(0, 10);
   const usage = state.botUsage?.day === day ? state.botUsage : { day, total: 0, users: {} };
@@ -72,8 +73,8 @@ export function retryBotReply(state, actor, chatId, config = loadChatBotConfig()
 }
 
 function prompt(state, chatId, job) {
-  const { chat, bot } = conversation(state, job.actor, chatId);
-  if (!chat.botConsentAt || chat.botConsentProvider !== job.provider || chat.botJob?.status !== 'pending' || chat.botJob.messageId !== job.messageId || chat.botJob.requestedAt !== job.requestedAt) throw new Error('BOT_CONTEXT_CHANGED');
+  const { chat, bot, human } = conversation(state, job.actor, chatId);
+  if (!hasChatConsent(human, chat, job.provider) || chat.botJob?.status !== 'pending' || chat.botJob.messageId !== job.messageId || chat.botJob.requestedAt !== job.requestedAt) throw new Error('BOT_CONTEXT_CHANGED');
   const index = chat.messages.findIndex(m => m.id === job.messageId && m.senderId === job.actor && m.deletedAt == null);
   if (index < 0) throw new Error('BOT_CONTEXT_CHANGED');
   // Only this conversation; no email, profile, other chats or internal IDs leave the server.

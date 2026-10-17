@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useApp } from './context';
 import { fullName, uid } from './domain';
 import { DeleteControl } from './AdminModeration';
+import { hasChatConsent } from './ai-consent';
 import { isBotUser, BOT_ERROR_TEXT } from './bot-personas';
 import {
   Avatar,
@@ -38,8 +39,7 @@ export function Chats({ id }) {
     current && state.users.find((u) => u.id === current.members.find((m) => m !== me?.id));
   const bot = isBotUser(partner);
   const botWaiting = bot && current?.botJob?.status === 'pending';
-  const botLocked = bot && (!state.chatAI?.ready || !current?.botConsentAt || current?.botConsentProvider !== state.chatAI?.provider || botWaiting);
-  const [consentBusy, setConsentBusy] = useState(false);
+  const botLocked = bot && (!state.chatAI?.ready || !hasChatConsent(me, current, state.chatAI?.provider) || botWaiting);
   const localMessages = outbox.filter(message =>
     message.chatId === current?.id && message.senderId === me?.id &&
     !current.messages.some(saved => saved.clientId === message.clientId),
@@ -294,23 +294,11 @@ export function Chats({ id }) {
                   />
                 )}
               </div>
-              {bot && <div className="bot-chat-info">
-                <p>{state.chatAI?.provider === 'groq' ? 'Groq' : 'Gemini'} · {t('AI-собеседник для языковой практики', 'AI language partner')}</p>
-                <details>
-                  <summary>{t('Как обрабатываются сообщения', 'How messages are processed')}</summary>
-                  <p>{t('Это вымышленный персонаж. Ответы могут содержать ошибки. Во внешний сервис передаются только последние сообщения этого диалога. Не отправляй личные данные.', 'This is a fictional character. Replies may contain mistakes. Only recent messages from this conversation go to the external service. Do not send personal data.')}</p>
-                  {state.chatAI?.provider !== 'groq' && <p>{t('В бесплатном API Google может использовать текст для улучшения моделей.', 'Google may use free API text to improve its models.')}</p>}
-                </details>
+              {bot && <div className="bot-chat-status" aria-live="polite">
                 {!state.chatAI?.ready && <p role="status">{t(...BOT_ERROR_TEXT.BOT_UNAVAILABLE)}</p>}
-                <label className="bot-chat-consent">
-                  <input type="checkbox" checked={!!current.botConsentAt && current.botConsentProvider === state.chatAI?.provider} disabled={consentBusy}
-                    onChange={async event => {
-                      setConsentBusy(true);
-                      try { await act('setBotConsent', { chatId: current.id, consent: event.target.checked }); }
-                      finally { setConsentBusy(false); }
-                    }} />
-                  <span>{t('Мне есть 18 лет. Разрешаю передавать сообщения этого чата в', 'I am 18 or older. I agree to send messages from this chat to')} {state.chatAI?.provider === 'groq' ? 'Groq' : 'Gemini'} {t('для ответа.', 'for replies.')}</span>
-                </label>
+                {!hasChatConsent(me, current, state.chatAI?.provider) && <p>
+                  {t('Для общения с AI подтверди согласие в', 'To chat with AI, give your consent in your')} <Link to="/profile">{t('профиле', 'profile')}</Link>.
+                </p>}
                 {botWaiting && <p role="status">{t('AI готовит ответ…', 'AI is preparing a reply…')}</p>}
                 {current.botJob?.status === 'error' && <div role="status">
                   <p>{t(...(BOT_ERROR_TEXT[current.botJob.error] || BOT_ERROR_TEXT.BOT_FAILED))}</p>

@@ -32,7 +32,7 @@ test('state survives a new process; expired and legacy sessions do not', () => {
       }});
     `);
     assert.equal(created.status, 0, created.stderr);
-    assert.deepEqual(readdirSync(dir).sort(), ['backups', 'db.json']);
+    assert.deepEqual(readdirSync(dir).sort(), ['backups', 'medium.sqlite']);
     const reopened = inStore(dir, `
       import { db } from './server/store.js';
       const message = db.state.chats[0].messages.at(-1);
@@ -85,7 +85,7 @@ test('empty install and private hashed bootstrap are idempotent and reject inval
     `);
     assert.equal(created.status, 0, created.stderr);
     assert.deepEqual(JSON.parse(created.stdout), { count: 1, role: 'admin' });
-    assert.ok(!readFileSync(join(dir, 'db.json'), 'utf8').includes('fabricated-admin-pass'));
+    assert.ok(!readFileSync(join(dir, 'medium.sqlite')).includes(Buffer.from('fabricated-admin-pass')));
     const reopened = inStore(dir, `import { db } from './server/store.js'; import { provisionAdministrator } from './server/admin.js'; provisionAdministrator(); console.log(db.state.users.length);`);
     assert.equal(reopened.stdout.trim(), '1');
   } finally { rmSync(dir, { recursive: true, force: true }); }
@@ -124,14 +124,16 @@ test('failed due backup blocks mutation and keeps memory and disk aligned', () =
   try {
     const result = inStore(dir, `
       import fs from 'node:fs';
-      import { db, commit, getBackupStatus } from './server/store.js';
+      import { db, commit, getBackupStatus, sql } from './server/store.js';
       import { createSeed } from './src/data.js';
-      fs.writeFileSync(process.env.BACKUP_DIR, 'blocked destination');
       commit({state:createSeed(),sessions:{}});
-      const before = fs.readFileSync(process.env.DATA_DIR+'/db.json','utf8');
+      fs.rmSync(process.env.BACKUP_DIR,{recursive:true});
+      fs.writeFileSync(process.env.BACKUP_DIR, 'blocked destination');
+      const clock = Date.now; Date.now = () => clock() + 2 * 86400000;
+      const before = JSON.stringify(sql.prepare('SELECT * FROM users').all());
       const next = structuredClone(db); next.state.users[0].about = 'must not persist';
       let code; try { commit(next); } catch (error) { code = error.code; }
-      console.log(JSON.stringify({ code, sameDisk: before === fs.readFileSync(process.env.DATA_DIR+'/db.json','utf8'),
+      console.log(JSON.stringify({ code, sameDisk: before === JSON.stringify(sql.prepare('SELECT * FROM users').all()),
         sameMemory: db.state.users[0].about !== 'must not persist', backupError:getBackupStatus().error }));
     `);
     assert.equal(result.status, 0, result.stderr);
@@ -139,7 +141,7 @@ test('failed due backup blocks mutation and keeps memory and disk aligned', () =
   } finally { rmSync(dir,{recursive:true,force:true}); }
 });
 
-test('rename failure leaves memory unchanged and cleans temporary writes', () => {
+test('replaced SQLite path refuses writes and leaves cached state unchanged', () => {
   const dir = mkdtempSync(join(tmpdir(), 'medium-rename-failure-'));
   try {
     const result = inStore(dir, `
@@ -147,7 +149,7 @@ test('rename failure leaves memory unchanged and cleans temporary writes', () =>
       import { db, commit } from './server/store.js';
       import { createSeed } from './src/data.js';
       commit({state:createSeed(),sessions:{}});
-      fs.unlinkSync(process.env.DATA_DIR+'/db.json'); fs.mkdirSync(process.env.DATA_DIR+'/db.json');
+      fs.renameSync(process.env.DATA_DIR+'/medium.sqlite',process.env.DATA_DIR+'/moved.sqlite'); fs.mkdirSync(process.env.DATA_DIR+'/medium.sqlite');
       const next = structuredClone(db); next.state.users[0].about = 'must not persist';
       let code; try { commit(next); } catch(error) { code=error.code; }
       console.log(JSON.stringify({code,unchanged:db.state.users[0].about !== 'must not persist',temp:fs.readdirSync(process.env.DATA_DIR).some(n=>n.endsWith('.tmp'))}));

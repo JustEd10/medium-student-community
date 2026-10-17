@@ -41,7 +41,7 @@ async function request(path, { method = 'GET', body, token, signal, timeout = 15
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     const data = await res.json().catch(() => null);
-    if (!res.ok) throw Object.assign(new Error(data?.error || 'SERVER_ERROR'), { status: res.status });
+    if (!res.ok) throw Object.assign(new Error(data?.error || 'SERVER_ERROR'), { status: res.status, payload: data });
     if (!data || typeof data !== 'object') throw Object.assign(new Error('SERVER_ERROR'), { status: 502 });
     return data;
   } finally {
@@ -204,13 +204,16 @@ export function AppProvider({ children }) {
     sessionGeneration.current += 1;
     invalidate();
     try {
-      const result = await request(`/auth/${kind}`, { method: 'POST', body });
+      const result = await request(`/auth/${kind}`, { method: 'POST', body, timeout: 35000 });
+      if (kind === 'register' || kind === 'register/resend') return { challenge: result };
       if (typeof result.token !== 'string' || !result.me) throw new Error('SERVER_ERROR');
       apply(result);
       token.current = result.token;
       write(TOKEN_KEY, result.token);
       return null;
     } catch (err) {
+      if ((kind === 'register' || kind === 'register/resend') && err.payload?.challengeId)
+        return { challenge: err.payload, pendingError: err.message };
       return err.status ? err.message : 'NETWORK';
     } finally {
       authBusy.current = false;
