@@ -422,8 +422,7 @@ export function StudentCard({ user }) {
       )}
       <p className="student-details">
         {user.direction}
-        <br />
-        {user.course} {t('курс', 'year')}
+        <br />{user.course} {t('курс', 'year')}
       </p>
       <Tags values={user.languages} />
       <Tags values={user.interests} kind="interest" />

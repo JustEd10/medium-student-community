@@ -1,5 +1,6 @@
 import { validCommunityState } from './community-schema.js';
 import { validNotificationReads } from './notifications.js';
+import { isBotUser, BOT_ERROR_TEXT } from './bot-personas.js';
 export const STORAGE_KEY = 'medium.frontend.v1';
 
 export const fullName = (user) => (user ? `${user.firstName} ${user.lastName}`.trim() : 'Медиум');
@@ -312,6 +313,7 @@ export function validState(value) {
     u.course <= 6 &&
     [u.languages, u.interests, u.skills].every(isTextList) &&
     validCredential(u.credential) &&
+    (u.botPersona === undefined || (isBotUser(u) && u.credential === null && u.role === 'user')) &&
     (u.bannedAt == null || (Number.isFinite(u.bannedAt) && isUser(u.bannedBy))) &&
     (u.studyHelpVisible === undefined || typeof u.studyHelpVisible === 'boolean') &&
     (u.peopleVisible === undefined || typeof u.peopleVisible === 'boolean') &&
@@ -350,6 +352,14 @@ export function validState(value) {
     if (!isTextList(c.members) || c.members.length !== 2) return false;
     if (c.members[0] === c.members[1] || !c.members.every(isUser)) return false;
     if (!Array.isArray(c.messages) || !uniqueIds(c.messages)) return false;
+    if (c.botConsentAt != null && (!Number.isFinite(c.botConsentAt) || c.botConsentAt <= 0)) return false;
+    if (c.botConsentProvider != null && !['gemini', 'groq'].includes(c.botConsentProvider)) return false;
+    if (c.botJob !== undefined) {
+      const j = c.botJob;
+      if (!j || !c.members.includes(j.actor) || !c.messages.some(m => m.id === j.messageId && m.senderId === j.actor) ||
+        !Number.isFinite(j.requestedAt) || !['gemini', 'groq'].includes(j.provider) || !['pending', 'done', 'error'].includes(j.status) ||
+        (j.status === 'error' && !Object.hasOwn(BOT_ERROR_TEXT, j.error))) return false;
+    }
     return c.messages.every(
       (m) => c.members.includes(m.senderId) && isText(m.body) && Number.isFinite(m.createdAt) &&
         (m.readAt == null || (Number.isFinite(m.readAt) && m.readAt >= m.createdAt)) &&
@@ -358,6 +368,12 @@ export function validState(value) {
   };
 
   return (
+    (value.botUsage === undefined || (value.botUsage && /^\d{4}-\d{2}-\d{2}$/.test(value.botUsage.day) &&
+      Number.isInteger(value.botUsage.total) && value.botUsage.total >= 0 && value.botUsage.total <= 20 &&
+      value.botUsage.users && typeof value.botUsage.users === 'object' && !Array.isArray(value.botUsage.users) &&
+      Object.entries(value.botUsage.users).every(([id, usage]) => isUser(id) && usage &&
+        Number.isInteger(usage.count) && usage.count >= 0 && usage.count <= 10 && Number.isFinite(usage.lastAt)) &&
+      Object.values(value.botUsage.users).reduce((sum, usage) => sum + usage.count, 0) === value.botUsage.total)) &&
     validNotificationReads(value.notificationReads, userIds) &&
     validCommunityState(value, userIds) &&
     value.users.every(userOk) &&

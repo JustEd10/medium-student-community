@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createEmptyState } from '../src/data.js';
 import { validState } from '../src/domain.js';
+import { isBotUser } from '../src/bot-personas.js';
 import { createBackupManager } from './backups.js';
 import { createDriveBackupUploader } from './drive-backups.js';
 
@@ -22,7 +23,7 @@ try {
   db.sessions = Object.fromEntries(Object.entries(saved.sessions || {}).filter(([token, session]) =>
     /^[a-f0-9]{48}$/.test(token) && session && typeof session === 'object' &&
     Number.isFinite(session.expiresAt) && session.expiresAt > Date.now() &&
-    db.state.users.some(u => u.id === session.userId && u.credential && u.deletedAt == null && u.bannedAt == null),
+    db.state.users.some(u => u.id === session.userId && u.credential && !isBotUser(u) && u.deletedAt == null && u.bannedAt == null),
   ));
 } catch (err) {
   if (err.code !== 'ENOENT') throw new Error(`Не удалось прочитать базу ${file}: ${err.message}`);

@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import './moderation.css';
+import { BOT_ERROR_TEXT } from './bot-personas';
 
 const Context = createContext(null);
 const TOKEN_KEY = 'medium.token';
@@ -182,6 +183,8 @@ export function AppProvider({ children }) {
           if (!silent) setNotice(t('Нет связи с сервером. Попробуй ещё раз.', 'Cannot reach the server. Try again.'));
         } else if (err.message === 'STORAGE_UNAVAILABLE') {
           if (!silent) setNotice(t('Сервер не смог сохранить данные. Попробуй позже.', 'The server could not save your data. Try again later.'));
+        } else if (Object.hasOwn(BOT_ERROR_TEXT, err.message)) {
+          if (!silent) setNotice(t(...BOT_ERROR_TEXT[err.message]));
         } else {
           if (!silent) setNotice(t('Не удалось сохранить. Проверь данные и попробуй снова.', 'Could not save. Check the data and try again.'));
         }

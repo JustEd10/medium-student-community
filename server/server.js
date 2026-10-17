@@ -12,8 +12,10 @@ import appRoutes from './routes/app.js';
 import { provisionAdministrator } from './admin.js';
 import { createAssistantRouter } from './assistant.js';
 import { recoverReviews } from './review-worker.js';
+import { initializeChatBots } from './bot-worker.js';
 
 provisionAdministrator();
+initializeChatBots();
 recoverReviews();
 startBackupSchedule();
 setKnowledgeSource(() => db.state);

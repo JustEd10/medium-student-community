@@ -7,6 +7,10 @@ import { startAutomaticAnswer } from '../assistant.js';
 import { prepareReviews, adminReviewAction } from '../ai-moderation.js';
 import { reviewWorker } from '../review-worker.js';
 import { getToken } from '../auth.js';
+import { isBotUser } from '../../src/bot-personas.js';
+import { sendBotMessage, setBotConsent, retryBotReply } from '../chat-bots.js';
+import { chatBotReady, loadChatBotConfig } from '../chat-provider.js';
+import { botWorker } from '../bot-worker.js';
 import { CATEGORIES, INTERESTS, LANGUAGES } from '../../src/data.js';
 import { deleteContent, restoreContent, setUserBan } from '../../src/moderation.js';
 import {
@@ -26,7 +30,6 @@ import {
   rateAnswer,
   rateHelp,
   saveProfile,
-  sendMessage,
   uid,
   validState,
 } from '../../src/domain.js';
@@ -50,15 +53,16 @@ function currentUserId(req) {
   const session = db.sessions[getToken(req)];
   if (!session || session.expiresAt <= Date.now()) return null;
   const id = session.userId;
-  return db.state.users.some((u) => u.id === id && u.credential && u.deletedAt == null && u.bannedAt == null) ? id : null;
+  return db.state.users.some((u) => u.id === id && u.credential && !isBotUser(u) && u.deletedAt == null && u.bannedAt == null) ? id : null;
 }
 
 // пользователям отдаём всё, кроме паролей и чужих почт; чаты только свои
 function publicState(userId) {
   const s = db.state;
+  const botConfig = loadChatBotConfig();
   const administrator = s.users.some(u => u.id === userId && u.role === 'admin' && u.deletedAt == null && u.bannedAt == null);
   // Старые демонстрационные анкеты без учётных данных не участвуют в рабочем сайте.
-  const alive = new Set(s.users.filter(u => u.deletedAt == null && u.credential && (administrator || u.bannedAt == null)).map(u => u.id));
+  const alive = new Set(s.users.filter(u => u.deletedAt == null && (u.credential || isBotUser(u)) && (administrator || u.bannedAt == null)).map(u => u.id));
   const questions = s.questions.filter(q => q.deletedAt == null && alive.has(q.authorId));
   const questionIds = new Set(questions.map(q => q.id));
   return {
@@ -78,6 +82,7 @@ function publicState(userId) {
       (administrator || c.members.includes(userId))).map(c => ({ ...c,
         messages: c.messages.filter(m => m.deletedAt == null && alive.has(m.senderId)) })),
     trash: [],
+    chatAI: { ready: chatBotReady(botConfig), provider: botConfig.provider },
     notifications: notificationsFor(s, userId),
     ...(administrator ? { aiReviews: s.aiReviews || {} } : {}),
   };
@@ -148,11 +153,11 @@ router.post('/auth/register', asyncRoute(async (req, res) => {
 router.post('/auth/login', asyncRoute(async (req, res) => {
   const identity = trimmed(req.body.identity ?? req.body.email).toLowerCase();
   const password = req.body.password;
-  if (typeof password !== 'string' || password.length < 8 || password.length > 128)
+  if (!identity || typeof password !== 'string' || password.length < 8 || password.length > 128)
     return res.status(401).json({ error: 'BAD_CREDENTIALS' });
   const user = db.state.users.find((u) => u.deletedAt == null && u.bannedAt == null &&
     (u.email === identity || (u.role === 'admin' && u.login === identity)));
-  if (!user || !user.credential) return res.status(401).json({ error: 'BAD_CREDENTIALS' });
+  if (!user || !user.credential || isBotUser(user)) return res.status(401).json({ error: 'BAD_CREDENTIALS' });
   const check = await passwordCredential(password, user.credential.salt);
   if (!samePassword(user.credential, check) || !db.state.users.some(u => u.id === user.id && u.deletedAt == null && u.bannedAt == null && u.credential === user.credential))
     return res.status(401).json({ error: 'BAD_CREDENTIALS' });
@@ -195,10 +200,12 @@ const actions = {
   completeHelp: (s, me, a) => completeHelp(s, me, text(a.helpId, 100), text(a.helperId, 100)),
   rateHelp: (s, me, a) => rateHelp(s, me, text(a.helpId, 100), a.value),
   openChat: (s, me, a) => openChat(s, me, text(a.partner, 100)),
-  sendMessage: (s, me, a) => sendMessage(
+  sendMessage: (s, me, a) => sendBotMessage(
     s, me, text(a.chatId, 100), text(a.body, 2000),
     a.clientId === undefined ? undefined : text(a.clientId, 100),
   ),
+  setBotConsent: (s, me, a) => setBotConsent(s, me, text(a.chatId, 100), a.consent),
+  retryBotReply: (s, me, a) => retryBotReply(s, me, text(a.chatId, 100)),
   markChatRead: (s, me, a) => markChatRead(s, me, text(a.chatId, 100), text(a.throughId, 100)),
   deleteContent: (s, me, a) => deleteContent(s, me, text(a.kind, 20), text(a.id, 100)),
   setUserBan: (s, me, a) => setUserBan(s, me, text(a.id, 100), a.banned),
@@ -259,6 +266,7 @@ router.post('/act', (req, res) => {
       reviewWorker.start();
     }
     if (req.body.type === 'addQuestion' && args.autoAI !== false) startAutomaticAnswer(out.id, me);
+    if (['sendMessage', 'retryBotReply'].includes(req.body.type)) botWorker.start();
     res.json({ id: out.id, me, state: publicState(me), ...(req.body.type === 'deleteContent' ? { undoExpiresAt: actionStartedAt + 5000 } : {}) });
   } catch (err) {
     if (err.code === 'STORAGE_UNAVAILABLE')

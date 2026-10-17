@@ -37,8 +37,9 @@ before(async () => {
   state.users.push({ ...state.users[0], id: 'legacy-unregistered', email: 'legacy@example.test', credential: null });
   writeFileSync(join(dataDir, 'db.json'), JSON.stringify({ state, sessions: {} }));
   writeFileSync(join(dataDir, 'admin-bootstrap.json'), JSON.stringify({ login: 'fixture-moderator', credential }));
+  writeFileSync(join(dataDir, 'chat-bots.json'), JSON.stringify({ enabled: true, provider: 'gemini', apiKey: '' }));
   server = spawn(process.execPath, ['server/server.js'], {
-    env: { ...process.env, PORT: port, DATA_DIR: dataDir },
+    env: { ...process.env, PORT: port, DATA_DIR: dataDir, CHAT_BOTS_ENABLED: '1', CHAT_BOT_PROVIDER: 'gemini', GEMINI_CHAT_API_KEY: '', GROQ_API_KEY: '' },
     stdio: ['ignore', 'ignore', 'pipe'],
   });
   server.stderr.on('data', chunk => { startupError += chunk; });
@@ -79,6 +80,29 @@ test('legacy demo profiles are hidden and cannot authenticate', async () => {
   assert.equal((await post('/api/app/auth/login', {
     email: 'legacy@example.test', password: fixturePassword,
   })).status, 401);
+});
+
+test('AI profiles are public but cannot login; chat consent is private and a missing key prevents sending', async () => {
+  const publicData = (await call('/api/app/state')).data;
+  const bots = publicData.state.users.filter(u => u.botPersona);
+  assert.equal(bots.length, 3);
+  assert.equal(publicData.state.chatAI.ready, false);
+  assert.ok(bots.every(u => !Object.hasOwn(u, 'credential') && !Object.hasOwn(u, 'instruction')));
+  const owner = (await post('/api/app/auth/register', { name: 'Bot Fixture', email: 'bot-owner@example.test', password: fixturePassword })).data;
+  const outsider = (await post('/api/app/auth/register', { name: 'Other Fixture', email: 'bot-outsider@example.test', password: fixturePassword })).data;
+  const opened = await post('/api/app/act', { type: 'openChat', args: { partner: bots[0].id } }, owner.token);
+  assert.equal(opened.status, 200);
+  const chatId = opened.data.id;
+  assert.equal((await post('/api/app/act', { type: 'setBotConsent', args: { chatId, consent: true } }, outsider.token)).status, 403);
+  assert.equal((await post('/api/app/act', { type: 'setBotConsent', args: { chatId, consent: true } })).status, 401);
+  const consent = await post('/api/app/act', { type: 'setBotConsent', args: { chatId, consent: true } }, owner.token);
+  assert.equal(consent.status, 200);
+  assert.equal(consent.data.state.chats.find(c => c.id === chatId).botConsentProvider, 'gemini');
+  const sent = await post('/api/app/act', { type: 'sendMessage', args: { chatId, body: '你好', clientId: 'fixture-bot-message' } }, owner.token);
+  assert.equal(sent.data.error, 'BOT_UNAVAILABLE');
+  assert.equal((await call('/api/app/state', { token: owner.token })).data.state.chats.find(c => c.id === chatId).messages.length, 0);
+  assert.equal((await call('/api/app/state', { token: outsider.token })).data.state.chats.some(c => c.id === chatId), false);
+  assert.equal((await post('/api/app/auth/login', { identity: '', password: fixturePassword })).status, 401);
 });
 
 test('Bearer header is required and logout revokes a token without a body', async () => {

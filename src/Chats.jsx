@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useApp } from './context';
 import { fullName, uid } from './domain';
 import { DeleteControl } from './AdminModeration';
+import { isBotUser, BOT_ERROR_TEXT } from './bot-personas';
 import {
   Avatar,
   Empty,
@@ -35,6 +36,10 @@ export function Chats({ id }) {
   activeChat.current = current?.id;
   const partner =
     current && state.users.find((u) => u.id === current.members.find((m) => m !== me?.id));
+  const bot = isBotUser(partner);
+  const botWaiting = bot && current?.botJob?.status === 'pending';
+  const botLocked = bot && (!state.chatAI?.ready || !current?.botConsentAt || current?.botConsentProvider !== state.chatAI?.provider || botWaiting);
+  const [consentBusy, setConsentBusy] = useState(false);
   const localMessages = outbox.filter(message =>
     message.chatId === current?.id && message.senderId === me?.id &&
     !current.messages.some(saved => saved.clientId === message.clientId),
@@ -143,7 +148,7 @@ export function Chats({ id }) {
   }
   function submit(e) {
     e.preventDefault();
-    if (sending.current) return;
+    if (sending.current || botLocked) return;
     if (!body.trim()) {
       setErrors({ body: t('Напиши сообщение.', 'Write a message.') });
       return;
@@ -289,6 +294,30 @@ export function Chats({ id }) {
                   />
                 )}
               </div>
+              {bot && <div className="bot-chat-info">
+                <p>{state.chatAI?.provider === 'groq' ? 'Groq' : 'Gemini'} · {t('AI-собеседник для языковой практики', 'AI language partner')}</p>
+                <details>
+                  <summary>{t('Как обрабатываются сообщения', 'How messages are processed')}</summary>
+                  <p>{t('Это вымышленный персонаж. Ответы могут содержать ошибки. Во внешний сервис передаются только последние сообщения этого диалога. Не отправляй личные данные.', 'This is a fictional character. Replies may contain mistakes. Only recent messages from this conversation go to the external service. Do not send personal data.')}</p>
+                  {state.chatAI?.provider !== 'groq' && <p>{t('В бесплатном API Google может использовать текст для улучшения моделей.', 'Google may use free API text to improve its models.')}</p>}
+                </details>
+                {!state.chatAI?.ready && <p role="status">{t(...BOT_ERROR_TEXT.BOT_UNAVAILABLE)}</p>}
+                <label className="bot-chat-consent">
+                  <input type="checkbox" checked={!!current.botConsentAt && current.botConsentProvider === state.chatAI?.provider} disabled={consentBusy}
+                    onChange={async event => {
+                      setConsentBusy(true);
+                      try { await act('setBotConsent', { chatId: current.id, consent: event.target.checked }); }
+                      finally { setConsentBusy(false); }
+                    }} />
+                  <span>{t('Мне есть 18 лет. Разрешаю передавать сообщения этого чата в', 'I am 18 or older. I agree to send messages from this chat to')} {state.chatAI?.provider === 'groq' ? 'Groq' : 'Gemini'} {t('для ответа.', 'for replies.')}</span>
+                </label>
+                {botWaiting && <p role="status">{t('AI готовит ответ…', 'AI is preparing a reply…')}</p>}
+                {current.botJob?.status === 'error' && <div role="status">
+                  <p>{t(...(BOT_ERROR_TEXT[current.botJob.error] || BOT_ERROR_TEXT.BOT_FAILED))}</p>
+                  <button type="button" className="text-link" disabled={botLocked || pending}
+                    onClick={() => act('retryBotReply', { chatId: current.id })}>{t('Повторить запрос к AI', 'Retry AI reply')}</button>
+                </div>}
+              </div>}
               <form ref={formRef} className="message-form" onSubmit={submit} aria-busy={pending} noValidate>
                 <FormErrors errors={errors} />
                 <Field
@@ -299,7 +328,7 @@ export function Chats({ id }) {
                     <button
                       type="submit"
                       className="icon-button send-button"
-                      disabled={pending}
+                      disabled={pending || botLocked}
                       aria-label={t('Отправить сообщение', 'Send message')}
                     >
                       <Icon name="send" />
@@ -307,6 +336,7 @@ export function Chats({ id }) {
                   }
                 >
                   <textarea
+                    disabled={botLocked}
                     ref={inputRef}
                     rows={1}
                     value={body}
